@@ -1,0 +1,78 @@
+// GET STARTED
+1. Create a Django Project and App:
+>> pip install virtualenv
+>> virtualenv ims_env
+>> ims_venv\Scripts\activate
+>> cd ims_venv
+>> django-admin startproject afb_ims
+>> python manage.py startapp inv_mgt
+
+---------------------------------------------------
+2. Install Django REST framework:
+>> pip install djangorestframework
+
+---------------------------------------------------
+3. Add 'rest_framework' and 'inv_mgt' to Project's Settings:
+INSTALLED_APPS = [
+    # ...
+    'rest_framework',
+]
+
+---------------------------------------------------
+4. Create a Model:
+# models.py
+from django.db import models
+
+class MyModel(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField()
+
+---------------------------------------------------
+5. Create a Serializer:
+# serializers.py
+from rest_framework import serializers
+from .models import MyModel
+
+class MyModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MyModel
+        fields = '__all__'
+
+---------------------------------------------------
+6. Create Views:
+# views.py
+from rest_framework import viewsets
+from .models import MyModel
+from .serializers import MyModelSerializer
+
+class MyModelViewSet(viewsets.ModelViewSet):
+    queryset = MyModel.objects.all()
+    serializer_class = MyModelSerializer
+
+---------------------------------------------------
+7. Define URL Patterns:
+# urls.py
+from rest_framework.routers import DefaultRouter
+from .views import MyModelViewSet
+
+router = DefaultRouter()
+router.register(r'mymodels', MyModelViewSet)
+
+urlpatterns = router.urls
+
+---------------------------------------------------
+8. Migrate the Database:
+>> python manage.py makemigrations
+>> python manage.py migrate
+
+---------------------------------------------------
+9. Run the Development Server:
+>> python manage.py runserver
+
+
+---------------------------------------------------
+10. Test the API:
+#by making requests to the specified endpoints (e.g., http://localhost:8000/mymodels/ for the MyModel API).
+
+---------------------------------------------------
+

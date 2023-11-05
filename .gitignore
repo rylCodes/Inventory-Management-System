@@ -1,1 +1,2 @@
-.ims_venv/
+./backend/afb_ims/ims_venv/
+./frontend/ims_front/node_modules

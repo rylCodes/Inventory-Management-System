@@ -1,10 +1,16 @@
-// GET STARTED
+admin
+afb_ims2023
+
+***************************************************
+// DJANGO REST API
 1. Create a Django Project and App:
 >> pip install virtualenv
 >> virtualenv ims_env
->> ims_venv\Scripts\activate
 >> cd ims_venv
+>> ims_venv\Scripts\activate
+>> pip install django
 >> django-admin startproject afb_ims
+>> cd afb_im
 >> python manage.py startapp inv_mgt
 
 ---------------------------------------------------
@@ -72,7 +78,182 @@ urlpatterns = router.urls
 
 ---------------------------------------------------
 10. Test the API:
-#by making requests to the specified endpoints (e.g., http://localhost:8000/mymodels/ for the MyModel API).
+#by making requests to the specified endpoints
+(e.g., http://localhost:8000/mymodels/ for the MyModel API).
 
 ---------------------------------------------------
+
+***************************************************
+// DJANGO CROSS-ORIGIN RESOURCE SHARING (CORS)
+1. Install the django-cors-headers package:
+>> pip install django-cors-headers
+
+---------------------------------------------------
+2. Configure CORS settings:
+# settings.py
+INSTALLED_APPS = [
+    # ...
+    'corsheaders',
+    # ...
+]
+
+MIDDLEWARE = [
+    # ...
+    'corsheaders.middleware.CorsMiddleware',  # Add this line
+    # ...
+]
+
+CORS_ALLOW_ALL_ORIGINS = False  # Set this to False to use the CORS_ALLOWED_ORIGINS setting
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:4200',  # Replace with the URL of your Angular app
+]
+
+CORS_ALLOW_METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']
+
+---------------------------------------------------
+3. Configure Angular API Requests:
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+
+const httpOptions = {
+    headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': 'http://localhost:4200',  // Match the Django CORS settings
+    }),
+};
+
+// Make API requests using the `httpOptions` when sending requests
+
+---------------------------------------------------
+4. Django Middleware Order:
+#Ensure that the CorsMiddleware is included in the middleware list before other middlewares that handle request and response processing.
+#The order of middleware matters in Django, so make sure it's placed correctly.
+
+
+***************************************************
+// POSTGRESQL TO DJANGO
+1. Install the PostgreSQL Database:
+#Install PostgreSQL from the official website
+#(https://www.postgresql.org/download/)
+
+---------------------------------------------------
+2. Install the PostgreSQL adapter for Django:
+>>pip install psycopg2
+
+---------------------------------------------------
+3. Configure Database Settings:
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'your_database_name',
+        'USER': 'your_database_user',
+        'PASSWORD': 'your_database_password',
+        'HOST': 'localhost',  # Change to the host where your PostgreSQL server is running
+        'PORT': '',           # You can specify a port if needed
+    }
+}
+
+---------------------------------------------------
+4. Apply Database Migrations:
+>> python manage.py makemigrations
+>> python manage.py migrate
+
+---------------------------------------------------
+5. Verify the Connection:
+>> python manage.py runserver
+
+
+***************************************************
+//  DJANGO BUILT-IN USER SYSTEM FOR AUTHENTICATION
+1. Set Up Django for Authentication:
+# settings.py
+INSTALLED_APPS = [
+    # ...
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    # ...
+]
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+)
+
+---------------------------------------------------
+2. Run migrations to apply these changes:
+python manage.py makemigrations
+python manage.py migrate
+
+---------------------------------------------------
+3. Create an API Endpoint for Authentication:
+# views.py
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.response import Response
+from rest_framework import status
+
+class CustomObtainAuthToken(ObtainAuthToken):
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            user = serializer.validated_data['user']
+            # Add any additional data you want to include in the response
+            data = {
+                'user_id': user.id,
+                'username': user.username,
+                'email': user.email,
+            }
+            return Response(data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+---------------------------------------------------
+4. Create an Angular Login Component:
+// login.component.ts
+import { Component } from '@angular/core';
+import { HttpClient } from '@angular/common/http;
+import { Router } from '@angular/router';
+
+@Component({
+  selector: 'app-login',
+  templateUrl: './login.component.html',
+})
+export class LoginComponent {
+  username: string = '';
+  password: string = '';
+  loginError: string = '';
+
+  constructor(private http: HttpClient, private router: Router) {}
+
+  login() {
+    this.http.post('/api/login/', { username: this.username, password: this.password }).subscribe(
+      (data: any) => {
+        // Handle successful login
+        localStorage.setItem('token', data.token);
+        this.router.navigate(['/dashboard']); // Redirect to a protected route
+      },
+      (error) => {
+        // Handle login error
+        if (error.status === 401) {
+          this.loginError = 'Invalid credentials. Please try again.';
+        } else {
+          this.loginError = 'An error occurred. Please try again later.';
+        }
+      }
+    );
+  }
+}
+
+---------------------------------------------------
+5. Create the HTML Template for the Login Page:
+Design and create the HTML template for the login page in your Angular component.
+
+6. Handle Login and Store User Data:
+In the Angular component, you can handle the login request, receive the response data, and store the user's authentication data (e.g., token) in a secure way, such as local storage or a cookie.
+
+7. Create Routes:
+Define routes for your login page and other components in your Angular application.
+
+8. Protect Authorized Routes:
+Implement route guards in Angular to protect routes that require authentication. When a user is not logged in, they should be redirected to the login page.
+
+9. Logout Functionality:
+Create a component and route for logging out, and handle the logout process on both the Angular and Django sides.
+
 

@@ -1,9 +1,9 @@
 from rest_framework import serializers
-from .models import Category, Stock, Supplier, PurchaseBill, PurchaseItem, SalesBill, SalesItem
+from .models import Product, Stock, Supplier, PurchaseBill, PurchaseItem, SalesBill, SalesItem
 
-class CategorySerializer(serializers.ModelSerializer):
+class ProductSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Category
+        model = Product
         fields = '__all__'
 
 class StockSerializer(serializers.ModelSerializer):

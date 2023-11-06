@@ -2,9 +2,9 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    # Category URLs
-    path('categories/', views.CategoryList.as_view(), name='category-list'),
-    path('categories/<int:pk>/', views.CategoryDetail.as_view(), name='category-detail'),
+    # Product URLs
+    path('products/', views.ProductList.as_view(), name='product-list'),
+    path('products/<int:pk>/', views.ProductDetail.as_view(), name='product-detail'),
 
     # Supplier URLs
     path('suppliers/', views.SupplierList.as_view(), name='supplier-list'),
@@ -27,6 +27,6 @@ urlpatterns = [
     path('sales-item/<int:pk>/', views.SalesItemDetail.as_view(), name='sales-item-detail'),
 
     # Stock URLs
-    path('stock/', views.StockList.as_view(), name='stock-list'),
-    path('stock/<int:pk>/', views.StockDetail.as_view(), name='stock-detail'),
+    path('stocks/', views.StockList.as_view(), name='stock-list'),
+    path('stocks/<int:pk>/', views.StockDetail.as_view(), name='stock-detail'),
 ]

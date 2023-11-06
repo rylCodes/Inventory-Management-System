@@ -1,11 +1,16 @@
 from django.core.validators import MinValueValidator
+from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import F
 from django.utils import timezone
 
-# CATEGORY
-class Category(models.Model):
-    name = models.CharField(max_length=100)
-    description = models.TextField()
+# STOCK
+class Stock(models.Model):
+    code = models.CharField(max_length=100, unique=True)
+    name = models.CharField(max_length=100, unique=True)
+    description = models.TextField(blank=True, null=True)
+    quantity = models.PositiveIntegerField(validators=[MinValueValidator(0)])
+    unit = models.CharField(max_length=200)
     date_added = models.DateTimeField(default=timezone.now)
     date_updated = models.DateTimeField(auto_now=True)
     status = models.IntegerField(default=1)
@@ -13,23 +18,38 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
-# STOCK
-class Stock(models.Model):
-    code = models.CharField(max_length=100, unique=True)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="stocks")
-    product_name = models.CharField(max_length=100, unique=True)
+    class Meta:
+        ordering = ["-date_updated"]
+
+    # def perform_sale(self, qty_sold):
+    #     self.quantity += qty_sold
+    #     self.save()
+
+    # def perform_purchase(self, qty_purchased):
+    #     self.quantity -= qty_purchased
+    #     self.save()
+
+    def perform_sale(self, qty_sold):
+        if qty_sold <= self.quantity:
+            Stock.objects.filter(pk=self.pk).update(quantity=F('quantity') - qty_sold)
+        else:
+            raise ValidationError("Quantity sold is greater than available stock!")
+
+    def perform_purchase(self, qty_purchased):
+        Stock.objects.filter(pk=self.pk).update(quantity=F('quantity') + qty_purchased)
+
+# PRODUCT    
+class Product(models.Model):
+    code = models.CharField(max_length=100)
+    name = models.CharField(max_length=200, unique=True)
+    stock_name = models.ForeignKey(Stock, on_delete=models.CASCADE)
     description = models.TextField(blank=True, null=True)
-    quantity_in_stock = models.PositiveIntegerField(validators=[MinValueValidator(0)])
+    qty_per_order = models.PositiveIntegerField(validators=[MinValueValidator(0)])
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    date_added = models.DateTimeField(default=timezone.now)
-    date_updated = models.DateTimeField(auto_now=True)
     status = models.IntegerField(default=1)
 
     def __str__(self):
-        return self.product_name
-
-    class Meta:
-        ordering = ["-date_updated"]
+        return self.name
 
 # SUPPLIER
 class Supplier(models.Model):
@@ -64,15 +84,18 @@ class PurchaseItem(models.Model):
     stock = models.ForeignKey(Stock, on_delete=models.CASCADE, related_name="purchase_items")
     billno = models.ForeignKey(PurchaseBill, on_delete=models.CASCADE)
     purchase_date = models.DateTimeField(auto_now_add=True)
-    quantity_purchased = models.PositiveIntegerField()
+    quantity_purchased = models.PositiveIntegerField(validators=[MinValueValidator(0)])
     item_price = models.DecimalField(max_digits=10, decimal_places=2)
 
     def calculate_total_price(self):
         total_price = self.quantity_purchased * self.item_price
         return total_price
+    
+    def update_stock(self):
+        self.stock.perform_purchase(self.quantity_purchased)
 
     def __str__(self):
-        return f"Bill no: {self.billno.billno}, Item = {self.stock.product_name}"
+        return f"Bill no: {self.billno.billno}, Item = {self.stock.name}"
 
 # SALES BILL
 class SalesBill(models.Model):
@@ -92,16 +115,21 @@ class SalesBill(models.Model):
 # SALES ITEM
 class SalesItem(models.Model):
     billno = models.ForeignKey(SalesBill, on_delete=models.CASCADE, related_name="sales_items")
-    stock = models.ForeignKey(Stock, on_delete=models.CASCADE)
-    quantity_sold = models.PositiveIntegerField()
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity_sold = models.PositiveIntegerField(validators=[MinValueValidator(0)])
     sale_date = models.DateTimeField(auto_now_add=True)
-
-    def item_price(self):
-        return self.stock.price
     
     def calculate_total_price(self):
-        total_price = self.quantity_sold * self.item_price()
+        total_price = self.quantity_sold * self.product.price
         return total_price
+    
+    def update_stock(self):
+        stock_qty = self.product.stock_name.quantity
+        total_qty = self.quantity_sold * self.product.qty_per_order
+        if total_qty > stock_qty:
+            raise ValidationError("Quantity sold is greater than available stock!")
+        else:
+            self.product.stock_name.perform_sale(total_qty)
 
     def __str__(self):
-        return f"{self.quantity_sold} of {self.stock.product_name} on {self.sale_date}"
+        return f"{self.quantity_sold} of {self.product.name} on {self.sale_date}"

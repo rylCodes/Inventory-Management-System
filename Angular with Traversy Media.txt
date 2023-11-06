@@ -65,12 +65,12 @@ e.g. "Inventory.ts"
 
 2. Edit "Inventory.ts":
 export interface Inventory {
-    id?: number,
-    productName: string,
-    description: string,
-    quantity: number,
-    unit: string,
-    reminder: boolean,
+    id?: number;
+    productName: string;
+    description: string;
+    quantity: number;
+    unit: string;
+    reminder: boolean;
 }
 --------------------------------------------------------------------------------
 

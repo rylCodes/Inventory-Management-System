@@ -1,0 +1,31 @@
+<div class="w-full">
+    <h1 class="px-4 font-bold text-3xl mt-8">STOCKS</h1>
+    <div class="w-full text-center shadow-xl rounded-xl mt-8">
+        <table class="w-full table-fixed rounded-xl">
+            <thead class="text-neutral-300 bg-neutral-900">
+                <th>Code</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Quantity</th>
+                <th>Unit</th>
+                <th>Date Added</th>
+                <th>Date Updated</th>
+                <th>Status</th>
+                <th>Action</th>
+            </thead>
+            <tbody>
+                <tr *ngFor="let stock of stocks">
+                    <td class="p-2">{{stock.code}}</td>
+                    <td class="p-2">{{stock.name}}</td>
+                    <td class="p-2">{{stock.description}}</td>
+                    <td class="p-2">{{stock.quantity}}</td>
+                    <td class="p-2">{{stock.unit}}</td>
+                    <td class="p-2">{{stock.date_added | date: 'dd/MM/yyyy'}}</td>
+                    <td class="p-2">{{stock.date_updated | date: 'dd/MM/yyyy'}}</td>
+                    <td class="p-2">{{stock.status? "active": "inactive"}}</td>
+                    <td class="p-2"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

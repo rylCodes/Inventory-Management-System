@@ -1,16 +1,16 @@
 from rest_framework.response import Response
 from rest_framework import generics
-from .models import Category, Stock, Supplier, PurchaseBill, PurchaseItem, SalesBill, SalesItem, Stock
-from .serializers import CategorySerializer, SupplierSerializer, PurchaseBillSerializer, PurchaseItemSerializer , SalesBillSerializer, SalesItemSerializer, StockSerializer
+from .models import Product, Stock, Supplier, PurchaseBill, PurchaseItem, SalesBill, SalesItem, Stock
+from .serializers import ProductSerializer, SupplierSerializer, PurchaseBillSerializer, PurchaseItemSerializer , SalesBillSerializer, SalesItemSerializer, StockSerializer
 
 # Category views
-class CategoryList(generics.ListCreateAPIView):
-    queryset = Category.objects.all()
-    serializer_class = CategorySerializer
+class ProductList(generics.ListCreateAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
 
-class CategoryDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Category.objects.all()
-    serializer_class = CategorySerializer
+class ProductDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
 
 # Supplier Views
 class SupplierList(generics.ListCreateAPIView):

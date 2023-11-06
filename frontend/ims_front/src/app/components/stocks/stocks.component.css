@@ -1,0 +1,11 @@
+table {
+    border-radius: 10px;
+}
+
+table tbody tr:nth-child(even) {
+    background-color: #bebebe;
+}
+
+table th {
+    padding: 10px;
+}

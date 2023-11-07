@@ -4,6 +4,9 @@ from django.db import models
 from django.db.models import F
 from django.utils import timezone
 
+# Status Fields Option
+STATUS_CHOICES = ((True, "Active"), (False, "Inactive"))
+
 # STOCK
 class Stock(models.Model):
     code = models.CharField(max_length=100, unique=True)
@@ -13,7 +16,7 @@ class Stock(models.Model):
     unit = models.CharField(max_length=200)
     date_added = models.DateTimeField(default=timezone.now)
     date_updated = models.DateTimeField(auto_now=True)
-    status = models.IntegerField(default=1)
+    status = models.BooleanField(choices=STATUS_CHOICES, default=True)
 
     def __str__(self):
         return self.name
@@ -46,7 +49,7 @@ class Product(models.Model):
     description = models.TextField(blank=True, null=True)
     qty_per_order = models.PositiveIntegerField(validators=[MinValueValidator(0)])
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    status = models.IntegerField(default=1)
+    status = models.BooleanField(choices=STATUS_CHOICES, default=True)
 
     def __str__(self):
         return self.name
@@ -57,7 +60,7 @@ class Supplier(models.Model):
     phone = models.CharField(max_length=15, unique=True)
     address = models.TextField()
     email = models.EmailField(max_length=100, unique=True)
-    status = models.IntegerField(default=1)
+    status = models.BooleanField(choices=STATUS_CHOICES, default=True)
 
     def __str__(self):
         return self.name

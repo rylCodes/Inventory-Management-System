@@ -1,16 +1,7 @@
 from rest_framework.response import Response
-from django.contrib.auth.models import User
 from rest_framework import generics
 from .models import Product, Stock, Supplier, PurchaseBill, PurchaseItem, SalesBill, SalesItem, Stock
-from .serializers import UserSerializer, ProductSerializer, SupplierSerializer, PurchaseBillSerializer, PurchaseItemSerializer , SalesBillSerializer, SalesItemSerializer, StockSerializer
-
-class UserList(generics.ListCreateAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-
-class UserDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+from .serializers import ProductSerializer, SupplierSerializer, PurchaseBillSerializer, PurchaseItemSerializer , SalesBillSerializer, SalesItemSerializer, StockSerializer
 
 # Products views
 class ProductList(generics.ListCreateAPIView):

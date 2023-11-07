@@ -1,0 +1,12 @@
+<h2>Login to RylCodes IMS</h2>
+<div>
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <label for="username">Username</label>
+        <input type="text" formControlName="username">
+
+        <label for="password">Password</label>
+        <input type="password" formControlName="password">
+
+        <button type="submit">Login</button>
+    </form>
+</div>

@@ -2,6 +2,15 @@ admin
 afb_ims2023
 
 ***************************************************
+// REQUIREMENTS
+>> pip install django
+>> pip install djangorestframework
+>> pip install markdown
+>> pip install django-filter
+>> pip install django-cors-headers
+>> pip install psycopg2
+
+***************************************************
 // DJANGO REST API
 1. Create a Django Project and App:
 >> pip install virtualenv
@@ -16,6 +25,8 @@ afb_ims2023
 ---------------------------------------------------
 2. Install Django REST framework:
 >> pip install djangorestframework
+>> pip install markdown
+>> pip install django-filter
 
 ---------------------------------------------------
 3. Add 'rest_framework' and 'inv_mgt' to Project's Settings:
@@ -137,7 +148,7 @@ const httpOptions = {
 
 ---------------------------------------------------
 2. Install the PostgreSQL adapter for Django:
->>pip install psycopg2
+>> pip install psycopg2
 
 ---------------------------------------------------
 3. Configure Database Settings:
@@ -163,97 +174,114 @@ DATABASES = {
 
 
 ***************************************************
-//  DJANGO BUILT-IN USER SYSTEM FOR AUTHENTICATION
-1. Set Up Django for Authentication:
-# settings.py
+// DJANGO-ANGULAR AUTHENTICATION
+1. Create accounts and public app:
+>> python manage.py startapp accounts
+>> python manage.py startapp public
+
+1. Edit settings.py
+#Installed apps
 INSTALLED_APPS = [
-    # ...
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    # ...
+    ...
+    'rest_framework',
+    'accounts.apps.InvMgtConfig',
+    'public.apps.PublicConfig',
 ]
 
-AUTHENTICATION_BACKENDS = (
-    'django.contrib.auth.backends.ModelBackend',
-)
-
----------------------------------------------------
-2. Run migrations to apply these changes:
-python manage.py makemigrations
-python manage.py migrate
-
----------------------------------------------------
-3. Create an API Endpoint for Authentication:
-# views.py
-from rest_framework.authtoken.views import ObtainAuthToken
-from rest_framework.response import Response
-from rest_framework import status
-
-class CustomObtainAuthToken(ObtainAuthToken):
-    def post(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data, context={'request': request})
-        if serializer.is_valid():
-            user = serializer.validated_data['user']
-            # Add any additional data you want to include in the response
-            data = {
-                'user_id': user.id,
-                'username': user.username,
-                'email': user.email,
-            }
-            return Response(data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
----------------------------------------------------
-4. Create an Angular Login Component:
-// login.component.ts
-import { Component } from '@angular/core';
-import { HttpClient } from '@angular/common/http;
-import { Router } from '@angular/router';
-
-@Component({
-  selector: 'app-login',
-  templateUrl: './login.component.html',
-})
-export class LoginComponent {
-  username: string = '';
-  password: string = '';
-  loginError: string = '';
-
-  constructor(private http: HttpClient, private router: Router) {}
-
-  login() {
-    this.http.post('/api/login/', { username: this.username, password: this.password }).subscribe(
-      (data: any) => {
-        // Handle successful login
-        localStorage.setItem('token', data.token);
-        this.router.navigate(['/dashboard']); // Redirect to a protected route
-      },
-      (error) => {
-        // Handle login error
-        if (error.status === 401) {
-          this.loginError = 'Invalid credentials. Please try again.';
-        } else {
-          this.loginError = 'An error occurred. Please try again later.';
-        }
-      }
-    );
-  }
+#At the bottom
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    ]
 }
 
 ---------------------------------------------------
-5. Create the HTML Template for the Login Page:
-Design and create the HTML template for the login page in your Angular component.
+2. Edit ACCOUNTS views.py:
+...
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
-6. Handle Login and Store User Data:
-In the Angular component, you can handle the login request, receive the response data, and store the user's authentication data (e.g., token) in a secure way, such as local storage or a cookie.
+class ProfileView(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
 
-7. Create Routes:
-Define routes for your login page and other components in your Angular application.
+    def get(self, request, format=None):
+        content = {
+            'user': str(request.user),  # `django.contrib.auth.User` instance.
+            'auth': str(request.auth),  # None
+        }
+        return Response(content)
 
-8. Protect Authorized Routes:
-Implement route guards in Angular to protect routes that require authentication. When a user is not logged in, they should be redirected to the login page.
+---------------------------------------------------
+3. Edit ACCOUNTS app urls.py:
+from django.urls import path
+from rest_framework.urlpatterns import format_suffix_patterns
+from accounts import views
 
-9. Logout Functionality:
-Create a component and route for logging out, and handle the logout process on both the Angular and Django sides.
+urlpatterns = [
+    #Users URL
+    path('profile/', views.ProfileView.as_view()),
+]
 
+urlpatterns = format_suffix_patterns(urlpatterns)
 
+---------------------------------------------------
+4. Edit ROOT urls.py:
+from django.contrib import admin
+from django.urls import path, include
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('accounts/', include('accounts.urls')),
+    path('api/auth/', include("rest_framework.urls")),
+]
+
+5. Create super user:
+>> python manage.py createsuperuser
+
+6. Run migrations to apply changes:
+>> python manage.py makemigrations
+>> python manage.py migrate
+
+7. Create another app as PUBLIC:
+>> python manage.py 
+
+8. Edit ACCOUNTS app views:
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.authtoken.models import Token
+from rest_framework.response import Response
+
+class CustomAuthToken(ObtainAuthToken):
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data,
+                                           context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        token, created = Token.objects.get_or_create(user=user)
+        return Response({
+            'token': token.key,
+            'user_id': user.pk,
+            'email': user.email
+        })
+And in your urls.py:
+
+urlpatterns += [
+    path('api-token-auth/', CustomAuthToken.as_view())
+]
+With Django admin
+It is also possible to create Tokens manually through the admin interface. In case you are using a large user base, we recommend that you monkey patch the TokenAdmin class customize it to your needs, more specifically by declaring the user field as raw_field.
+
+your_app/admin.py:
+
+from rest_framework.authtoken.admin import TokenAdmin
+
+TokenAdmin.raw_id_fields = ['user']
+Using Django manage.py command
+
+9. Generate token:
+>> python manage.py drf_create_token <username>

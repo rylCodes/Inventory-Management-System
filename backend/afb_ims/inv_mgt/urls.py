@@ -1,11 +1,7 @@
 from django.urls import path
-from . import views
+from inv_mgt import views
 
 urlpatterns = [
-    #Login URL
-    path('api/users/', UserList.as_view(), name='user-list'),
-    path('api/users/<int:pk>/', UserDetail.as_view(), name='user-detail'),
-
     # Product URLs
     path('products/', views.ProductList.as_view(), name='product-list'),
     path('products/<int:pk>/', views.ProductDetail.as_view(), name='product-detail'),

@@ -1,5 +1,5 @@
 <header class="flex bg-neutral-800 h-20 px-4 w-full justify-between items-center">
-    <h2 class="text-neutral-300 text-3xl font-bold text-center px-6">RylCodes-IMS</h2>
+    <h2 class="text-neutral-300 text-3xl font-bold text-center px-6">{{ title }}</h2>
     <nav class="flex px-8 space-x-6 text-neutral-300 xl:hidden">
         <a routerLink="/">Home</a>
         <a routerLink="/products">Products</a>
@@ -8,4 +8,5 @@
         <a routerLink="/sales">Sales</a>
         <a routerLink="/about">About</a>
     </nav>
+    <button type="button" ((click))="logOut()">Logout</button>
 </header>

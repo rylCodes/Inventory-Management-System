@@ -13,12 +13,14 @@ import { HeaderComponent } from './components/header/header.component';
 import { StocksComponent } from './components/stocks/stocks.component';
 import { PublicComponent } from './components/public/public.component';
 import { LoginComponent } from './components/login/login.component';
+import { DashboardComponent } from './components/dashboard/dashboard.component';
 
 const appRoutes = [
   {path: 'products', component: ProductsComponent},
   {path: 'stocks', component: StocksComponent},
   {path: 'public', component: PublicComponent},
-  {path: '', component: LoginComponent},
+  {path: 'login', component: LoginComponent},
+  {path: '', component: DashboardComponent}
 ]
 
 @NgModule({
@@ -31,6 +33,7 @@ const appRoutes = [
     StocksComponent,
     PublicComponent,
     LoginComponent,
+    DashboardComponent,
   ],
   imports: [
     BrowserModule,

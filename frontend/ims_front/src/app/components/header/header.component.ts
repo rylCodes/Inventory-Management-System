@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth/auth.service';
 
 @Component({
@@ -9,9 +10,10 @@ import { AuthService } from 'src/app/services/auth/auth.service';
 export class HeaderComponent {
   title = 'RylCodes-IMS';
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, private router: Router) {}
 
   logOut() {
     this.authService.logout();
+    this.router.navigate(["login"]);
   }
 }

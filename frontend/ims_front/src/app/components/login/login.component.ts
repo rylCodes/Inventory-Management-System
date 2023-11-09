@@ -24,22 +24,22 @@ export class LoginComponent implements OnInit {
   }
 
   onSubmit() {
-  const username = this.loginForm.get('username')?.value;
-    const password = this.loginForm.get('password')?.value;
-
-    this.authService.login(username, password)
+    this.authService.login(this.loginForm.getRawValue())
       .pipe(
         catchError(() => {
           return of(null);
-        })
+        }),
+        first(),
       )
-      .subscribe(data => {
-        if (!data) {
-          window.alert("Invalid username or password!");
-          this.loginForm.reset();
+      .subscribe(
+        data => {
+        if (data) {
+          this.router.navigate(['']);
+          window.alert("Logged in successfully!");
         }
         else {
-          this.router.navigate(['stocks']);
+          window.alert("Invalid username or password!");
+          this.loginForm.reset();
         }
       });
   }

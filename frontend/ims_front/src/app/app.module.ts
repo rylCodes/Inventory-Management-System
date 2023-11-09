@@ -11,16 +11,15 @@ import { NavbarComponent } from './components/navbar/navbar.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { HeaderComponent } from './components/header/header.component';
 import { StocksComponent } from './components/stocks/stocks.component';
-import { PublicComponent } from './components/public/public.component';
 import { LoginComponent } from './components/login/login.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
+import { authGuard } from './guard/auth.guard';
 
-const appRoutes = [
-  {path: 'products', component: ProductsComponent},
-  {path: 'stocks', component: StocksComponent},
-  {path: 'public', component: PublicComponent},
+const appRoutes: Routes = [
   {path: 'login', component: LoginComponent},
-  {path: '', component: DashboardComponent}
+  {path: '', component: DashboardComponent, canActivate: [authGuard]},
+  {path: 'stocks', component: StocksComponent, canActivate: [authGuard]},
+  {path: 'products', component: ProductsComponent, canActivate: [authGuard]},
 ]
 
 @NgModule({
@@ -31,7 +30,6 @@ const appRoutes = [
     FooterComponent,
     HeaderComponent,
     StocksComponent,
-    PublicComponent,
     LoginComponent,
     DashboardComponent,
   ],

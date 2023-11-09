@@ -1,4 +1,3 @@
-from rest_framework.response import Response
 from rest_framework import generics
 from .models import Product, Stock, Supplier, PurchaseBill, PurchaseItem, SalesBill, SalesItem, Stock
 from .serializers import ProductSerializer, SupplierSerializer, PurchaseBillSerializer, PurchaseItemSerializer , SalesBillSerializer, SalesItemSerializer, StockSerializer

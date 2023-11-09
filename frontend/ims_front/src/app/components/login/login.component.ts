@@ -35,10 +35,8 @@ export class LoginComponent implements OnInit {
         data => {
         if (data) {
           this.router.navigate(['']);
-          window.alert("Logged in successfully!");
         }
         else {
-          window.alert("Invalid username or password!");
           this.loginForm.reset();
         }
       });

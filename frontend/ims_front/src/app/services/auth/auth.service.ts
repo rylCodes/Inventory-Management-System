@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
-import { catchError, map, first } from 'rxjs/operators';
-import { throwError } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+import { Observable, throwError } from 'rxjs';
+import { UserDetails } from 'src/app/interface/UserDetails';
 
 const httpOptions = {
   headers: new HttpHeaders({
@@ -13,7 +14,9 @@ const httpOptions = {
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:8000/accounts/ims-api/auth/';
+  private apiUrl = 'http://localhost:8000/';
+  currentUser!: UserDetails;
+  userDetails!: UserDetails[];
 
   constructor(private http: HttpClient) { }
 
@@ -23,13 +26,27 @@ export class AuthService {
     return throwError(() => errorMessage);
   }
 
+  storeToken(userDetails: UserDetails) {
+    return this.http.post<UserDetails>(this.apiUrl + 'user-access/authenticated/', userDetails ,httpOptions);
+  }
+
+  getToken(): Observable<UserDetails[]> {
+    return this.http.get<UserDetails[]>(this.apiUrl + "user-access/authenticated/");
+  }
+
+  deleteToken(userDetails: UserDetails): Observable<UserDetails> {
+    return this.http.delete<UserDetails>(this.apiUrl + "user-access/authenticated/" + `${userDetails.id}`);
+  }
+
   login(form: {username: string, password: string}) {
-    return this.http.post<any>(this.apiUrl, form, httpOptions).pipe(
+    return this.http.post<any>(this.apiUrl + 'accounts/auth/', form, httpOptions).pipe(
       catchError(this.handleError),
       map((user) => {
         if (user && user.token) {
-          sessionStorage.setItem("currentUser", JSON.stringify(user.username));
-          sessionStorage.setItem("authToken", JSON.stringify(user.token));
+          this.currentUser = user; 
+          console.log(this.currentUser);
+          this.storeToken(this.currentUser).subscribe();
+          window.alert("Logged in successfully!")
           return user;
         } 
       })
@@ -37,13 +54,15 @@ export class AuthService {
   }
 
   logout() {
-    sessionStorage.removeItem("currentUser");
-    sessionStorage.removeItem("authToken");
+    this.getToken().subscribe(userDetails => {
+      this.userDetails = userDetails;
+      this.deleteToken(this.userDetails[0]).subscribe();
+    }); 
   }
 
   isAuthenticated() {
-    return sessionStorage.getItem("currentUser") !== null &&
-           sessionStorage.getItem("authToken") !== null;
+    this.getToken().subscribe(userDetails => this.userDetails = userDetails);
+    return this.userDetails.length > 0;
   }
 
 // AuthService class ends here

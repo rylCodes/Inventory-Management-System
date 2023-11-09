@@ -1,6 +1,5 @@
 from rest_framework import serializers
-from django.contrib.auth.models import User
-from .models import Product, Stock, Supplier, PurchaseBill, PurchaseItem, SalesBill, SalesItem
+from inv_mgt.models import Product, Stock, Supplier, PurchaseBill, PurchaseItem, SalesBill, SalesItem
 
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:

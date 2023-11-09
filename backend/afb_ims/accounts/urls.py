@@ -4,7 +4,7 @@ from accounts import views
 
 urlpatterns = [
     path('profile/', views.ProfileView.as_view()),
-    path('ims-api/auth/', views.CustomAuthToken.as_view()),
+    path('auth/', views.CustomAuthToken.as_view()),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

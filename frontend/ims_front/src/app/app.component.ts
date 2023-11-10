@@ -10,7 +10,6 @@ export class AppComponent {
   constructor(private router: Router) {}
 
   hasRoute(route: string) {
-    console.log(route);
     return this.router.url !== route;
   }
 }

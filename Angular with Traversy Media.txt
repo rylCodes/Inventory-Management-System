@@ -2,35 +2,43 @@
 Youtube: https://www.youtube.com/watch?v=3dHNOWTI7H8&t=3089s
 Github: https://github.com/bradtraversy/angular-crash-2021
 
---------------------------------------------------------------------------------
-
+______________________________________________________________________________________
+**************************************************************************************
 // ANGULAR CLI & SETUP
+
 1. Install the Angular globally:
 >> ng install -g @angular/cli
 
+----------------------------------------------------------------------
 2. Create new app:
 >> ng new app_name
 
+----------------------------------------------------------------------
 3. Generate component (components folder is optional):
 >> ng generate component components_folder/component_name
 
+----------------------------------------------------------------------
 4. Generate service (services folder is optional):
 >> ng generate service services_folder/service_name
 
+----------------------------------------------------------------------
 5. Run your angular app (at localhost:4200):
 >> ng serve
 
---------------------------------------------------------------------------------
-
+______________________________________________________________________________________
+**************************************************************************************
 // COMPONENT INPUT (for reusable button)
+
 1. Generate new component for button:
 >> ng generate component components/button
 
+----------------------------------------------------------------------
 2. Edit button.component.html:
 <button class="btn" [ngStyle]="{'background-color': color}" (click)="onClick()">
     {{ text }}
 </button>
 
+----------------------------------------------------------------------
 3. Edit button.component.ts:
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 
@@ -44,12 +52,14 @@ export class ButtonComponent {
   }
 }
 
+----------------------------------------------------------------------
 4. Edit header.component.html (any component to use the button):
 <header>
     <app-button color="green" text="add" (btnClick)="toggleAddInventory()">
     </app-button>
 </header>
 
+----------------------------------------------------------------------
 5. Edit header.component.ts:
 export class HeaderComponent {
   toggleAddInventory() {
@@ -57,12 +67,14 @@ export class HeaderComponent {
   }
 }
 
---------------------------------------------------------------------------------
-
+______________________________________________________________________________________
+**************************************************************************************
 // INTERFACE
+
 1. Create new .ts file in app folder:
 e.g. "Inventory.ts"
 
+----------------------------------------------------------------------
 2. Edit "Inventory.ts":
 export interface Inventory {
     id?: number;
@@ -72,22 +84,26 @@ export interface Inventory {
     unit: string;
     reminder: boolean;
 }
---------------------------------------------------------------------------------
 
+______________________________________________________________________________________
+**************************************************************************************
 // JSON-SERVER SETUP
 
 1. Install JSON server:
 >> npm i json-server
 
+----------------------------------------------------------------------
 2. Edit package.json:
 "scripts": {
     ...
     "server": "json-server --watch db.json --port 5000"
 }
 
+----------------------------------------------------------------------
 3. Create .json file in src folder:
 e.g. "db.json"
 
+----------------------------------------------------------------------
 4. Edit "db.json":
 {
   "inventories": [
@@ -110,12 +126,14 @@ e.g. "db.json"
   ]
 }
 
+----------------------------------------------------------------------
 5. Run the json-server (at localhost:5000):
 >> npm run server
 
---------------------------------------------------------------------------------
-
+______________________________________________________________________________________
+**************************************************************************************
 // ANGULAR HTTP CLIENT
+
 1. Edit app.module.ts:
 ...
 import { HttpClientModule } from '@angular/common/http';
@@ -128,12 +146,14 @@ import { HttpClientModule } from '@angular/common/http';
     ]
 })
 
---------------------------------------------------------------------------------
-
+______________________________________________________________________________________
+**************************************************************************************
 // FETCH, SUBSCRIBING & DELETE (get & delete inventories)
+
 1. Generate new service
 >> ng generate service services/inventory
 
+----------------------------------------------------------------------
 2. Edit inventory.service.ts:
 ...
 import { HttpClient, HttpHeaders } from '@angular/common/http';
@@ -154,9 +174,11 @@ export class InventoryService {
   }
 }
 
+----------------------------------------------------------------------
 3. Generate new component:
 >> ng generate component components/inventories
 
+----------------------------------------------------------------------
 4. Edit inventories.component.ts:
 import { Component, OnInit } from '@angular/core';
 import { Inventory } from 'src/app/Inventory';
@@ -181,9 +203,10 @@ export class InventoriesComponent implements OnInit {
   }
 }
 
---------------------------------------------------------------------------------
-
+______________________________________________________________________________________
+**************************************************************************************
 // LOOPING WITH *ngFor (to show the fetched data)
+
 1. Edit inventories.component.html:
 <div class="table-container">
     <table>
@@ -199,15 +222,18 @@ export class InventoriesComponent implements OnInit {
     </table>
 </div>
 
---------------------------------------------------------------------------------
-
+______________________________________________________________________________________
+**************************************************************************************
 // FONTAWESOME SETUP (to create delete icons)
+
 1. Install fontawesome:
 >> ng add @fortawesome/angular-fontawesome
 
+----------------------------------------------------------------------
 2. Choose fontawesome icon packages:
 Press arrow-keys to navigate, space-bar to choose, enter to continue.
 
+----------------------------------------------------------------------
 3. Edit the components.ts where to use icons (e.g: inventories.component.ts):
 ...
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
@@ -218,6 +244,7 @@ export class InventoriesComponent implements OnInit {
   ...
 }
 
+----------------------------------------------------------------------
 4. Add the fa-icon element in inventories.component.html:
 <div class="table-container">
     <table>
@@ -236,8 +263,10 @@ export class InventoriesComponent implements OnInit {
     </table>
 </div>
 
---------------------------------------------------------------------------------
+______________________________________________________________________________________
+**************************************************************************************
  // FORMS MODULE
+
  1. Edit app.module.ts:
 ...
 import { FormsModule } from '@angular/forms';
@@ -250,15 +279,18 @@ import { FormsModule } from '@angular/forms';
   ],
 })
 
+----------------------------------------------------------------------
 2. Generate new component:
 >> ng generate component components/add-inventory
 
+----------------------------------------------------------------------
 3. Edit inventories.component.html (any component to place the form):
 <app-add-inventory (onAddTask)="addInventory($event)"></app-add-inventory>
 <div class="table-container">
     ...
 </div>
 
+----------------------------------------------------------------------
 4. Edit add-inventory.component.html:
 <form class="add-form">
     <div class="form-control">
@@ -286,9 +318,10 @@ import { FormsModule } from '@angular/forms';
     <input type="submit" value="Save Inventory" class="btn btn-block">
 </form>
 
---------------------------------------------------------------------------------
-
+______________________________________________________________________________________
+**************************************************************************************
 // SUBMIT and CREATE (to add new inventories)
+
 1. Edit add-inventory.component.ts:
 import { Component, EventEmitter, Output } from '@angular/core';
 import { Inventory } from 'src/app/Inventory';
@@ -333,11 +366,13 @@ export class AddInventoryComponent {
   }
 }
 
+----------------------------------------------------------------------
 2. Edit add-inventory.component.html:
 <form class="add-form" (ngSubmit)="onSubmit()">
     ...
 </form>
 
+----------------------------------------------------------------------
 3. Edit inventory.service.ts:
 ...
 import { HttpClient, HttpHeaders } from '@angular/common/http';
@@ -358,6 +393,7 @@ export class InventoryService {
   }
 }
 
+----------------------------------------------------------------------
 4. Edit inventories.component.ts (component that has add-inventory tag that calls onAddInventory):
 ...
 import { Inventory } from 'src/app/Inventory';
@@ -373,15 +409,17 @@ export class InventoriesComponent implements OnInit {
   }
 }
 
+----------------------------------------------------------------------
 5. Edit inventories.component.html:
 <app-add-inventory (onAddInventory)="addInventory($event)"></app-add-inventory>
 <div class="table-container">
     ...
 </div>
 
---------------------------------------------------------------------------------
-
+______________________________________________________________________________________
+**************************************************************************************
 // UPDATE (toggle reminder of inventories and edit/update each inventory)
+
 1. Edit inventory.service.ts:
 ...
 import { HttpClient, HttpHeaders } from '@angular/common/http';
@@ -410,6 +448,7 @@ export class InventoryService {
   }
 }
 
+----------------------------------------------------------------------
 2. Edit inventories.component.ts:
 ...
 import { Inventory } from 'src/app/Inventory';
@@ -448,12 +487,14 @@ export class InventoriesComponent implements OnInit {
 
 }
 
+----------------------------------------------------------------------
 3. Edit inventories.component.css (style that occurs when toggle):
 ...
 .reminder {
     border-left: 5px solid green;
 }
 
+----------------------------------------------------------------------
 4. Edit inventories.component.html (add any button/icon to call edit function):
 ...
 <div class="table-container">
@@ -469,12 +510,14 @@ export class InventoriesComponent implements OnInit {
     </table>
 </div>
 
---------------------------------------------------------------------------------
-
+______________________________________________________________________________________
+**************************************************************************************
 // TOGGLE BUTTON AND FORM VISIBILITY (enabling/disabling the button and form)
+
 1. Generate new service:
 >> ng generate service services/ui
 
+----------------------------------------------------------------------
 2. Edit ui.service.ts:
 ...
 import { Observable, Subject } from 'rxjs';
@@ -493,6 +536,7 @@ export class UiService {
   }
 }
 
+----------------------------------------------------------------------
 3. Edit header.component.ts (component that has button that calls toggle function)
 import { Component } from '@angular/core';
 import { Subscription } from 'rxjs';
@@ -518,6 +562,7 @@ export class HeaderComponent {
   }
 }
 
+----------------------------------------------------------------------
 4. Edit header.component.html:
 <header>
     <h1>Inventory Management System</h1>
@@ -528,6 +573,7 @@ export class HeaderComponent {
     </app-button>
 </header>
 
+----------------------------------------------------------------------
 5. Edit add-inventory.component.ts:
 ...
 import { UiService } from 'src/app/services/ui.service';
@@ -546,16 +592,19 @@ export class AddInventoryComponent {
   ...
 }
 
+----------------------------------------------------------------------
 6. Edit add-inventory.component.html:
 <form *ngIf="showAddInventory" ...">
     ...
 </form>
 
---------------------------------------------------------------------------------
-
+______________________________________________________________________________________
+**************************************************************************************
 // ANGULAR ROUTER
+
 1. Generate new component (for about page and footer)
 
+----------------------------------------------------------------------
 2. Edit app.module.ts:
 ...
 import { RouterModule, Routes } from '@angular/router';
@@ -573,6 +622,7 @@ const appRoutes: Routes =  [
   ],
 })
 
+----------------------------------------------------------------------
 3. Edit app.component.html:
 <div class="container">
   <app-header></app-header>
@@ -580,21 +630,24 @@ const appRoutes: Routes =  [
   <app-footer></app-footer>
 </div>
 
+----------------------------------------------------------------------
 4. Edit about.component.html:
 <div class="about-page">
     ...
     <a routerLink="/">Go back</a>
 </div>
 
+----------------------------------------------------------------------
 5. Edit footer.component.html:
 <footer>
     ...
     <a routerLink="/about">About</a>
 </footer>
 
---------------------------------------------------------------------------------
-
+______________________________________________________________________________________
+**************************************************************************************
 // LIMIT COMPONENT TO ROUTE
+
 1. Edit header.component.ts (any component that contains the button to limit routing):
 ...
 import { Router } from '@angular/router'
@@ -610,6 +663,7 @@ export class HeaderComponent {
   }
 }
 
+----------------------------------------------------------------------
 2. Edit header.component.html:
 <header>
     ...

@@ -1,24 +1,67 @@
-<div class="w-full px-4">
-    <div class="text-neutral-900 bg-neutral-300 w-full h-auto mt-2">
-        <div class="bg-neutral-300 w-[400px] h-auto mx-auto px-8 py-10 rounded-lg shadow-xl">
-            <h2 class="text-center text-2xl font-bold">Add New Stocks</h2>
-            <form class="flex flex-col">
-                <label class="mt-6" for="username">Code</label>
-                <input class="text-neutral-300 px-2 py-1 rounded-sm mt-1" type="text">
-    
-                <label class="mt-6" for="password">Name</label>
-                <input class="text-neutral-300 px-2 py-1 rounded-sm mt-1" type="password">
-    
-                <button class="mt-10 bg-neutral-900 text-neutral-300 font-bold p-2 rounded hover:bg-neutral-950" type="submit">Login</button>
-            </form>
-        </div>
-    </div>
-
+<div class="w-full px-8">
+    <!-- HEADING -->
     <div class="flex justify-between mt-8">
         <h1 class="font-bold text-3xl">STOCKS</h1>
-        <app-button text="add" color="green"></app-button>
+        <app-button txtContent="add" bgColor="green"></app-button>
+    </div>
+    <hr class="border-b-1 border-neutral-900 mt-4">
+
+    <!-- FORM -->
+    <div class="bg-[#fff] max-w-xl h-auto mx-auto px-8 py-10 rounded-lg shadow-xl text-neutral-900 mt-4">
+        <form class="flex flex-col" (ngSubmit)="onAddStock()">
+            <label class="" for="code">Code</label>
+            <input class="border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text" name="code" id="code"
+                [(ngModel)]="code">
+
+            <label class="mt-4" for="name">Name</label>
+            <input class="border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text" name="name" id="name"
+                [(ngModel)]="name">
+
+            <label class="mt-4" for="description">Description</label>
+            <input class="border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text" name="description"
+                id="description" [(ngModel)]="description">
+
+            <label class="mt-4" for="quantity">Quantity</label>
+            <input class="border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="number" name="quantity"
+                id="quantity" [(ngModel)]="quantity">
+
+            <!-- <label class="mt-4" for="unit">Unit</label>
+            <input class="border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text" name="unit" id="unit"
+                [(ngModel)]="unit"> -->
+
+            <label class="mt-4" for="unit">Unit</label>
+            <select class="border border-neutral-900 px-2 py-1 rounded-sm mt-1" name="unit" id="unit"
+                [(ngModel)]="unit">
+                <option value="bottle">bottle</option>
+                <option value="piece">piece</option>
+                <option value="liter">liter</option>
+                <option value="kilo">kilo</option>
+                <option value="pack">pack</option>
+                <option value="">others...</option>
+            </select>
+            <!-- Input field for custom unit when "other" is selected -->
+            <input *ngIf="unit === ''" class="border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text"
+                name="customUnit" id="customUnit" [(ngModel)]="customUnit" placeholder="Please specify.">
+
+
+            <div class="flex items-center mt-4">
+                <label class="" for="status">Status:</label>
+                <div class="flex items-center ml-10">
+                    <input class="border border-neutral-900 px-2 py-1 rounded-sm w-4 h-4" type="checkbox" name="status"
+                        id="active" [(ngModel)]="status" checked>
+                    <label class="ml-1" for="active">Active</label>
+
+                </div>
+            </div>
+
+            <button class="mt-10 bg-neutral-800 text-neutral-300 font-bold p-2 rounded hover:bg-[rgb(48,48,48)]"
+                type="submit">
+                Add Stock
+            </button>
+        </form>
     </div>
 
+    <!-- TABLE -->
     <div class="w-full text-center shadow-xl rounded-xl mt-8">
         <table class="w-full table-fixed rounded-xl">
             <thead class="text-neutral-300 bg-neutral-900">

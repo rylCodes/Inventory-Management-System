@@ -12,7 +12,7 @@ class Stock(models.Model):
     code = models.CharField(max_length=100, unique=True)
     name = models.CharField(max_length=100, unique=True)
     description = models.TextField(blank=True, null=True)
-    quantity = models.PositiveIntegerField(validators=[MinValueValidator(0)])
+    quantity = models.FloatField(validators=[MinValueValidator(0)])
     unit = models.CharField(max_length=200)
     date_added = models.DateTimeField(default=timezone.now)
     date_updated = models.DateTimeField(auto_now=True)
@@ -24,13 +24,13 @@ class Stock(models.Model):
     class Meta:
         ordering = ["-date_updated"]
 
-    # def perform_sale(self, qty_sold):
-    #     self.quantity += qty_sold
-    #     self.save()
+    def perform_sale(self, qty_sold):
+        self.quantity += qty_sold
+        self.save()
 
-    # def perform_purchase(self, qty_purchased):
-    #     self.quantity -= qty_purchased
-    #     self.save()
+    def perform_purchase(self, qty_purchased):
+        self.quantity -= qty_purchased
+        self.save()
 
     def perform_sale(self, qty_sold):
         if qty_sold <= self.quantity:

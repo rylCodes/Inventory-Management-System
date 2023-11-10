@@ -2,10 +2,22 @@ table {
     border-radius: 10px;
 }
 
+table tbody tr {
+    background-color: #fff;
+}
+
 table tbody tr:nth-child(even) {
-    background-color: #bebebe;
+    background-color: #ebebeb;
 }
 
 table th {
     padding: 10px;
+}
+
+@media (min-width: 1080px) {
+    td {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 }

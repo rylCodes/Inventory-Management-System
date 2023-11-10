@@ -24,6 +24,11 @@ export class LoginComponent implements OnInit {
   }
 
   onSubmit() {
+    if (!this.loginForm.get("username")?.value || !this.loginForm.get("password")?.value) {
+      window.alert("Please enter username and password!");
+      return;
+    }
+
     this.authService.login(this.loginForm.getRawValue())
       .pipe(
         catchError(() => {
@@ -34,11 +39,16 @@ export class LoginComponent implements OnInit {
       .subscribe(
         data => {
         if (data) {
+          console.log(data);
           this.router.navigate(['']);
+          window.alert("You've successfully logged in!");
         }
         else {
+          this.router.navigate(['login']);
+          window.alert("Invalid username or password!");
           this.loginForm.reset();
         }
       });
+      
   }
 }

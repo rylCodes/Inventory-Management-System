@@ -1,12 +1,14 @@
-<h2>Login to RylCodes IMS</h2>
-<div>
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-        <label for="username">Username</label>
-        <input type="text" formControlName="username">
+<div class="bg-neutral-300 w-full h-screen text-neutral-300 pt-32">
+    <div class="bg-neutral-900 w-[400px] h-auto mx-auto px-8 py-10 rounded-lg">
+        <h2 class="text-center text-2xl font-bold">Login to RylCodes IMS</h2>
+        <form class="flex flex-col" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+            <label class="mt-6" for="username">Username</label>
+            <input class="text-neutral-900 px-2 py-1 rounded-sm mt-1" type="text" formControlName="username">
 
-        <label for="password">Password</label>
-        <input type="password" formControlName="password">
+            <label class="mt-6" for="password">Password</label>
+            <input class="text-neutral-900 px-2 py-1 rounded-sm mt-1" type="password" formControlName="password">
 
-        <button type="submit">Login</button>
-    </form>
+            <button class="mt-10 bg-neutral-300 text-neutral-900 font-bold p-2 rounded hover:bg-neutral-100" type="submit">Login</button>
+        </form>
+    </div>
 </div>

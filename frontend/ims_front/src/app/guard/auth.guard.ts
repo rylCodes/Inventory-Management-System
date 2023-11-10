@@ -10,8 +10,7 @@ export const authGuard: CanActivateFn = (route, state) => {
   if (authService.isAuthenticated()) {
     return true;
   }
-
+  window.alert("Login required!");
   router.navigate(["login"]);
-  window.alert("Access Denied!");
   return false;
 };

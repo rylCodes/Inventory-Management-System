@@ -15,4 +15,8 @@ export class StocksService {
     return this.http.get<Stock[]>(this.apiUrl);
   }
 
+  addStocks() {
+    
+  }
+
 }

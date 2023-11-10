@@ -610,7 +610,7 @@ export class HeaderComponent {
   }
 }
 
-2. Edit html.component.html:
+2. Edit header.component.html:
 <header>
     ...
     <app-button *ngIf="hasRoute('/')" ...>

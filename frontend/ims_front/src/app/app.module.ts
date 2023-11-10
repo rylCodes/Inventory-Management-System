@@ -14,6 +14,7 @@ import { StocksComponent } from './components/stocks/stocks.component';
 import { LoginComponent } from './components/login/login.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { authGuard } from './guard/auth.guard';
+import { ButtonComponent } from './components/button/button.component';
 
 const appRoutes: Routes = [
   {path: 'login', component: LoginComponent},
@@ -32,6 +33,7 @@ const appRoutes: Routes = [
     StocksComponent,
     LoginComponent,
     DashboardComponent,
+    ButtonComponent,
   ],
   imports: [
     BrowserModule,

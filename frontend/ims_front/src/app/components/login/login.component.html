@@ -1,6 +1,11 @@
 <div class="bg-neutral-300 w-full h-screen text-neutral-300 pt-32">
     <div class="bg-neutral-900 w-[400px] h-auto mx-auto px-8 py-10 rounded-lg">
-        <h2 class="text-center text-3xl font-bold">Login to RylCodes IMS</h2>
+        <h2 class="text-center">
+            Log in to<br>
+            <span class="text-3xl font-bold">
+                RylCodes IMS
+            </span>
+        </h2>
         <form class="flex flex-col mt-2" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
             <label class="mt-6" for="username">Username</label>
             <input class="text-neutral-900 px-2 py-1 rounded-sm mt-1" type="text" formControlName="username">
@@ -9,7 +14,7 @@
             <input class="text-neutral-900 px-2 py-1 rounded-sm mt-1" type="password" formControlName="password">
 
             <button class="mt-12 bg-neutral-300 text-neutral-900 font-bold p-2 rounded hover:bg-neutral-100"
-                type="submit">LOGIN</button>
+                type="submit">LOG IN</button>
         </form>
     </div>
 </div>

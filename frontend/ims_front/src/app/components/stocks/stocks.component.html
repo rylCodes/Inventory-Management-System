@@ -1,54 +1,54 @@
-<div class="w-full px-8">
+<div class="relative w-full px-8">
     <!-- HEADING -->
     <div class="flex justify-between mt-8">
         <h1 class="font-bold text-3xl">STOCKS</h1>
-        <app-button txtContent="add" bgColor="green"></app-button>
+        <!-- ADD BUTTON -->
+        <app-button txtContent="{{showAddStocks? 'Cancel': 'Add'}}" bgColor="{{showAddStocks? 'red': 'green'}}"
+            (btnClick)="toggleAddStocks()"></app-button>
     </div>
     <hr class="border-b-1 border-neutral-900 mt-4">
 
     <!-- FORM -->
-    <div class="bg-[#fff] max-w-xl h-auto mx-auto px-8 py-10 rounded-lg shadow-xl text-neutral-900 mt-4">
+    <div *ngIf="showAddStocks"
+        class="bg-[#fff] max-w-xl h-auto mx-auto px-8 py-10 rounded-lg shadow-xl text-neutral-900 mt-4">
+        <h2 class="font-bold text-center text-2xl"> Add new stocks</h2>
         <form class="flex flex-col" (ngSubmit)="onAddStock()">
-            <label class="" for="code">Code</label>
-            <input class="border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text" name="code" id="code"
-                [(ngModel)]="code">
+            <label class="" for="code">Code:</label>
+            <input class="border border-neutral-900 px-2 py-1 rounded-sm mt-1 uppercase" type="text" name="code"
+                id="code" [(ngModel)]="code">
 
-            <label class="mt-4" for="name">Name</label>
-            <input class="border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text" name="name" id="name"
-                [(ngModel)]="name">
+            <label class="mt-4" for="name">Name:</label>
+            <input class="border border-neutral-900 px-2 py-1 rounded-sm mt-1 capitalize" type="text" name="name"
+                id="name" [(ngModel)]="name">
 
-            <label class="mt-4" for="description">Description</label>
-            <input class="border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text" name="description"
+            <label class="mt-4" for="description">Description:</label>
+            <input class="border border-neutral-900 px-2 py-1 rounded-sm mt-1 capitalize" type="text" name="description"
                 id="description" [(ngModel)]="description">
 
-            <label class="mt-4" for="quantity">Quantity</label>
+            <label class="mt-4" for="quantity">Quantity:</label>
             <input class="border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="number" name="quantity"
                 id="quantity" [(ngModel)]="quantity">
 
-            <!-- <label class="mt-4" for="unit">Unit</label>
-            <input class="border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text" name="unit" id="unit"
-                [(ngModel)]="unit"> -->
-
-            <label class="mt-4" for="unit">Unit</label>
-            <select class="border border-neutral-900 px-2 py-1 rounded-sm mt-1" name="unit" id="unit"
+            <label class="mt-4" for="unit">Unit:</label>
+            <select class="border border-neutral-900 px-2 py-1 rounded-sm mt-1 lowercase" name="unit" id="unit"
                 [(ngModel)]="unit">
+                <option selected value="piece">piece</option>
                 <option value="bottle">bottle</option>
-                <option value="piece">piece</option>
                 <option value="liter">liter</option>
                 <option value="kilo">kilo</option>
                 <option value="pack">pack</option>
                 <option value="">others...</option>
             </select>
             <!-- Input field for custom unit when "other" is selected -->
-            <input *ngIf="unit === ''" class="border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text"
+            <input *ngIf="unit === ''" class="border border-neutral-900 px-2 py-1 rounded-sm mt-1 lowercase" type="text"
                 name="customUnit" id="customUnit" [(ngModel)]="customUnit" placeholder="Please specify.">
 
 
             <div class="flex items-center mt-4">
                 <label class="" for="status">Status:</label>
                 <div class="flex items-center ml-10">
-                    <input class="border border-neutral-900 px-2 py-1 rounded-sm w-4 h-4" type="checkbox" name="status"
-                        id="active" [(ngModel)]="status" checked>
+                    <input class="border border-neutral-900 px-2 py-1 rounded-sm w-4 h-4 lowercase" type="checkbox"
+                        name="status" id="active" [(ngModel)]="status" checked>
                     <label class="ml-1" for="active">Active</label>
 
                 </div>
@@ -56,13 +56,13 @@
 
             <button class="mt-10 bg-neutral-800 text-neutral-300 font-bold p-2 rounded hover:bg-[rgb(48,48,48)]"
                 type="submit">
-                Add Stock
+                Add
             </button>
         </form>
     </div>
 
     <!-- TABLE -->
-    <div class="w-full text-center shadow-xl rounded-xl mt-8">
+    <div class="w-full text-center shadow-xl rounded-xl mt-8 {{showAddStocks? 'hidden': 'block'}}">
         <table class="w-full table-fixed rounded-xl">
             <thead class="text-neutral-300 bg-neutral-900">
                 <th>Code</th>
@@ -77,17 +77,37 @@
             </thead>
             <tbody>
                 <tr *ngFor="let stock of stocks">
-                    <td class="p-2">{{stock.code}}</td>
-                    <td class="p-2">{{stock.name}}</td>
-                    <td class="p-2">{{stock.description}}</td>
+                    <td class="p-2 uppercase">{{stock.code}}</td>
+                    <td class="p-2 capitalize">{{stock.name}}</td>
+                    <td class="p-2 capitalize">{{stock.description}}</td>
                     <td class="p-2">{{stock.quantity}}</td>
-                    <td class="p-2">{{stock.unit}}</td>
+                    <td class="p-2 lowercase">{{stock.unit}}</td>
                     <td class="p-2">{{stock.date_added | date: 'dd/MM/yyyy'}}</td>
                     <td class="p-2">{{stock.date_updated | date: 'dd/MM/yyyy'}}</td>
-                    <td class="p-2">{{stock.status? "active": "inactive"}}</td>
-                    <td class="p-2"></td>
+                    <td class="p-2 lowercase">{{stock.status? "active": "inactive"}}</td>
+                    <td class="flex justify-center p-2 space-x-6">
+                        <!-- Edit Stock -->
+                        <fa-icon class="hover:scale-110" [ngStyle]="{color: 'green'}" [icon]="faPen">
+                        </fa-icon>
+                        <!-- Delete Stock -->
+                        <fa-icon class="hover:scale-110" [ngStyle]="{color: 'red'}" [icon]="faTrashCan"
+                            (click)="deleteStock(stock)">
+                        </fa-icon>
+                    </td>
                 </tr>
             </tbody>
         </table>
+    </div>
+
+    <!-- Confirm to Delete Stock -->
+    <div *ngIf="showActionModal" class="flex justify-center top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] fixed">
+        <div class="relative flex flex-col items-center bg-white rounded-lg w-96 h-fit p-4 mt-48">
+            <fa-icon class="place-self-end scale-125 hover:scale-110" [icon]="faXmark"
+                [ngStyle]="{color: 'rgb(64 64 64 )'}" (click)="toggleActionModal()">
+            </fa-icon>
+            <p class="mb-8 mt-6">Are you sure you want to delete this stock?</p>
+            <app-button (btnClick)="onConfirmDelete()" bgColor="red" txtColor="bg-white"
+                txtContent="Delete"></app-button>
+        </div>
     </div>
 </div>

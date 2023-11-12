@@ -47,7 +47,7 @@ class Product(models.Model):
     name = models.CharField(max_length=200, unique=True)
     stock_name = models.ForeignKey(Stock, on_delete=models.CASCADE)
     description = models.TextField(blank=True, null=True)
-    qty_per_order = models.PositiveIntegerField(validators=[MinValueValidator(0)])
+    qty_per_order = models.FloatField(validators=[MinValueValidator(0)])
     price = models.DecimalField(max_digits=10, decimal_places=2)
     status = models.BooleanField(choices=STATUS_CHOICES, default=True)
 
@@ -87,7 +87,7 @@ class PurchaseItem(models.Model):
     stock = models.ForeignKey(Stock, on_delete=models.CASCADE, related_name="purchase_items")
     billno = models.ForeignKey(PurchaseBill, on_delete=models.CASCADE)
     purchase_date = models.DateTimeField(auto_now_add=True)
-    quantity_purchased = models.PositiveIntegerField(validators=[MinValueValidator(0)])
+    quantity_purchased = models.FloatField(validators=[MinValueValidator(0)])
     item_price = models.DecimalField(max_digits=10, decimal_places=2)
 
     def calculate_total_price(self):
@@ -119,7 +119,7 @@ class SalesBill(models.Model):
 class SalesItem(models.Model):
     billno = models.ForeignKey(SalesBill, on_delete=models.CASCADE, related_name="sales_items")
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity_sold = models.PositiveIntegerField(validators=[MinValueValidator(0)])
+    quantity_sold = models.FloatField(validators=[MinValueValidator(0)])
     sale_date = models.DateTimeField(auto_now_add=True)
     
     def calculate_total_price(self):

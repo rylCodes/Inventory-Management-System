@@ -524,7 +524,7 @@ import { Observable, Subject } from 'rxjs';
 ...
 export class UiService {
   private showAddInventory: boolean = false;
-  private subject = new Subject<any>();
+  private subject: Subject<any> = new Subject<any>();
 
   toggleAddInventory(): void {
     this.showAddInventory = !this.showAddInventory;
@@ -575,14 +575,14 @@ export class HeaderComponent {
 
 ----------------------------------------------------------------------
 5. Edit add-inventory.component.ts:
-...
+import { Component, OnDestroy } from '@angular/core';
 import { UiService } from 'src/app/services/ui.service';
 import { Subscription } from 'rxjs';
 ...
-export class AddInventoryComponent {
+export class AddInventoryComponent implements OnDestroy {
   ...
   showAddInventory: boolean = false;
-  subscription: Subscription;
+  subscription: Subscription = new Subscription;
 
   constructor(private uiService: UiService) {
     this.subscription = this.uiService
@@ -590,6 +590,12 @@ export class AddInventoryComponent {
     .subscribe((value) => (this.showAddInventory = value));
   }
   ...
+
+  ngOnDestroy(): void {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
+  }
 }
 
 ----------------------------------------------------------------------

@@ -1,11 +1,11 @@
 <app-header *ngIf="hasRoute('/login')"></app-header>
 <div class="flex h-full w-full">
     <app-navbar *ngIf="hasRoute('/login')" class="hidden xl:flex"></app-navbar>
-    <div class="relative flex-1 h-auto w-full">
+    <div class="flex-1 h-auto w-full">
         <router-outlet></router-outlet>
-        <p class="bg-[#fff] text-neutral-700 p-4 mt-12 text-sm"><span class="font-bold">&copy; 2023
-                RylCodes-IMS</span>. All rights
-            reserved.</p>
+        <p class="bg-[#fff] text-neutral-700 p-4 mt-12 text-sm">
+            <span class="font-bold">&copy;2023 RylCodes-IMS</span>. All rights reserved.
+        </p>
     </div>
 </div>
 <app-footer *ngIf="hasRoute('/login')"></app-footer>

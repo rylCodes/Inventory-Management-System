@@ -30,4 +30,9 @@ export class UiService {
   onToggleActionModal(): Observable<any> {
     return this.actionModalSubject.asObservable();
   }
+
+  wait(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
 }

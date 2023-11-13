@@ -32,7 +32,8 @@ export class StocksService {
   }
 
   editStock(stock: Stock) {
-    return this.http.put<Stock>(this.apiUrl, stock.id, httpOptions);
+    const url = this.apiUrl + `${stock.id}/`;
+    return this.http.put<Stock>(url, stock, httpOptions);
   }
 
   deleteStock(stock: Stock) {

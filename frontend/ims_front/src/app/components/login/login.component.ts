@@ -4,6 +4,7 @@ import { AuthService } from 'src/app/services/auth/auth.service';
 import { catchError, first } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { of } from 'rxjs';
+import { UiService } from 'src/app/services/ui/ui.service';
 
 @Component({
   selector: 'app-login',
@@ -14,7 +15,12 @@ export class LoginComponent implements OnInit {
   loginForm!: FormGroup;
   error: string | null = null;
 
-  constructor(private formBuilder: FormBuilder, private authService: AuthService, private router: Router) {}
+  constructor(
+    private formBuilder: FormBuilder,
+    private authService: AuthService,
+    private router: Router,
+    private uiService: UiService,
+    ) {}
 
   ngOnInit(): void {
     this.loginForm = this.formBuilder.group({
@@ -37,10 +43,11 @@ export class LoginComponent implements OnInit {
         first(),
       )
       .subscribe(
-        data => {
+        async (data) => {
         if (data) {
           console.log(data);
           this.router.navigate(['']);
+          await this.uiService.wait(100);
           window.alert("You've successfully logged in!");
         }
         else {

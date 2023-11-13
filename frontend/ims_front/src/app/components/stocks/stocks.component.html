@@ -3,16 +3,16 @@
     <div class="flex justify-between mt-8">
         <h1 class="font-bold text-3xl">STOCKS</h1>
         <!-- ADD BUTTON -->
-        <app-button txtContent="{{showAddStocks? 'Cancel': 'Add'}}" bgColor="{{showAddStocks? 'red': 'green'}}"
-            (btnClick)="toggleAddStocks()"></app-button>
+        <app-button txtContent="{{showForm? 'Cancel': 'Add'}}" bgColor="{{showForm? 'red': 'green'}}"
+            (btnClick)="toggleForm()"></app-button>
     </div>
     <hr class="border-b-1 border-neutral-900 mt-4">
 
     <!-- FORM -->
-    <div *ngIf="showAddStocks"
+    <div *ngIf="showForm"
         class="bg-[#fff] max-w-xl h-auto mx-auto px-8 py-10 rounded-lg shadow-xl text-neutral-900 mt-4">
-        <h2 class="font-bold text-center text-2xl"> Add new stocks</h2>
-        <form class="flex flex-col" (ngSubmit)="onAddStock()">
+        <h2 class="font-bold text-center text-2xl"> {{ proceedEdit? 'Edit stock': 'Add new stocks' }}</h2>
+        <form class="flex flex-col" (ngSubmit)="onSubmit()">
             <label class="" for="code">Code:</label>
             <input class="border border-neutral-900 px-2 py-1 rounded-sm mt-1 uppercase" type="text" name="code"
                 id="code" [(ngModel)]="code">
@@ -53,16 +53,16 @@
 
                 </div>
             </div>
-
+            <!-- Submit Button -->
             <button class="mt-10 bg-neutral-800 text-neutral-300 font-bold p-2 rounded hover:bg-[rgb(48,48,48)]"
                 type="submit">
-                Add
+                {{ proceedEdit? 'Update': 'Add' }}
             </button>
         </form>
     </div>
 
     <!-- TABLE -->
-    <div class="w-full text-center shadow-xl rounded-xl mt-8 {{showAddStocks? 'hidden': 'block'}}">
+    <div class="table-container w-full text-center shadow-xl rounded-xl mt-8 {{showForm? 'hidden': 'block'}}">
         <table class="w-full table-fixed rounded-xl">
             <thead class="text-neutral-300 bg-neutral-900">
                 <th>Code</th>
@@ -76,7 +76,7 @@
                 <th>Action</th>
             </thead>
             <tbody>
-                <tr *ngFor="let stock of stocks">
+                <tr class="w-fit" [ngClass]="{active: stock.status}" *ngFor="let stock of stocks">
                     <td class="p-2 uppercase">{{stock.code}}</td>
                     <td class="p-2 capitalize">{{stock.name}}</td>
                     <td class="p-2 capitalize">{{stock.description}}</td>
@@ -87,7 +87,8 @@
                     <td class="p-2 lowercase">{{stock.status? "active": "inactive"}}</td>
                     <td class="flex justify-center p-2 space-x-6">
                         <!-- Edit Stock -->
-                        <fa-icon class="hover:scale-110" [ngStyle]="{color: 'green'}" [icon]="faPen">
+                        <fa-icon class="hover:scale-110" [ngStyle]="{color: 'green'}" [icon]="faPen"
+                            (click)="updateStock(stock)">
                         </fa-icon>
                         <!-- Delete Stock -->
                         <fa-icon class="hover:scale-110" [ngStyle]="{color: 'red'}" [icon]="faTrashCan"

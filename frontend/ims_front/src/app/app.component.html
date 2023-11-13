@@ -2,7 +2,7 @@
 <div class="flex h-full w-full">
     <app-navbar *ngIf="hasRoute('/login')" class="hidden xl:flex"></app-navbar>
     <div class="flex-1 h-auto w-full">
-        <!-- <router-outlet></router-outlet> -->
+        <router-outlet></router-outlet>
         <p *ngIf="hasRoute('/login')" class="bg-[#fff] text-neutral-700 p-4 mt-12 text-sm">
             <span class="font-bold">&copy;2023 RylCodes-IMS</span>. All rights reserved.
         </p>

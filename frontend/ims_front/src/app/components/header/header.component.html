@@ -8,5 +8,9 @@
         <a routerLink="/sales">Sales</a>
         <a routerLink="/about">About</a>
     </nav>
-    <app-button bgColor="purple" txtColor="#ffff" txtContent="Logout" (btnClick)="logOut()"></app-button>
+    <!-- <app-button bgColor="purple" txtColor="#ffff" txtContent="Logout" (btnClick)="logOut()"></app-button> -->
+    <button class="flex hover:border-b-2 hover:border-neutral-300" (click)="logOut()">
+        <fa-icon [ngStyle]="{color: 'rgb(212 212 212)'}"  [icon]="logOutIcon"></fa-icon>
+        <p class="text-neutral-300 ml-1">Logout</p>
+    </button>
 </header>

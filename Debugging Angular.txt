@@ -1,0 +1,11 @@
+// DEBUGGING
+
+1. An unhandled exception occurred:
+Cannot find module: node_modules\json-parse-even-better-errors\lib\index.js. Please verify that the package.json has a valid "main" entry
+
+>> npm install json-parse-even-better-errors --save
+
+2. Browser application bundle generation complete w/ Error:
+Cannot find module: node_modules\parse5-html-rewriting-stream\dist\index.js
+
+>> npm link parse5-html-rewriting-stream

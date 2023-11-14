@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Stock } from 'src/app/interface/Stock';
-import { StocksService } from 'src/app/services/stocks/stocks.service';
+import { StocksService } from 'src/app/services/stocks/stocks';
 import { UiService } from 'src/app/services/ui/ui.service';
 import { Subscription } from 'rxjs';
 import { faPen, faTrashCan, faXmark } from '@fortawesome/free-solid-svg-icons';
@@ -53,13 +53,13 @@ export class StocksComponent implements OnInit, OnDestroy {
 
   toggleForm() {
     if (this.proceedEdit) {
-      this.editForm();
+      this.toggleEditStock();
     } else {
-      this.addStockForm();
+      this.toggleAddStock();
     }
   }
 
-  editForm() {
+  toggleEditStock() {
     this.showForm = !this.showForm;
     if (!this.showForm) {
       this.proceedEdit = false;
@@ -67,7 +67,7 @@ export class StocksComponent implements OnInit, OnDestroy {
     }
   }
 
-  addStockForm() {
+  toggleAddStock() {
     return this.uiService.toggleForm();
   }
 
@@ -125,7 +125,15 @@ export class StocksComponent implements OnInit, OnDestroy {
       status: this.status,
     }
 
-    this.stockService.addStock(newStock)
+    const isCodeExist = this.stocks.some(stock => stock.code === newStock.code);
+    const isNameExist = this.stocks.some(stock => stock.name === newStock.name);
+  
+    if (isCodeExist) {
+      window.alert("Stock with this code already exists!");
+    } else if (isNameExist) {
+      window.alert("Stock with this name already exists!");
+    } else {
+      this.stockService.addStock(newStock)
       .subscribe(async (stock) => {
         this.stocks.push(stock);
         this.resetForm();
@@ -133,6 +141,7 @@ export class StocksComponent implements OnInit, OnDestroy {
         await this.uiService.wait(100);
         window.alert("New stock has been created successfully!");
       });
+    }
   }
 
   // DELETE STOCK
@@ -159,42 +168,53 @@ export class StocksComponent implements OnInit, OnDestroy {
       });
   }
 
-  // UPDATE STOCK
-  updateStock(stock: Stock) {
-    this.proceedEdit = true;
+// UPDATE STOCK
+updateStock(stock: Stock) {
+  this.proceedEdit = true;
 
-    this.id = stock.id;
-    this.code = stock.code;
-    this.name = stock.name;
-    this.description = stock.description;
-    this.quantity = stock.quantity;
-    this.unit = stock.unit;
-    this.status = stock.status;
+  this.id = stock.id;
+  this.code = stock.code;
+  this.name = stock.name;
+  this.description = stock.description;
+  this.quantity = stock.quantity;
+  this.unit = stock.unit;
+  this.status = stock.status;
 
-    this.toggleForm();
+  this.toggleForm();
+}
+
+onSaveUpdate() {
+  const editingStock = {
+    id: this.id,
+    code: this.code,
+    name: this.name,
+    description: this.description,
+    quantity: this.quantity,
+    unit: this.unit,
+    status: this.status,
   }
+  const isCodeExist = this.stocks.some(stock => stock.id !== editingStock.id && stock.code === editingStock.code);
+  const isNameExist = this.stocks.some(stock => stock.id !== editingStock.id && stock.name === editingStock.name);
 
-  onSaveUpdate() {
-    const editingStock = {
-      id: this.id,
-      code: this.code,
-      name: this.name,
-      description: this.description,
-      quantity: this.quantity,
-      unit: this.unit,
-      status: this.status,
-    }
-
-    this.stockService
+  if (isCodeExist) {
+    window.alert("Stock with this code already exists!");
+  } else if (isNameExist) {
+    window.alert("Stock with this name already exists!");
+  } else {
+      this.stockService
       .editStock(editingStock)
       .subscribe(async (stockData) => {
         const index = this.stocks.findIndex(stock => stock.id === stockData.id);
-        this.stocks[index] = stockData;
+
         this.showForm = false;
         this.proceedEdit = false;
         this.resetForm();
-        await this.uiService.wait(100);
-      });
-  }
 
+        await this.uiService.wait(100);
+        window.alert("Successfully saved changes to the stock.");
+
+        this.stocks[index] = stockData;
+      });
+    }
+  }
 }

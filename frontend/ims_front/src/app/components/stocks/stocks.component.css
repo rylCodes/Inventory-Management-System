@@ -20,6 +20,12 @@ table th {
     padding: 0;
 }
 
+.inactive {
+    border-left: 5px solid orange;
+    margin: 0;
+    padding: 0;
+}
+
 @media (min-width: 1080px) {
     td {
         white-space: nowrap;

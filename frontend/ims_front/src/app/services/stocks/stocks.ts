@@ -17,12 +17,22 @@ export class StocksService {
 
   constructor(private http: HttpClient) { }
 
+  handleStockError(error:any) {
+    if (error.error.name) {
+      console.log(error.error.name[0]);
+    } else if (error.error.code) {
+      console.log(error.error.code[0])
+    } else {
+      console.log('Invalid inputs!');
+    }
+  }
+
   addStock(stock: Stock) {
     return this.http.post<Stock>(this.apiUrl, stock, httpOptions)
       .pipe(
         catchError((error) => {
-          console.log('Error during stock addition:', error);
-          return throwError(() => {'Failed to add new stock!'})
+          this.handleStockError(error);
+          return throwError(() => 'Failed to add new stock!');
         })
       );
   }
@@ -33,7 +43,13 @@ export class StocksService {
 
   editStock(stock: Stock) {
     const url = this.apiUrl + `${stock.id}/`;
-    return this.http.put<Stock>(url, stock, httpOptions);
+    return this.http.put<Stock>(url, stock, httpOptions)
+    .pipe(
+      catchError((error) => {
+        this.handleStockError(error);
+        return throwError(() => "Failed to edit stock!");
+      })
+    );
   }
 
   deleteStock(stock: Stock) {

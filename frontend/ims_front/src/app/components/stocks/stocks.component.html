@@ -11,18 +11,18 @@
     <!-- FORM -->
     <div *ngIf="showForm"
         class="bg-[#fff] max-w-xl h-auto mx-auto px-8 py-10 rounded-lg shadow-xl text-neutral-900 mt-4">
-        <h2 class="font-bold text-center text-2xl"> {{ proceedEdit? 'Edit stock': 'Add new stocks' }}</h2>
-        <form class="flex flex-col" (ngSubmit)="onSubmit()">
+        <h2 class="font-bold text-center text-2xl"> {{ proceedEdit? 'Edit stock' : 'Create new stock' }}</h2>
+        <form class="flex flex-col mt-2" (ngSubmit)="onSubmit()">
             <label class="" for="code">Code:</label>
-            <input class="border border-neutral-900 px-2 py-1 rounded-sm mt-1 uppercase" type="text" name="code"
+            <input autofocus class="border border-neutral-900 px-2 py-1 rounded-sm mt-1 uppercase" type="text" name="code"
                 id="code" [(ngModel)]="code">
 
             <label class="mt-4" for="name">Name:</label>
-            <input class="border border-neutral-900 px-2 py-1 rounded-sm mt-1 capitalize" type="text" name="name"
+            <input class="border border-neutral-900 px-2 py-1 rounded-sm mt-1 capitalize" type="text" name="name"   
                 id="name" [(ngModel)]="name">
 
             <label class="mt-4" for="description">Description:</label>
-            <input class="border border-neutral-900 px-2 py-1 rounded-sm mt-1 capitalize" type="text" name="description"
+            <input class="border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text" name="description"
                 id="description" [(ngModel)]="description">
 
             <label class="mt-4" for="quantity">Quantity:</label>
@@ -30,7 +30,7 @@
                 id="quantity" [(ngModel)]="quantity">
 
             <label class="mt-4" for="unit">Unit:</label>
-            <select class="border border-neutral-900 px-2 py-1 rounded-sm mt-1 lowercase" name="unit" id="unit"
+            <select class="border border-neutral-900 px-2 py-1 rounded-sm mt-1" name="unit" id="unit"
                 [(ngModel)]="unit">
                 <option selected value="piece">piece</option>
                 <option value="bottle">bottle</option>
@@ -40,14 +40,14 @@
                 <option value="">others...</option>
             </select>
             <!-- Input field for custom unit when "other" is selected -->
-            <input *ngIf="unit === ''" class="border border-neutral-900 px-2 py-1 rounded-sm mt-1 lowercase" type="text"
+            <input *ngIf="unit === ''" class="border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text"
                 name="customUnit" id="customUnit" [(ngModel)]="customUnit" placeholder="Please specify.">
 
 
             <div class="flex items-center mt-4">
                 <label class="" for="status">Status:</label>
                 <div class="flex items-center ml-10">
-                    <input class="border border-neutral-900 px-2 py-1 rounded-sm w-4 h-4 lowercase" type="checkbox"
+                    <input class="border border-neutral-900 px-2 py-1 rounded-sm w-4 h-4" type="checkbox"
                         name="status" id="active" [(ngModel)]="status" checked>
                     <label class="ml-1" for="active">Active</label>
 
@@ -76,15 +76,15 @@
                 <th>Action</th>
             </thead>
             <tbody>
-                <tr class="w-fit" [ngClass]="{active: stock.status}" *ngFor="let stock of stocks">
+                <tr class="w-fit {{stock.status? 'active' : 'inactive'}}" *ngFor="let stock of stocks">
                     <td class="p-2 uppercase">{{stock.code}}</td>
                     <td class="p-2 capitalize">{{stock.name}}</td>
-                    <td class="p-2 capitalize">{{stock.description}}</td>
+                    <td class="p-2">{{stock.description}}</td>
                     <td class="p-2">{{stock.quantity}}</td>
-                    <td class="p-2 lowercase">{{stock.unit}}</td>
+                    <td class="p-2">{{stock.unit}}</td>
                     <td class="p-2">{{stock.date_added | date: 'dd/MM/yyyy'}}</td>
                     <td class="p-2">{{stock.date_updated | date: 'dd/MM/yyyy'}}</td>
-                    <td class="p-2 lowercase">{{stock.status? "active": "inactive"}}</td>
+                    <td class="p-2">{{stock.status? "active": "inactive"}}</td>
                     <td class="flex justify-center p-2 space-x-6">
                         <!-- Edit Stock -->
                         <fa-icon class="hover:scale-110" [ngStyle]="{color: 'green'}" [icon]="faPen"
@@ -106,7 +106,7 @@
             <fa-icon class="place-self-end scale-125 hover:scale-110" [icon]="faXmark"
                 [ngStyle]="{color: 'rgb(64 64 64 )'}" (click)="toggleActionModal()">
             </fa-icon>
-            <p class="mb-8 mt-6">Are you sure you want to delete this stock?</p>
+            <p class="mb-8 mt-6 text-center">Are you sure you want to delete this stock?<br>This action cannot be undone.</p>
             <app-button (btnClick)="onConfirmDelete()" bgColor="red" txtColor="bg-white"
                 txtContent="Delete"></app-button>
         </div>

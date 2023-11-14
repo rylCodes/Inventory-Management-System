@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth/auth.service';
+import { faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-header',
@@ -9,6 +10,7 @@ import { AuthService } from 'src/app/services/auth/auth.service';
 })
 export class HeaderComponent {
   title = 'RylCodes-IMS';
+  logOutIcon = faRightFromBracket;
 
   constructor(private authService: AuthService, private router: Router) {}
 

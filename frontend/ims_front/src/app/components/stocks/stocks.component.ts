@@ -2,8 +2,9 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Stock } from 'src/app/interface/Stock';
 import { StocksService } from 'src/app/services/stocks/stocks';
 import { UiService } from 'src/app/services/ui/ui.service';
-import { Subscription } from 'rxjs';
+import { Subscription, filter } from 'rxjs';
 import { faPen, faTrashCan, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { Router, NavigationStart } from '@angular/router';
 
 @Component({
   selector: 'app-stocks',
@@ -35,10 +36,18 @@ export class StocksComponent implements OnInit, OnDestroy {
   showActionModal: boolean = false;
   actionModalSubscription: Subscription = new Subscription;
 
-  constructor(private stockService: StocksService, private uiService: UiService) {
+  constructor(private stockService: StocksService, private uiService: UiService, private router: Router) {
     this.formSubscription = this.uiService
       .onToggleForm()
       .subscribe((value: boolean) => {this.showForm = value});
+
+    this.router.events
+      .pipe(filter((event): event is NavigationStart => event instanceof NavigationStart))
+      .subscribe((event: NavigationStart) => {
+        if (event.url !== '/products') {
+          this.showForm = false;
+        }
+      });
   }
 
   resetForm() {
@@ -51,7 +60,7 @@ export class StocksComponent implements OnInit, OnDestroy {
     this.customUnit = "";
   }
 
-  toggleForm() {
+  toggleForm() {    
     if (this.proceedEdit) {
       this.toggleEditStock();
     } else {
@@ -60,7 +69,7 @@ export class StocksComponent implements OnInit, OnDestroy {
   }
 
   toggleEditStock() {
-    this.showForm = !this.showForm;
+    this.uiService.toggleForm();
     if (!this.showForm) {
       this.proceedEdit = false;
       this.resetForm();
@@ -68,7 +77,11 @@ export class StocksComponent implements OnInit, OnDestroy {
   }
 
   toggleAddStock() {
-    return this.uiService.toggleForm();
+    this.uiService.toggleForm();
+    console.log(this.showForm);
+    if (!this.showForm) {
+      this.resetForm();
+    }
   }
 
   toggleActionModal() {
@@ -137,7 +150,7 @@ export class StocksComponent implements OnInit, OnDestroy {
       .subscribe(async (stock) => {
         this.stocks.push(stock);
         this.resetForm();
-        this.showForm = false;
+        this.uiService.toggleForm();
         await this.uiService.wait(100);
         window.alert("New stock has been created successfully!");
       });
@@ -146,7 +159,6 @@ export class StocksComponent implements OnInit, OnDestroy {
 
   // DELETE STOCK
   deleteStock(stock: Stock) {
-    console.log(this.showForm);
     this.proceedEdit = false;
     this.deletingStock = stock;
     this.toggleActionModal();
@@ -206,7 +218,7 @@ onSaveUpdate() {
       .subscribe(async (stockData) => {
         const index = this.stocks.findIndex(stock => stock.id === stockData.id);
 
-        this.showForm = false;
+        this.uiService.toggleForm();
         this.proceedEdit = false;
         this.resetForm();
 

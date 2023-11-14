@@ -1,9 +1,12 @@
 export interface Product {
-    code?: string;
+    id?: number,
+    code: string;
     name: string;
-    stockName: string;
+    stock_name: number | undefined;
     description: string;
-    qtyPerOrder: number;
+    qty_per_order: number;
     price: number;
-    status: number;
+    date_added?: Date;
+    date_updated?: Date;
+    status: boolean;
 }

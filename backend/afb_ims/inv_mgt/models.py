@@ -49,6 +49,8 @@ class Product(models.Model):
     description = models.TextField(blank=True, null=True)
     qty_per_order = models.FloatField(validators=[MinValueValidator(0)])
     price = models.DecimalField(max_digits=10, decimal_places=2)
+    date_added = models.DateTimeField(default=timezone.now)
+    date_updated = models.DateTimeField(auto_now=True)
     status = models.BooleanField(choices=STATUS_CHOICES, default=True)
 
     def __str__(self):
@@ -60,6 +62,8 @@ class Supplier(models.Model):
     phone = models.CharField(max_length=15, unique=True)
     address = models.TextField()
     email = models.EmailField(max_length=100, unique=True)
+    date_added = models.DateTimeField(default=timezone.now)
+    date_updated = models.DateTimeField(auto_now=True)
     status = models.BooleanField(choices=STATUS_CHOICES, default=True)
 
     def __str__(self):

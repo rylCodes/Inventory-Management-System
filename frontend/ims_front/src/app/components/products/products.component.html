@@ -1,0 +1,115 @@
+<div class="relative w-full px-8">
+    <!-- HEADING -->
+    <div class="flex justify-between mt-8">
+        <h1 class="font-bold text-3xl">PRODUCTS</h1>
+        <!-- ADD BUTTON -->
+        <app-button txtContent="{{showForm? 'Cancel': 'Add'}}" bgColor="{{showForm? 'red': 'green'}}"
+            (btnClick)="toggleForm()"></app-button>
+    </div>
+    <hr class="border-b-1 border-neutral-900 mt-4">
+
+    <!-- FORM -->
+    <div *ngIf="showForm"
+        class="bg-[#fff] max-w-xl h-auto mx-auto px-8 py-10 rounded-lg shadow-xl text-neutral-900 mt-4">
+        <h2 class="font-bold text-center text-2xl"> {{ proceedEdit? 'Edit product' : 'Create new product' }}</h2>
+        <form class="flex flex-col mt-2" (ngSubmit)="onSubmit()">
+            <label class="" for="code">Code:</label>
+            <input class="border border-neutral-900 px-2 py-1 rounded-sm mt-1 uppercase" type="text" name="code"
+                id="code" [(ngModel)]="code">
+
+            <label class="mt-4" for="name">Name:</label>
+            <input class="border border-neutral-900 px-2 py-1 rounded-sm mt-1 capitalize" type="text" name="name"
+                id="name" [(ngModel)]="name">
+
+            <label class="mt-4" for="stock_name">Stock Name:</label>
+            <select class="border border-neutral-900 px-2 py-1 rounded-sm mt-1" name="stock_name" id="stock_name"
+                [(ngModel)]="stock_name" (change)="onStockSelectionChange($event)">
+                <option *ngFor="let stock of stocks" selected value="{{stock.id}}">
+                    {{stock.name}}</option>
+                <option class="text-neutral-500" value="addNewStock">add new stock ...</option>
+            </select>
+
+            <label class="mt-4" for="description">Description:</label>
+            <input class="border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text" name="description"
+                id="description" [(ngModel)]="description">
+
+            <label class="mt-4" for="qty_per_order">Quantity per order:</label>
+            <input class="border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="number" name="qty_per_order"
+                id="quantity" [(ngModel)]="qty_per_order">
+
+            <label class="mt-4" for="price">Price:</label>
+            <input class="border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="number" name="price" id="price"
+                [(ngModel)]="price">
+
+
+            <div class="flex items-center mt-4">
+                <label class="" for="status">Status:</label>
+                <div class="flex items-center ml-10">
+                    <input class="border border-neutral-900 px-2 py-1 rounded-sm w-4 h-4" type="checkbox" name="status"
+                        id="active" [(ngModel)]="status" checked>
+                    <label class="ml-1" for="active">Active</label>
+
+                </div>
+            </div>
+            <!-- Submit Button -->
+            <button class="mt-10 bg-neutral-800 text-neutral-300 font-bold p-2 rounded hover:bg-[rgb(48,48,48)]"
+                type="submit">
+                {{ proceedEdit? 'Update': 'Add' }}
+            </button>
+        </form>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-container w-full text-center shadow-xl rounded-xl mt-8 {{showForm? 'hidden': 'block'}}">
+        <table class="w-full table-fixed rounded-xl">
+            <thead class="text-neutral-300 bg-neutral-900">
+                <th>Code</th>
+                <th>Product Name</th>
+                <th>Stock Name</th>
+                <th>Description</th>
+                <th>Qty per order</th>
+                <th>Price</th>
+                <th>Date Added</th>
+                <th>Date Updated</th>
+                <th>Status</th>
+                <th>Action</th>
+            </thead>
+            <tbody>
+                <tr class="w-fit {{product.status? 'active' : 'inactive'}}" *ngFor="let product of products">
+                    <td class="p-2 uppercase">{{product.code}}</td>
+                    <td class="p-2 capitalize">{{product.name}}</td>
+                    <td class="p-2 capitalize">{{getStockName(product.stock_name)}}</td>
+                    <td class="p-2">{{product.description}}</td>
+                    <td class="p-2">{{product.qty_per_order}}</td>
+                    <td class="p-2">{{product.price}}</td>
+                    <td class="p-2">{{product.date_added | date: 'dd/MM/yyyy'}}</td>
+                    <td class="p-2">{{product.date_updated | date: 'dd/MM/yyyy'}}</td>
+                    <td class="p-2">{{product.status? "active": "inactive"}}</td>
+                    <td class="flex justify-center p-2 space-x-6">
+                        <!-- Edit Product -->
+                        <fa-icon class="hover:scale-110" [ngStyle]="{color: 'green'}" [icon]="faPen"
+                            (click)="updateProduct(product)">
+                        </fa-icon>
+                        <!-- Delete Product -->
+                        <fa-icon class="hover:scale-110" [ngStyle]="{color: 'red'}" [icon]="faTrashCan"
+                            (click)="deleteProduct(product)">
+                        </fa-icon>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Confirm to Delete Product -->
+    <div *ngIf="showActionModal" class="flex justify-center top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] fixed">
+        <div class="relative flex flex-col items-center bg-white rounded-lg w-96 h-fit p-4 mt-48">
+            <fa-icon class="place-self-end scale-125 hover:scale-110" [icon]="faXmark"
+                [ngStyle]="{color: 'rgb(64 64 64 )'}" (click)="toggleActionModal()">
+            </fa-icon>
+            <p class="mb-8 mt-6 text-center">Are you sure you want to delete this product?<br>This action cannot be
+                undone.</p>
+            <app-button (btnClick)="onConfirmDelete()" bgColor="red" txtColor="bg-white"
+                txtContent="Delete"></app-button>
+        </div>
+    </div>
+</div>

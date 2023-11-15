@@ -74,6 +74,7 @@ class PurchaseBill(models.Model):
     billno = models.CharField(max_length=100)
     time = models.DateTimeField(auto_now=True)
     supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE, related_name="bills")
+    grand_total = models.FloatField(validators=[MinValueValidator(0)], blank=True, null=True)
 
     def __str__(self):
         return "Bill no: " + self.billno
@@ -93,6 +94,7 @@ class PurchaseItem(models.Model):
     purchase_date = models.DateTimeField(auto_now_add=True)
     quantity_purchased = models.FloatField(validators=[MinValueValidator(0)])
     item_price = models.DecimalField(max_digits=10, decimal_places=2)
+    sub_total = models.FloatField(validators=[MinValueValidator(0)], blank=True, null=True)
 
     def calculate_total_price(self):
         total_price = self.quantity_purchased * self.item_price
@@ -110,6 +112,7 @@ class SalesBill(models.Model):
     time = models.DateTimeField(auto_now=True)
     customer_name = models.CharField(max_length=200)
     remarks = models.CharField(max_length=100)
+    grand_total = models.FloatField(validators=[MinValueValidator(0)], blank=True, null=True)
 
     def __str__(self):
         return "Bill no: " + self.billno
@@ -125,6 +128,7 @@ class SalesItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity_sold = models.FloatField(validators=[MinValueValidator(0)])
     sale_date = models.DateTimeField(auto_now_add=True)
+    sub_total = models.FloatField(validators=[MinValueValidator(0)], blank=True, null=True)
     
     def calculate_total_price(self):
         total_price = self.quantity_sold * self.product.price

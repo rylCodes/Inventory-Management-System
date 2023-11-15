@@ -1,38 +1,26 @@
+import { sequence } from '@angular/animations';
 import { Injectable } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UiService {
-  private showForm: boolean = false;
-  private showActionModal: boolean = false;
-  private formSubject: Subject<any> = new Subject<any>();
-  private actionModalSubject: Subject<any> = new Subject<any>();
-
-
   constructor() { }
-
-  toggleForm(): void {
-    this.showForm = !this.showForm;
-    this.formSubject.next(this.showForm);
-  }
-
-  onToggleForm(): Observable<any> {
-    return this.formSubject.asObservable();
-  }
-
-  toggleActionModal(): void {
-    this.showActionModal = !this.showActionModal;
-    this.actionModalSubject.next(this.showActionModal);
-  }
-
-  onToggleActionModal(): Observable<any> {
-    return this.actionModalSubject.asObservable();
-  }
 
   wait(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
+  generateUiid(): string {
+    const uuid = uuidv4();
+    const sequentialPart = uuid.substring(0, 4);
+    return sequentialPart;
+  }
+
+  generateSequentialCode(prefix: string, id: number): string {
+     const multiplier = 1000;
+    const sequentialCode = `${prefix}-${multiplier * id}`;
+    return sequentialCode;
+  }
 }

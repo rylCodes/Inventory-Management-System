@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Stock } from 'src/app/interface/Stock';
 import { StocksService } from 'src/app/services/stocks/stocks';
 import { UiService } from 'src/app/services/ui/ui.service';
@@ -11,7 +11,7 @@ import { Router, NavigationStart } from '@angular/router';
   templateUrl: './stocks.component.html',
   styleUrls: ['./stocks.component.css'],
 })
-export class StocksComponent implements OnInit, OnDestroy {
+export class StocksComponent implements OnInit {
   deletingStock?: Stock | null = null;
   proceedEdit: boolean = false;
 
@@ -36,19 +36,7 @@ export class StocksComponent implements OnInit, OnDestroy {
   showActionModal: boolean = false;
   actionModalSubscription: Subscription = new Subscription;
 
-  constructor(private stockService: StocksService, private uiService: UiService, private router: Router) {
-    this.formSubscription = this.uiService
-      .onToggleForm()
-      .subscribe((value: boolean) => {this.showForm = value});
-
-    this.router.events
-      .pipe(filter((event): event is NavigationStart => event instanceof NavigationStart))
-      .subscribe((event: NavigationStart) => {
-        if (event.url !== '/products') {
-          this.showForm = false;
-        }
-      });
-  }
+  constructor(private stockService: StocksService, private uiService: UiService) {}
 
   resetForm() {
     this.code = "";
@@ -61,40 +49,15 @@ export class StocksComponent implements OnInit, OnDestroy {
   }
 
   toggleForm() {    
-    if (this.proceedEdit) {
-      this.toggleEditStock();
-    } else {
-      this.toggleAddStock();
-    }
-  }
-
-  toggleEditStock() {
-    this.uiService.toggleForm();
+    this.showForm = !this.showForm;
     if (!this.showForm) {
       this.proceedEdit = false;
       this.resetForm();
     }
   }
 
-  toggleAddStock() {
-    this.uiService.toggleForm();
-    console.log(this.showForm);
-    if (!this.showForm) {
-      this.resetForm();
-    }
-  }
-
   toggleActionModal() {
     this.showActionModal = !this.showActionModal;
-  }
-
-  ngOnDestroy(): void {
-    if (this.formSubscription) {
-      this.formSubscription.unsubscribe();
-    }
-    if (this.actionModalSubscription) {
-      this.actionModalSubscription.unsubscribe();
-    }
   }
 
   // SHOW STOCKS
@@ -149,8 +112,7 @@ export class StocksComponent implements OnInit, OnDestroy {
       this.stockService.addStock(newStock)
       .subscribe(async (stock) => {
         this.stocks.push(stock);
-        this.resetForm();
-        this.uiService.toggleForm();
+        this.toggleForm();
         await this.uiService.wait(100);
         window.alert("New stock has been created successfully!");
       });
@@ -159,7 +121,6 @@ export class StocksComponent implements OnInit, OnDestroy {
 
   // DELETE STOCK
   deleteStock(stock: Stock) {
-    this.proceedEdit = false;
     this.deletingStock = stock;
     this.toggleActionModal();
   }
@@ -183,7 +144,6 @@ export class StocksComponent implements OnInit, OnDestroy {
 // UPDATE STOCK
 updateStock(stock: Stock) {
   this.proceedEdit = true;
-
   this.id = stock.id;
   this.code = stock.code;
   this.name = stock.name;
@@ -191,7 +151,6 @@ updateStock(stock: Stock) {
   this.quantity = stock.quantity;
   this.unit = stock.unit;
   this.status = stock.status;
-
   this.toggleForm();
 }
 
@@ -217,15 +176,10 @@ onSaveUpdate() {
       .editStock(editingStock)
       .subscribe(async (stockData) => {
         const index = this.stocks.findIndex(stock => stock.id === stockData.id);
-
-        this.uiService.toggleForm();
-        this.proceedEdit = false;
-        this.resetForm();
-
+        this.stocks[index] = stockData;
+        this.toggleForm();
         await this.uiService.wait(100);
         window.alert("Successfully saved changes to the stock.");
-
-        this.stocks[index] = stockData;
       });
     }
   }

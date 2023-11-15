@@ -1,19 +1,18 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Product } from 'src/app/interface/Product';
 import { Stock } from 'src/app/interface/Stock';
 import { ProductsService } from 'src/app/services/products/products.service';
 import { StocksService } from 'src/app/services/stocks/stocks';
 import { UiService } from 'src/app/services/ui/ui.service';
-import { Subscription, filter } from 'rxjs';
 import { faPen, faTrashCan, faXmark } from '@fortawesome/free-solid-svg-icons';
-import { Router, NavigationStart } from '@angular/router';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-products',
   templateUrl: './products.component.html',
   styleUrls: ['./products.component.css'],
 })
-export class ProductsComponent implements OnInit, OnDestroy {
+export class ProductsComponent implements OnInit {
   deletingProduct?: Product | null = null;
   proceedEdit: boolean = false;
 
@@ -34,21 +33,14 @@ export class ProductsComponent implements OnInit, OnDestroy {
   status: boolean = true;
 
   showForm: boolean = false;
-  formSubscription: Subscription = new Subscription;
-
   showActionModal: boolean = false;
-  actionModalSubscription: Subscription = new Subscription;
 
   constructor(
       private productService: ProductsService,
       private stockService: StocksService,
       private uiService: UiService,
       private router: Router
-    ) {
-    this.formSubscription = this.uiService
-      .onToggleForm()
-      .subscribe((value: boolean) => {this.showForm = value});
-  }
+    ) {}
 
   resetForm() {
     this.proceedEdit = false;
@@ -61,26 +53,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
   }
 
   toggleForm() {
-    if (this.showForm) {
-      this.showForm = false;
-    } 
-
-    if (this.proceedEdit) {
-      this.toggleEditProduct();
-    } else {
-      this.toggleAddProduct();
-    }  
-  }
-
-  toggleEditProduct() {
-    this.uiService.toggleForm();
-    if (!this.showForm) {
-      this.resetForm();
-    }
-  }
-
-  toggleAddProduct() {
-    this.uiService.toggleForm();
+    this.showForm = !this.showForm;
     if (!this.showForm) {
       this.resetForm();
     }
@@ -88,15 +61,6 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   toggleActionModal() {
     this.showActionModal = !this.showActionModal;
-  }
-
-  ngOnDestroy(): void {
-    if (this.formSubscription) {
-      this.formSubscription.unsubscribe();
-    }
-    if (this.actionModalSubscription) {
-      this.actionModalSubscription.unsubscribe();
-    }
   }
 
   // SHOW PRODUCTS
@@ -161,8 +125,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
       this.productService.addProduct(newProduct)
       .subscribe(async (product) => {
         this.products.push(product);
-        this.resetForm();
-        this.showForm = false;
+        this.toggleForm();
         await this.uiService.wait(100);
         window.alert("New product has been created successfully!");
       });
@@ -171,17 +134,14 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   onStockSelectionChange(event: Event) {
     const target = event?.target as HTMLSelectElement;
-
     if (target.value === 'addNewStock') {
-      this.uiService.toggleForm();
+      this.toggleForm();
       this.router.navigate(['stocks/']);
     }
   }
 
   // DELETE PRODUCT
   deleteProduct(product: Product) {
-    console.log(this.showForm);
-    this.proceedEdit = false;
     this.deletingProduct = product;
     this.toggleActionModal();
   }
@@ -241,8 +201,7 @@ onSaveUpdate() {
       .subscribe(async (productData) => {
         const index = this.products.findIndex(product => product.id === productData.id);
 
-        this.showForm = false;
-        this.resetForm();
+        this.toggleForm();
 
         await this.uiService.wait(100);
         window.alert("Successfully saved changes to the product.");

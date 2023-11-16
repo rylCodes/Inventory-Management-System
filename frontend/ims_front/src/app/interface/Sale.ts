@@ -1,17 +1,17 @@
 export interface SaleBill {
     id?: number,
-    billno: string,
-    time: string,
+    billno?: string,
+    time?: string,
     customer_name: string,
     remarks: string,
-    grand_total: number,
+    grand_total?: number,
 }
 
 export interface SaleItem {
     id?: number
-    billno: any,
+    billno?: string,
     product: any,
     quantity_sold: number,
-    sale_data: string,
-    sub_total: number,
+    sale_date?: string,
+    sub_total?: number,
 }

@@ -17,11 +17,7 @@ export class SalesService {
   constructor(private http: HttpClient) { }
   
   handleSaleBillError(error:any) {
-    if (error.error.billno) {
-      console.log(error.error.billno[0]);
-    } else {
-      console.log('Invalid inputs!');
-    }
+    console.log('See error here:', error.error);
   }
 
   // SALE BILL
@@ -43,7 +39,7 @@ export class SalesService {
     const url = `${this.apiUrl}sales-bill/` + `${saleBill.id}/`;
     return this.http.put<SaleBill>(url, saleBill, httpOptions)
     .pipe(
-      catchError((error) => {
+      catchError((error) => { 
         this.handleSaleBillError(error);
         return throwError(() => "Failed to edit product!");
       })

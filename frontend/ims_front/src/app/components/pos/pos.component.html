@@ -14,11 +14,11 @@
         <h2 class="font-bold text-center text-2xl"> {{ proceedEdit? 'Edit bill' : 'Create new bill' }}</h2>
         <form class="flex flex-col mt-2" (ngSubmit)="onSubmit()">
             <label class="mt-4" for="customer_name">Customer Name:</label>
-            <input class="border border-neutral-900 px-2 py-1 rounded-sm mt-1 capitalize" type="text" name="customer_name"
+            <input class="uppercase border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text" name="customer_name"
                 id="customer_name" [(ngModel)]="customer_name">
 
             <label class="mt-4" for="remarks">Remarks:</label>
-            <input class="border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text" name="remarks"
+            <input class="uppercase border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text" name="remarks"
                 id="remarks" [(ngModel)]="remarks">
 
             <!-- Submit Button -->
@@ -41,9 +41,9 @@
                 <th>Action</th>
             </thead>
             <tbody>
-                <tr class="w-fit" *ngFor="let saleBill of saleBills">
-                    <td class="p-2 uppercase">{{saleBill.billno}}</td>
-                    <td class="p-2 capitalize">{{saleBill.time | date: 'dd/MM/yyyy hh:mm a' }}</td>
+                <tr *ngFor="let saleBill of saleBills">
+                    <td class="p-2">{{saleBill.billno}}</td>
+                    <td class="p-2">{{saleBill.time | date: 'dd/MM/yyyy hh:mm a' }}</td>
                     <td class="p-2">{{saleBill.customer_name}}</td>
                     <td class="p-2">{{saleBill.remarks}}</td>
                     <td class="p-2">{{saleBill.grand_total}}</td>

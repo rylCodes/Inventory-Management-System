@@ -14,13 +14,21 @@ export class UiService {
 
   generateUiid(): string {
     const uuid = uuidv4();
-    const sequentialPart = uuid.substring(0, 4);
-    return sequentialPart;
+    const prefix = uuid.substring(0, 3);
+    return prefix;
   }
 
-  generateSequentialCode(prefix: string, id: number): string {
-     const multiplier = 1000;
-    const sequentialCode = `${prefix}-${multiplier * id}`;
+  generateSequentialCode(prefix: string, lastItem?: number): string {
+    let sequentialNumber;
+    if (lastItem) {
+      sequentialNumber = (lastItem + 1) * 1;
+    }
+
+    const currentDate = new Date();
+    const yearCode = currentDate.getFullYear().toString().slice(-3);
+
+    const formattedNumber = sequentialNumber?.toString().padStart(4, '0');
+    const sequentialCode = `${prefix}-${yearCode}-${formattedNumber}`;
     return sequentialCode;
   }
 }

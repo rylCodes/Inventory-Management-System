@@ -13,16 +13,13 @@
         class="bg-[#fff] max-w-xl h-auto mx-auto px-8 py-10 rounded-lg shadow-xl text-neutral-900 mt-4">
         <h2 class="font-bold text-center text-2xl"> {{ proceedEdit? 'Edit stock' : 'Create new stock' }}</h2>
         <form class="flex flex-col mt-2" (ngSubmit)="onSubmit()">
-            <label class="" for="code">Code:</label>
-            <input autofocus class="border border-neutral-900 px-2 py-1 rounded-sm mt-1 uppercase" type="text" name="code"
-                id="code" [(ngModel)]="code">
 
-            <label class="mt-4" for="name">Name:</label>
-            <input class="border border-neutral-900 px-2 py-1 rounded-sm mt-1 capitalize" type="text" name="name"   
+            <label class="mt-4" for="name">Stock Name:</label>
+            <input class="uppercase border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text" name="name"   
                 id="name" [(ngModel)]="name">
 
             <label class="mt-4" for="description">Description:</label>
-            <input class="border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text" name="description"
+            <input class="uppercase border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text" name="description"
                 id="description" [(ngModel)]="description">
 
             <label class="mt-4" for="quantity">Quantity:</label>
@@ -30,7 +27,7 @@
                 id="quantity" [(ngModel)]="quantity">
 
             <label class="mt-4" for="unit">Unit:</label>
-            <select class="border border-neutral-900 px-2 py-1 rounded-sm mt-1" name="unit" id="unit"
+            <select class="lowercase border border-neutral-900 px-2 py-1 rounded-sm mt-1" name="unit" id="unit"
                 [(ngModel)]="unit">
                 <option selected value="piece">piece</option>
                 <option value="bottle">bottle</option>
@@ -40,7 +37,7 @@
                 <option value="">others...</option>
             </select>
             <!-- Input field for custom unit when "other" is selected -->
-            <input *ngIf="unit === ''" class="border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text"
+            <input class="lowercase" *ngIf="unit === ''" class="border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text"
                 name="customUnit" id="customUnit" [(ngModel)]="customUnit" placeholder="Please specify.">
 
 
@@ -76,9 +73,9 @@
                 <th>Action</th>
             </thead>
             <tbody>
-                <tr class="w-fit {{stock.status? 'active' : 'inactive'}}" *ngFor="let stock of stocks">
-                    <td class="p-2 uppercase">{{stock.code}}</td>
-                    <td class="p-2 capitalize">{{stock.name}}</td>
+                <tr class="{{stock.status? 'active' : 'inactive'}}" *ngFor="let stock of stocks">
+                    <td class="p-2">{{stock.code}}</td>
+                    <td class="p-2">{{stock.name}}</td>
                     <td class="p-2">{{stock.description}}</td>
                     <td class="p-2">{{stock.quantity}}</td>
                     <td class="p-2">{{stock.unit}}</td>

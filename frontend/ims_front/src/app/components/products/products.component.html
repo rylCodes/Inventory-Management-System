@@ -75,10 +75,10 @@
                 <th>Action</th>
             </thead>
             <tbody>
-                <tr class="w-fit {{product.status? 'active' : 'inactive'}}" *ngFor="let product of products">
-                    <td class="p-2 uppercase">{{product.code}}</td>
-                    <td class="p-2 capitalize">{{product.name}}</td>
-                    <td class="p-2 capitalize">{{getStockName(product.stock_name)}}</td>
+                <tr class="{{product.status? 'active' : 'inactive'}}" *ngFor="let product of products">
+                    <td class="p-2">{{product.code}}</td>
+                    <td class="p-2">{{product.name}}</td>
+                    <td class="p-2">{{getStockName(product.stock_name)}}</td>
                     <td class="p-2">{{product.description}}</td>
                     <td class="p-2">{{product.qty_per_order}}</td>
                     <td class="p-2">{{product.price}}</td>

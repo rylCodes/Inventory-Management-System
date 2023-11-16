@@ -39,7 +39,6 @@ export class StocksComponent implements OnInit {
   constructor(private stockService: StocksService, private uiService: UiService) {}
 
   resetForm() {
-    this.code = "";
     this.name = "";
     this.description = "";
     this.quantity = 0;
@@ -82,6 +81,9 @@ export class StocksComponent implements OnInit {
 
   // CREATE STOCK
   addStock() {
+    const lastItem = this.stocks[this.stocks.length - 1];
+    this.code = this.uiService.generateSequentialCode("STO", lastItem.id);
+
     if (!this.name) {
       window.alert("Enter stock name!");
       return;
@@ -94,19 +96,16 @@ export class StocksComponent implements OnInit {
 
     const newStock = {
       code: this.code,
-      name: this.name,
-      description: this.description,
+      name: this.name.toUpperCase(),
+      description: this.description.toUpperCase(),
       quantity: this.quantity,
       unit: this.unit || this.customUnit,
       status: this.status,
     }
 
-    const isCodeExist = this.stocks.some(stock => stock.code === newStock.code);
     const isNameExist = this.stocks.some(stock => stock.name === newStock.name);
   
-    if (isCodeExist) {
-      window.alert("Stock with this code already exists!");
-    } else if (isNameExist) {
+    if (isNameExist) {
       window.alert("Stock with this name already exists!");
     } else {
       this.stockService.addStock(newStock)
@@ -146,8 +145,8 @@ updateStock(stock: Stock) {
   this.proceedEdit = true;
   this.id = stock.id;
   this.code = stock.code;
-  this.name = stock.name;
-  this.description = stock.description;
+  this.name = stock.name.toUpperCase();
+  this.description = stock.description.toUpperCase();
   this.quantity = stock.quantity;
   this.unit = stock.unit;
   this.status = stock.status;
@@ -158,18 +157,16 @@ onSaveUpdate() {
   const editingStock = {
     id: this.id,
     code: this.code,
-    name: this.name,
-    description: this.description,
+    name: this.name.toUpperCase(),
+    description: this.description.toUpperCase(),
     quantity: this.quantity,
     unit: this.unit,
     status: this.status,
   }
-  const isCodeExist = this.stocks.some(stock => stock.id !== editingStock.id && stock.code === editingStock.code);
+
   const isNameExist = this.stocks.some(stock => stock.id !== editingStock.id && stock.name === editingStock.name);
 
-  if (isCodeExist) {
-    window.alert("Stock with this code already exists!");
-  } else if (isNameExist) {
+  if (isNameExist) {
     window.alert("Stock with this name already exists!");
   } else {
       this.stockService

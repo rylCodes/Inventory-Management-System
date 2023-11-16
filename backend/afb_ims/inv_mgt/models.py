@@ -4,7 +4,6 @@ from django.db import models
 from django.db.models import F
 from django.utils import timezone
 
-# Status Fields Option
 STATUS_CHOICES = ((True, "Active"), (False, "Inactive"))
 
 # STOCK
@@ -25,14 +24,6 @@ class Stock(models.Model):
         ordering = ["-date_updated"]
 
     def perform_sale(self, qty_sold):
-        self.quantity += qty_sold
-        self.save()
-
-    def perform_purchase(self, qty_purchased):
-        self.quantity -= qty_purchased
-        self.save()
-
-    def perform_sale(self, qty_sold):
         if qty_sold <= self.quantity:
             Stock.objects.filter(pk=self.pk).update(quantity=F('quantity') - qty_sold)
         else:
@@ -40,6 +31,9 @@ class Stock(models.Model):
 
     def perform_purchase(self, qty_purchased):
         Stock.objects.filter(pk=self.pk).update(quantity=F('quantity') + qty_purchased)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
 
 # PRODUCT    
 class Product(models.Model):
@@ -96,15 +90,16 @@ class PurchaseItem(models.Model):
     item_price = models.DecimalField(max_digits=10, decimal_places=2)
     sub_total = models.FloatField(validators=[MinValueValidator(0)], blank=True, null=True)
 
+    def __str__(self):
+        return f"Bill no: {self.billno.billno}, Item = {self.stock.name}"
+    
     def calculate_total_price(self):
-        total_price = self.quantity_purchased * self.item_price
-        return total_price
+        self.sub_total = self.quantity_purchased * self.item_price
+        return self.sub_total
     
     def update_stock(self):
         self.stock.perform_purchase(self.quantity_purchased)
 
-    def __str__(self):
-        return f"Bill no: {self.billno.billno}, Item = {self.stock.name}"
 
 # SALES BILL
 class SalesBill(models.Model):
@@ -117,10 +112,14 @@ class SalesBill(models.Model):
     def __str__(self):
         return "Bill no: " + self.billno
 
-    def get_items_list(self):
+    def get_grand_total(self):
         sales_items = SalesItem.objects.filter(billno=self)
-        total = sum(item.total_price for item in sales_items)
-        return total
+        self.grand_total = sum(item.sub_total for item in sales_items)
+        return self.grand_total
+    
+    def save(self, *args, **kwargs):
+        self.get_grand_total()
+        super().save(*args, **kwargs)
 
 # SALES ITEM
 class SalesItem(models.Model):
@@ -130,9 +129,12 @@ class SalesItem(models.Model):
     sale_date = models.DateTimeField(auto_now_add=True)
     sub_total = models.FloatField(validators=[MinValueValidator(0)], blank=True, null=True)
     
+    def __str__(self):
+        return f"{self.quantity_sold} of {self.product.name} on {self.sale_date}"
+    
     def calculate_total_price(self):
-        total_price = self.quantity_sold * self.product.price
-        return total_price
+        self.sub_total = self.quantity_sold * self.product.price
+        return self.sub_total
     
     def update_stock(self):
         stock_qty = self.product.stock_name.quantity
@@ -142,5 +144,7 @@ class SalesItem(models.Model):
         else:
             self.product.stock_name.perform_sale(total_qty)
 
-    def __str__(self):
-        return f"{self.quantity_sold} of {self.product.name} on {self.sale_date}"
+    def save(self, *args, **kwargs):
+        self.calculate_total_price()
+        self.update_stock()
+        super().save(*args, **kwargs)

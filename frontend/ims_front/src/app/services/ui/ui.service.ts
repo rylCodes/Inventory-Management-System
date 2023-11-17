@@ -1,4 +1,3 @@
-import { sequence } from '@angular/animations';
 import { Injectable } from '@angular/core';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -18,15 +17,14 @@ export class UiService {
     return prefix;
   }
 
-  generateSequentialCode(prefix: string, lastItem?: number): string {
+  generateSequentialCode(prefix: string, lastItemNumber?: number): string {
     let sequentialNumber;
-    if (lastItem) {
-      sequentialNumber = (lastItem + 1) * 1;
+    if (lastItemNumber !== undefined) {
+      sequentialNumber = (lastItemNumber + 1) * 1;
     }
 
     const currentDate = new Date();
     const yearCode = currentDate.getFullYear().toString().slice(-3);
-
     const formattedNumber = sequentialNumber?.toString().padStart(4, '0');
     const sequentialCode = `${prefix}-${yearCode}-${formattedNumber}`;
     return sequentialCode;

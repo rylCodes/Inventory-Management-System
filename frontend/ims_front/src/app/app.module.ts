@@ -7,6 +7,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { DatePipe } from '@angular/common';
 
+import { authGuard } from './guard/auth.guard';
+
 import { AppComponent } from './app.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { FooterComponent } from './components/footer/footer.component';
@@ -17,8 +19,8 @@ import { LoginComponent } from './components/login/login.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { ButtonComponent } from './components/button/button.component';
 import { PosComponent } from './components/pos/pos.component';
-
-import { authGuard } from './guard/auth.guard';
+import { SaleBillsComponent } from './components/sale-bills/sale-bills.component';
+import { SaleItemsComponent } from './components/sale-items/sale-items.component';
 
 const appRoutes: Routes = [
   {path: 'login', component: LoginComponent},
@@ -40,6 +42,8 @@ const appRoutes: Routes = [
     ButtonComponent,
     PosComponent,
     ProductsComponent,
+    SaleBillsComponent,
+    SaleItemsComponent,
   ],
   imports: [
     BrowserModule,

@@ -13,29 +13,25 @@
         class="bg-[#fff] max-w-xl h-auto mx-auto px-8 py-10 rounded-lg shadow-xl text-neutral-900 mt-4">
         <h2 class="font-bold text-center text-2xl"> {{ proceedEdit? 'Edit product' : 'Create new product' }}</h2>
         <form class="flex flex-col mt-2" (ngSubmit)="onSubmit()">
-            <label class="" for="code">Code:</label>
-            <input class="border border-neutral-900 px-2 py-1 rounded-sm mt-1 uppercase" type="text" name="code"
-                id="code" [(ngModel)]="code">
-
-            <label class="mt-4" for="name">Name:</label>
-            <input class="border border-neutral-900 px-2 py-1 rounded-sm mt-1 capitalize" type="text" name="name"
-                id="name" [(ngModel)]="name">
+            <label class="mt-4" for="product_name">Product Name:</label>
+            <input class="uppercase border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text" name="product_name"
+                id="product_name" [(ngModel)]="product_name">
 
             <label class="mt-4" for="stock_name">Stock Name:</label>
             <select class="border border-neutral-900 px-2 py-1 rounded-sm mt-1" name="stock_name" id="stock_name"
                 [(ngModel)]="stock_name" (change)="onStockSelectionChange($event)">
-                <option *ngFor="let stock of stocks" selected value="{{stock.id}}">
-                    {{stock.name}}</option>
+                <option *ngFor="let stock of stocks" value="{{stock.id}}">
+                    {{stock.stock_name}}</option>
                 <option class="text-neutral-500" value="addNewStock">add new stock ...</option>
             </select>
 
             <label class="mt-4" for="description">Description:</label>
-            <input class="border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text" name="description"
+            <input class="uppercase border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text" name="description"
                 id="description" [(ngModel)]="description">
 
             <label class="mt-4" for="qty_per_order">Quantity per order:</label>
             <input class="border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="number" name="qty_per_order"
-                id="quantity" [(ngModel)]="qty_per_order">
+                id="qty_per_order" [(ngModel)]="qty_per_order">
 
             <label class="mt-4" for="price">Price:</label>
             <input class="border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="number" name="price" id="price"
@@ -75,9 +71,9 @@
                 <th>Action</th>
             </thead>
             <tbody>
-                <tr class="{{product.status? 'active' : 'inactive'}}" *ngFor="let product of products">
+                <tr class="uppercase {{product.status? 'active' : 'inactive'}}" *ngFor="let product of products">
                     <td class="p-2">{{product.code}}</td>
-                    <td class="p-2">{{product.name}}</td>
+                    <td class="p-2">{{product.product_name}}</td>
                     <td class="p-2">{{getStockName(product.stock_name)}}</td>
                     <td class="p-2">{{product.description}}</td>
                     <td class="p-2">{{product.qty_per_order}}</td>

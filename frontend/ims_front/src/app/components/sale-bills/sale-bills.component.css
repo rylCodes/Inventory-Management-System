@@ -27,7 +27,7 @@ table th {
 }
 
 @media (min-width: 1080px) {
-    td, th {
+    td {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;

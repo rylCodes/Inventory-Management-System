@@ -1,14 +1,14 @@
 from rest_framework import serializers
 from inv_mgt.models import Product, Stock, Supplier, PurchaseBill, PurchaseItem, SalesBill, SalesItem
 
-class ProductSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Product
-        fields = '__all__'
-
 class StockSerializer(serializers.ModelSerializer):
     class Meta:
         model = Stock
+        fields = '__all__'
+
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
         fields = '__all__'
 
 class SupplierSerializer(serializers.ModelSerializer):

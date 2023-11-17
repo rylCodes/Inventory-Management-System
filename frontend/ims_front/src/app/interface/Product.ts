@@ -1,7 +1,7 @@
 export interface Product {
     id?: number,
     code: string;
-    name: string;
+    product_name: string;
     stock_name: number | undefined;
     description: string;
     qty_per_order: number;

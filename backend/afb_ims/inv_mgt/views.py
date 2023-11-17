@@ -1,7 +1,28 @@
 from rest_framework import generics, status
 from rest_framework.response import Response
+from rest_framework.permissions import IsAdminUser
 from .models import Product, Stock, Supplier, PurchaseBill, PurchaseItem, SalesBill, SalesItem, Stock
 from .serializers import ProductSerializer, SupplierSerializer, PurchaseBillSerializer, PurchaseItemSerializer , SalesBillSerializer, SalesItemSerializer, StockSerializer
+
+# Stock views
+class StockList(generics.ListCreateAPIView):
+    queryset = Stock.objects.all()
+    serializer_class = StockSerializer
+
+    def list(self, request):
+        search_query = request.query_params.get('search', None)
+        
+        if search_query:
+            queryset = Stock.objects.filter(name__icontains=search_query)
+        else:
+            queryset = self.get_queryset()
+
+        serializer = StockSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+class StockDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Stock.objects.all()
+    serializer_class = StockSerializer
 
 # Products views
 class ProductList(generics.ListCreateAPIView):
@@ -56,12 +77,3 @@ class SalesItemList(generics.ListCreateAPIView):
 class SalesItemDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = SalesItem.objects.all()
     serializer_class = SalesItemSerializer
-
-# Stock views
-class StockList(generics.ListCreateAPIView):
-    queryset = Stock.objects.all()
-    serializer_class = StockSerializer
-
-class StockDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Stock.objects.all()
-    serializer_class = StockSerializer

@@ -2,9 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { Stock } from 'src/app/interface/Stock';
 import { StocksService } from 'src/app/services/stocks/stocks';
 import { UiService } from 'src/app/services/ui/ui.service';
-import { Subscription, filter } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { faPen, faTrashCan, faXmark } from '@fortawesome/free-solid-svg-icons';
-import { Router, NavigationStart } from '@angular/router';
 
 @Component({
   selector: 'app-stocks',
@@ -12,6 +11,7 @@ import { Router, NavigationStart } from '@angular/router';
   styleUrls: ['./stocks.component.css'],
 })
 export class StocksComponent implements OnInit {
+  searchQuery: string = "product";
   deletingStock?: Stock | null = null;
   proceedEdit: boolean = false;
 
@@ -23,7 +23,7 @@ export class StocksComponent implements OnInit {
 
   id?: number; 
   code: string = "";
-  name: string = "";
+  stock_name: string = "";
   description: string = "";
   quantity: number = 0;
   unit: string = "piece";
@@ -39,7 +39,7 @@ export class StocksComponent implements OnInit {
   constructor(private stockService: StocksService, private uiService: UiService) {}
 
   resetForm() {
-    this.name = "";
+    this.stock_name = "";
     this.description = "";
     this.quantity = 0;
     this.unit = "piece";
@@ -65,7 +65,7 @@ export class StocksComponent implements OnInit {
       .getStocks()
       .subscribe((stocks) => {
         const sortedStocks = stocks.sort((a, b) => {
-          return a.name.localeCompare(b.name)
+          return a.stock_name.localeCompare(b.stock_name)
         })
         this.stocks = sortedStocks;
       });
@@ -73,7 +73,7 @@ export class StocksComponent implements OnInit {
 
   onSubmit() {
     if (this.proceedEdit) {
-      this.onSaveUpdate();
+      this.saveUpdate();
     } else {
       this.addStock();
     }
@@ -82,9 +82,16 @@ export class StocksComponent implements OnInit {
   // CREATE STOCK
   addStock() {
     const lastItem = this.stocks[this.stocks.length - 1];
-    this.code = this.uiService.generateSequentialCode("STO", lastItem.id);
+    let lastItemNumber;
+    if (lastItem) {
+      lastItemNumber = Number(lastItem.code.split('-')[2])
+    } else {
+      lastItemNumber = 0;
+    }
 
-    if (!this.name) {
+    this.code = this.uiService.generateSequentialCode("STO", lastItemNumber);
+
+    if (!this.stock_name) {
       window.alert("Enter stock name!");
       return;
     }
@@ -95,17 +102,18 @@ export class StocksComponent implements OnInit {
     }
 
     const newStock = {
+      id: this.id,
       code: this.code,
-      name: this.name.toUpperCase(),
+      stock_name: this.stock_name.toUpperCase(),
       description: this.description.toUpperCase(),
       quantity: this.quantity,
       unit: this.unit || this.customUnit,
       status: this.status,
     }
 
-    const isNameExist = this.stocks.some(stock => stock.name === newStock.name);
+    const isstock_NameExist = this.stocks.some(stock => stock.stock_name === newStock.stock_name);
   
-    if (isNameExist) {
+    if (isstock_NameExist) {
       window.alert("Stock with this name already exists!");
     } else {
       this.stockService.addStock(newStock)
@@ -145,7 +153,7 @@ updateStock(stock: Stock) {
   this.proceedEdit = true;
   this.id = stock.id;
   this.code = stock.code;
-  this.name = stock.name.toUpperCase();
+  this.stock_name = stock.stock_name.toUpperCase();
   this.description = stock.description.toUpperCase();
   this.quantity = stock.quantity;
   this.unit = stock.unit;
@@ -153,20 +161,20 @@ updateStock(stock: Stock) {
   this.toggleForm();
 }
 
-onSaveUpdate() {
+saveUpdate() {
   const editingStock = {
     id: this.id,
     code: this.code,
-    name: this.name.toUpperCase(),
+    stock_name: this.stock_name.toUpperCase(),
     description: this.description.toUpperCase(),
     quantity: this.quantity,
     unit: this.unit,
     status: this.status,
   }
 
-  const isNameExist = this.stocks.some(stock => stock.id !== editingStock.id && stock.name === editingStock.name);
+  const isstock_NameExist = this.stocks.some(stock => stock.id !== editingStock.id && stock.stock_name === editingStock.stock_name);
 
-  if (isNameExist) {
+  if (isstock_NameExist) {
     window.alert("Stock with this name already exists!");
   } else {
       this.stockService

@@ -1,7 +1,7 @@
 export interface Stock {
     id?: number;
     code: string;
-    name: string;
+    stock_name: string;
     description: string;
     quantity: number;
     unit: string;

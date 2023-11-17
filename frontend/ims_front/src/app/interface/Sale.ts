@@ -1,6 +1,6 @@
 export interface SaleBill {
     id?: number,
-    billno?: string,
+    billno: string,
     time?: string,
     customer_name: string,
     remarks: string,
@@ -10,8 +10,8 @@ export interface SaleBill {
 export interface SaleItem {
     id?: number
     billno?: string,
-    product: any,
-    quantity_sold: number,
+    product_name: any,
+    quantity_sold: number | null,
     sale_date?: string,
-    sub_total?: number,
+    sub_total?: number | null,
 }

@@ -18,16 +18,17 @@ class Stock(models.Model):
     status = models.BooleanField(choices=STATUS_CHOICES, default=True)
 
     def __str__(self):
-        return self.name
+        return self.stock_name
 
     class Meta:
         ordering = ["-date_updated"]
 
     def perform_sale(self, qty_sold):
-        if qty_sold <= self.quantity:
-            Stock.objects.filter(pk=self.pk).update(quantity=F('quantity') - qty_sold)
-        else:
-            raise ValidationError("Quantity sold is greater than available stock!")
+        # if qty_sold <= self.quantity:
+        #     Stock.objects.filter(pk=self.pk).update(quantity=F('quantity') - qty_sold)
+        # else:
+        #     raise ValidationError("Quantity sold is greater than available stock!")
+        Stock.objects.filter(pk=self.pk).update(quantity=F('quantity') - qty_sold)
 
     def perform_purchase(self, qty_purchased):
         Stock.objects.filter(pk=self.pk).update(quantity=F('quantity') + qty_purchased)
@@ -42,7 +43,7 @@ class Product(models.Model):
     stock_name = models.ForeignKey(Stock, on_delete=models.CASCADE)
     description = models.TextField(blank=True, null=True)
     qty_per_order = models.FloatField(validators=[MinValueValidator(0)])
-    price = models.DecimalField(max_digits=10, decimal_places=2)
+    price = models.FloatField(validators=[MinValueValidator(0)])
     date_added = models.DateTimeField(default=timezone.now)
     date_updated = models.DateTimeField(auto_now=True)
     status = models.BooleanField(choices=STATUS_CHOICES, default=True)
@@ -78,7 +79,7 @@ class PurchaseBill(models.Model):
 
     def get_total_price(self):
         purchase_items = PurchaseItem.objects.filter(billno=self)
-        total = sum(item.total_price for item in purchase_items)
+        total = sum(item.sub_total for item in purchase_items)
         return total
 
 # PURCHASE ITEM
@@ -87,7 +88,7 @@ class PurchaseItem(models.Model):
     billno = models.ForeignKey(PurchaseBill, on_delete=models.CASCADE)
     purchase_date = models.DateTimeField(auto_now_add=True)
     quantity_purchased = models.FloatField(validators=[MinValueValidator(0)])
-    item_price = models.DecimalField(max_digits=10, decimal_places=2)
+    item_price = models.FloatField(validators=[MinValueValidator(0)])
     sub_total = models.FloatField(validators=[MinValueValidator(0)], blank=True, null=True)
 
     def __str__(self):
@@ -139,10 +140,11 @@ class SalesItem(models.Model):
     def update_stock(self):
         stock_qty = self.product_name.stock_name.quantity
         total_qty = self.quantity_sold * self.product_name.qty_per_order
-        if total_qty > stock_qty:
-            raise ValidationError("Quantity sold is greater than available stock!")
-        else:
-            self.product_name.stock_name.perform_sale(total_qty)
+        # if total_qty > stock_qty:
+        #     raise ValidationError("Quantity sold is greater than available stock!")
+        # else:
+        #     self.product_name.stock_name.perform_sale(total_qty)
+        self.product_name.stock_name.perform_sale(total_qty)
 
     def save(self, *args, **kwargs):
         self.calculate_total_price()

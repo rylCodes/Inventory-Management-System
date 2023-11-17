@@ -6,6 +6,7 @@ import { UiService } from 'src/app/services/ui/ui.service';
 import { faPen, faTrashCan, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { Router } from '@angular/router';
 import { SalesService } from 'src/app/services/sales/sales.service';
+import { DecimalPipe } from '@angular/common';
 
 @Component({
   selector: 'app-sale-bills',

@@ -8,7 +8,8 @@
     </div>
 
     <!-- FORM -->
-    <div *ngIf="showForm" class="bg-[#fff] max-w-xl h-auto mx-auto px-8 py-10 rounded-lg shadow-xl text-neutral-900 mt-4">
+    <div *ngIf="showForm"
+        class="bg-[#fff] max-w-xl h-auto mx-auto px-8 py-10 rounded-lg shadow-xl text-neutral-900 mt-4">
         <h2 class="font-bold text-center text-2xl"> {{ proceedEdit? 'Edit item' : 'Create new item' }}</h2>
         <form class="flex flex-col mt-2" (ngSubmit)="onSubmit()">
             <label class="mt-4" for="billno">Bill no:</label>
@@ -28,8 +29,8 @@
             </select>
 
             <label class="mt-4" for="quantity_sold">Quantity:</label>
-            <input class="uppercase border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text" name="quantity_sold"
-                id="quantity_sold" [(ngModel)]="quantity_sold">
+            <input class="uppercase border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text"
+                name="quantity_sold" id="quantity_sold" [(ngModel)]="quantity_sold">
 
             <!-- Submit Button -->
             <button class="mt-10 bg-neutral-800 text-neutral-300 font-bold p-2 rounded hover:bg-[rgb(48,48,48)]"
@@ -43,6 +44,7 @@
     <div class="table-container w-full text-center shadow-xl rounded-xl mt-8 {{showForm? 'hidden': 'block'}}">
         <table class="w-full table-fixed rounded-xl">
             <thead class="text-neutral-300 bg-neutral-900">
+                <th>Customer Name</th>
                 <th>Product</th>
                 <th>Quantity</th>
                 <th>Sub Total</th>
@@ -53,7 +55,7 @@
                     <td class="p-2">{{getSaleBill(saleItem.billno)}}</td>
                     <td class="p-2">{{getProduct(saleItem.product_name)}}</td>
                     <td class="p-2">{{saleItem.quantity_sold}}</td>
-                    <td class="p-2">{{saleItem.sub_total}}</td>
+                    <td class="p-2">{{saleItem.sub_total | number: '1.2-2'}}</td>
                     <td class="flex justify-center p-2 space-x-6">
                         <!-- Edit Sale Bill -->
                         <fa-icon class="hover:scale-110" [ngStyle]="{color: 'green'}" [icon]="faPen"

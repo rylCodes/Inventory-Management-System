@@ -4,6 +4,7 @@ import { StocksService } from 'src/app/services/stocks/stocks';
 import { UiService } from 'src/app/services/ui/ui.service';
 import { Subscription } from 'rxjs';
 import { faPen, faTrashCan, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-stocks',

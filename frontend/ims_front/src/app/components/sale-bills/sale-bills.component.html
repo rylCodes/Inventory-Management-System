@@ -8,12 +8,13 @@
     </div>
 
     <!-- FORM -->
-    <div *ngIf="showForm" class="bg-[#fff] max-w-xl h-auto mx-auto px-8 py-10 rounded-lg shadow-xl text-neutral-900 mt-4">
+    <div *ngIf="showForm"
+        class="bg-[#fff] max-w-xl h-auto mx-auto px-8 py-10 rounded-lg shadow-xl text-neutral-900 mt-4">
         <h2 class="font-bold text-center text-2xl"> {{ proceedEdit? 'Edit bill' : 'Create new bill' }}</h2>
         <form class="flex flex-col mt-2" (ngSubmit)="onSubmit()">
             <label class="mt-4" for="customer_name">Customer Name:</label>
-            <input class="uppercase border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text" name="customer_name"
-                id="customer_name" [(ngModel)]="customer_name">
+            <input class="uppercase border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text"
+                name="customer_name" id="customer_name" [(ngModel)]="customer_name">
 
             <label class="mt-4" for="remarks">Remarks:</label>
             <input class="uppercase border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text" name="remarks"
@@ -44,7 +45,7 @@
                     <td class="p-2">{{saleBill.customer_name}}</td>
                     <td class="p-2">{{saleBill.remarks}}</td>
                     <td class="p-2">{{saleBill.time | date: 'hh:mm a' }}</td>
-                    <td class="p-2">{{saleBill.grand_total}}</td>
+                    <td class="p-2">{{saleBill.grand_total | number: '1.2-2'}}</td>
                     <td class="flex justify-center p-2 space-x-6">
                         <!-- Edit Sale Bill -->
                         <fa-icon class="hover:scale-110" [ngStyle]="{color: 'green'}" [icon]="faPen"

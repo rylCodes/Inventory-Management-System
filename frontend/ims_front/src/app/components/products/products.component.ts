@@ -6,6 +6,7 @@ import { StocksService } from 'src/app/services/stocks/stocks';
 import { UiService } from 'src/app/services/ui/ui.service';
 import { faPen, faTrashCan, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { Router } from '@angular/router';
+import { DecimalPipe } from '@angular/common';
 
 @Component({
   selector: 'app-products',
@@ -39,7 +40,7 @@ export class ProductsComponent implements OnInit {
       private productService: ProductsService,
       private stockService: StocksService,
       private uiService: UiService,
-      private router: Router
+      private router: Router,
     ) {}
 
   resetForm() {
@@ -76,13 +77,22 @@ export class ProductsComponent implements OnInit {
 
     this.stockService
       .getStocks()
-      .subscribe(stocks => this.stocks = stocks);
+      .subscribe(stocks => {
+        const activeStocks = stocks.filter(stock => stock.status === true);
+        this.stocks = activeStocks;
+      });
   }
 
   getStockName(stockId: any): string {
     const foundStock = this.stocks.find(stock => stock.id === stockId);
     return foundStock ? foundStock.stock_name : 'Stock Not Found';
+  }
+  
+  getStockUnit(stockId: any): string {
+    const foundStock = this.stocks.find(stock => stock.id === stockId);
+    return foundStock ? foundStock.unit : 'Stock Not Found';
   }  
+
 
   onSubmit() {
     if (this.proceedEdit) {

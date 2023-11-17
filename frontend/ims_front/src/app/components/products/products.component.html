@@ -71,13 +71,14 @@
                 <th>Action</th>
             </thead>
             <tbody>
-                <tr class="uppercase {{product.status? 'active' : 'inactive'}}" *ngFor="let product of products">
+                <tr class="{{product.status? 'active' : 'inactive'}}" *ngFor="let product of products">
                     <td class="p-2">{{product.code}}</td>
                     <td class="p-2">{{product.product_name}}</td>
                     <td class="p-2">{{getStockName(product.stock_name)}}</td>
                     <td class="p-2">{{product.description}}</td>
-                    <td class="p-2">{{product.qty_per_order}}</td>
-                    <td class="p-2">{{product.price}}</td>
+                    <td class="p-2">{{product.qty_per_order | number: '1.0-3'}} {{getStockUnit(product.stock_name)}}
+                    </td>
+                    <td class="p-2">{{product.price | number: '1.2-2'}}</td>
                     <td class="p-2">{{product.date_added | date: 'dd/MM/yyyy'}}</td>
                     <td class="p-2">{{product.date_updated | date: 'dd/MM/yyyy'}}</td>
                     <td class="p-2">{{product.status? "active": "inactive"}}</td>

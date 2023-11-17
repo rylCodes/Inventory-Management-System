@@ -6,6 +6,7 @@ import { UiService } from 'src/app/services/ui/ui.service';
 import { faPen, faTrashCan, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { Router } from '@angular/router';
 import { SalesService } from 'src/app/services/sales/sales.service';
+import { DecimalPipe } from '@angular/common';
 
 @Component({
   selector: 'app-sale-items',
@@ -67,10 +68,7 @@ export class SaleItemsComponent implements OnInit {
     this.salesService
       .getSaleItems()
       .subscribe((saleItems) => {
-        const sortedSaleItems = saleItems.sort((a, b) => {
-          return a.product_name.localeCompare(b.product_name)
-        })
-        this.saleItems = sortedSaleItems;
+        this.saleItems = saleItems;
       });
 
     this.salesService
@@ -79,7 +77,10 @@ export class SaleItemsComponent implements OnInit {
 
     this.productService
       .getProducts()
-      .subscribe(products => this.products = products)
+      .subscribe(products => {
+        const activeProducts = products.filter(product => product.status === true);
+        this.products = activeProducts;
+      })
   }
 
   getSaleBill(saleBillId: any): string {
@@ -167,6 +168,8 @@ export class SaleItemsComponent implements OnInit {
 
   // UPDATE SALE BILL
   updateSaleItem(saleItem: SaleItem) {
+    this.proceedEdit = true;
+
     this.id = saleItem.id;
     this.billno = saleItem.billno;
     this.product_name = saleItem.product_name;

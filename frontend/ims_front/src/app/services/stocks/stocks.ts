@@ -21,10 +21,8 @@
     handleStockError(error:any) {
       if (error.error.name) {
         console.log(error.error.name[0]);
-      } else if (error.error.code) {
-        console.log(error.error.code[0])
       } else {
-        console.log('Invalid inputs!');
+        console.log('Error here →', error.error);
       }
     }
 

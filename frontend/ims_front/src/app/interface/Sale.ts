@@ -10,8 +10,8 @@ export interface SaleBill {
 export interface SaleItem {
     id?: number
     billno?: string,
-    product_name: any,
-    quantity_sold: number | null,
+    product_id?: number,
+    quantity_sold: number,
     sale_date?: string,
-    sub_total?: number | null,
+    sub_total?: number,
 }

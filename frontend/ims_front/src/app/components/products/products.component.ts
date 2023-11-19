@@ -27,11 +27,13 @@ export class ProductsComponent implements OnInit {
   id?: number; 
   code: string = "";
   product_name: string = "";
-  stock_name: number | undefined;
-  description: string = "";
+  stock_id: number | undefined;
+  category: string = "liquor";
   qty_per_order: number = 0;
   price: number = 0;
   status: boolean = true;
+
+  customCategory: string = "";
 
   showForm: boolean = false;
   showActionModal: boolean = false;
@@ -47,10 +49,11 @@ export class ProductsComponent implements OnInit {
     this.proceedEdit = false;
     this.code = "";
     this.product_name = "";
-    this.stock_name = undefined;
-    this.description = "";
+    this.stock_id = undefined;
+    this.category = "liquor";
     this.qty_per_order = 0;
     this.status = true;
+    this.customCategory = "";
   }
 
   toggleForm() {
@@ -83,9 +86,21 @@ export class ProductsComponent implements OnInit {
       });
   }
 
-  getStockName(stockId: any): string {
+  getStockDetails(stockId: any): {stockName: string, stockUnit: string, stockCode: string} {
     const foundStock = this.stocks.find(stock => stock.id === stockId);
-    return foundStock ? foundStock.stock_name : 'Stock Not Found';
+    if (foundStock) {
+      return {
+        stockName: foundStock.stock_name,
+        stockCode: foundStock.code,
+        stockUnit: foundStock.unit
+      }
+    } else {
+      return {
+        stockName: "Stock not found!",
+        stockCode: "Stock not found!",
+        stockUnit: "Stock not found!",
+      }
+    }
   }
   
   getStockUnit(stockId: any): string {
@@ -104,6 +119,16 @@ export class ProductsComponent implements OnInit {
 
   // CREATE PRODUCT
   addProduct() {
+    let previousProductID;
+    if (this.products.length > 0) {
+      const previousProduct = this.products[this.products.length - 1];
+      previousProductID = previousProduct.id;
+      this.code = this.uiService.generateSequentialCode("PRO", previousProductID);
+    } else {
+      previousProductID = 0;
+      this.code = this.uiService.generateSequentialCode("PRO", previousProductID);
+    }
+
     if (!this.product_name) {
       window.alert("Enter product name!");
       return;
@@ -115,23 +140,12 @@ export class ProductsComponent implements OnInit {
       return;
     }
 
-    const lastItem = this.products[this.products.length - 1];
-    let lastItemNumber;
-
-    if (lastItem) {
-      lastItemNumber = Number(lastItem.code.split('-')[2]);
-    } else {
-      lastItemNumber = 0;
-    }
-
-    this.code = this.uiService.generateSequentialCode('PRO', lastItemNumber);
-
     const newProduct = {
       id: this.id,
       code: this.code,
       product_name: this.product_name.toUpperCase(),
-      stock_name: this.stock_name,
-      description: this.description.toUpperCase(),
+      stock_id: this.stock_id,
+      category: this.category.toUpperCase() || this.customCategory.toUpperCase(),
       qty_per_order: this.qty_per_order,
       price: this.price,
       status: this.status,
@@ -169,10 +183,62 @@ export class ProductsComponent implements OnInit {
     }
   }
 
+// UPDATE PRODUCT
+updateProduct(product: Product) {
+  this.proceedEdit = true;
+
+  this.id = product.id;
+  this.code = product.code;
+  this.product_name = product.product_name.toUpperCase();
+  this.stock_id = product.stock_id;
+  this.category = product.category.toUpperCase();
+  this.qty_per_order = product.qty_per_order;
+  this.price = product.price;
+  this.status = product.status;
+
+  this.toggleForm();
+}
+
+onSaveUpdate() {
+  const editingProduct = {
+    id: this.id,
+    code: this.code,
+    product_name: this.product_name.toUpperCase(),
+    stock_id: this.stock_id,
+    category: this.category.toUpperCase() || this.customCategory.toUpperCase(),
+    qty_per_order: this.qty_per_order,
+    price: this.price,
+    status: this.status,
+  }
+  const isNameExist = this.products.some(product => product.id !== editingProduct.id && product.product_name === editingProduct.product_name);
+
+  if (isNameExist) {
+    window.alert("Product with this name already exists!");
+  } else {
+      this.productService
+      .editProduct(editingProduct)
+      .subscribe(async (productData) => {
+        const index = this.products.findIndex(product => product.id === productData.id);
+
+        this.toggleForm();
+
+        await this.uiService.wait(100);
+        window.alert("Successfully saved changes to the product.");
+
+        this.products[index] = productData;
+      });
+    }
+  }
+
   // DELETE PRODUCT
   deleteProduct(product: Product) {
-    this.deletingProduct = product;
-    this.toggleActionModal();
+    if (this.products.length <= 1) {
+      window.alert("Please create a new product before deleting this one! Consider editing this product instead of deletion.");
+      return;
+    } else {
+      this.deletingProduct = product;
+      this.toggleActionModal();
+    }
   }
 
   onConfirmDelete() {
@@ -191,53 +257,4 @@ export class ProductsComponent implements OnInit {
       });
   }
 
-// UPDATE PRODUCT
-updateProduct(product: Product) {
-  this.proceedEdit = true;
-
-  this.id = product.id;
-  this.code = product.code;
-  this.product_name = product.product_name.toUpperCase();
-  this.stock_name = product.stock_name;
-  this.description = product.description.toUpperCase();
-  this.qty_per_order = product.qty_per_order;
-  this.price = product.price;
-  this.status = product.status;
-
-  this.toggleForm();
-}
-
-onSaveUpdate() {
-  const editingProduct = {
-    id: this.id,
-    code: this.code,
-    product_name: this.product_name.toUpperCase(),
-    stock_name: this.stock_name,
-    description: this.description.toUpperCase(),
-    qty_per_order: this.qty_per_order,
-    price: this.price,
-    status: this.status,
-  }
-  const isCodeExist = this.products.some(product => product.id !== editingProduct.id && product.code === editingProduct.code);
-  const isNameExist = this.products.some(product => product.id !== editingProduct.id && product.product_name === editingProduct.product_name);
-
-  if (isCodeExist) {
-    window.alert("Product with this code already exists!");
-  } else if (isNameExist) {
-    window.alert("Product with this name already exists!");
-  } else {
-      this.productService
-      .editProduct(editingProduct)
-      .subscribe(async (productData) => {
-        const index = this.products.findIndex(product => product.id === productData.id);
-
-        this.toggleForm();
-
-        await this.uiService.wait(100);
-        window.alert("Successfully saved changes to the product.");
-
-        this.products[index] = productData;
-      });
-    }
-  }
 }

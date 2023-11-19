@@ -2,8 +2,8 @@ export interface Product {
     id?: number,
     code: string;
     product_name: string;
-    stock_name: number | undefined;
-    description: string;
+    stock_id: number | undefined;
+    category: string;
     qty_per_order: number;
     price: number;
     date_added?: Date;

@@ -19,8 +19,6 @@ import { LoginComponent } from './components/login/login.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { ButtonComponent } from './components/button/button.component';
 import { PosComponent } from './components/pos/pos.component';
-import { SaleBillsComponent } from './components/sale-bills/sale-bills.component';
-import { SaleItemsComponent } from './components/sale-items/sale-items.component';
 
 const appRoutes: Routes = [
   {path: 'login', component: LoginComponent},
@@ -42,8 +40,6 @@ const appRoutes: Routes = [
     ButtonComponent,
     PosComponent,
     ProductsComponent,
-    SaleBillsComponent,
-    SaleItemsComponent,
   ],
   imports: [
     BrowserModule,

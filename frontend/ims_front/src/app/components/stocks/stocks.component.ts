@@ -65,10 +65,7 @@ export class StocksComponent implements OnInit {
     this.stockService
       .getStocks()
       .subscribe((stocks) => {
-        const sortedStocks = stocks.sort((a, b) => {
-          return a.stock_name.localeCompare(b.stock_name)
-        })
-        this.stocks = sortedStocks;
+        this.stocks = stocks;
       });
   }
 
@@ -82,15 +79,15 @@ export class StocksComponent implements OnInit {
 
   // CREATE STOCK
   addStock() {
-    const lastItem = this.stocks[this.stocks.length - 1];
-    let lastItemNumber;
-    if (lastItem) {
-      lastItemNumber = Number(lastItem.code.split('-')[2])
+    let previousStockID;
+    if (this.stocks.length > 0) {
+      const previousStock = this.stocks[this.stocks.length - 1];
+      previousStockID = previousStock.id;
+      this.code = this.uiService.generateSequentialCode("STO", previousStockID);
     } else {
-      lastItemNumber = 0;
+      previousStockID = 0;
+      this.code = this.uiService.generateSequentialCode("STO", previousStockID);
     }
-
-    this.code = this.uiService.generateSequentialCode("STO", lastItemNumber);
 
     if (!this.stock_name) {
       window.alert("Enter stock name!");
@@ -112,9 +109,9 @@ export class StocksComponent implements OnInit {
       status: this.status,
     }
 
-    const isstock_NameExist = this.stocks.some(stock => stock.stock_name === newStock.stock_name);
+    const isStockNameExist = this.stocks.some(stock => stock.stock_name === newStock.stock_name);
   
-    if (isstock_NameExist) {
+    if (isStockNameExist) {
       window.alert("Stock with this name already exists!");
     } else {
       this.stockService.addStock(newStock)
@@ -129,8 +126,12 @@ export class StocksComponent implements OnInit {
 
   // DELETE STOCK
   deleteStock(stock: Stock) {
-    this.deletingStock = stock;
-    this.toggleActionModal();
+    if (this.stocks.length <= 1) {
+      window.alert("Please create a new stock before deleting this one! Consider editing this stock instead of deletion.");
+    } else {
+      this.deletingStock = stock;
+      this.toggleActionModal();
+    }
   }
 
   onConfirmDelete() {
@@ -169,13 +170,13 @@ saveUpdate() {
     stock_name: this.stock_name.toUpperCase(),
     description: this.description.toUpperCase(),
     quantity: this.quantity,
-    unit: this.unit,
+    unit: this.unit || this.customUnit,
     status: this.status,
   }
 
-  const isstock_NameExist = this.stocks.some(stock => stock.id !== editingStock.id && stock.stock_name === editingStock.stock_name);
+  const isStockNameExist = this.stocks.some(stock => stock.id !== editingStock.id && stock.stock_name === editingStock.stock_name);
 
-  if (isstock_NameExist) {
+  if (isStockNameExist) {
     window.alert("Stock with this name already exists!");
   } else {
       this.stockService

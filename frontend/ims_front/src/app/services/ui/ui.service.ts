@@ -17,10 +17,10 @@ export class UiService {
     return prefix;
   }
 
-  generateSequentialCode(prefix: string, lastItemNumber?: number): string {
+  generateSequentialCode(prefix: string, previousItemId?: number): string {
     let sequentialNumber;
-    if (lastItemNumber !== undefined) {
-      sequentialNumber = (lastItemNumber + 1) * 1;
+    if (previousItemId !== undefined) {
+      sequentialNumber = (previousItemId + 1) * 1;
     }
 
     const currentDate = new Date();

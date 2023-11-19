@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { faMagnifyingGlass, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faMagnifyingGlass, faTimes, faHouse, faBoxesStacked, faList, faDesktop, faWallet, faCreditCard, faCircleInfo } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-navbar',
@@ -9,6 +9,13 @@ import { faMagnifyingGlass, faTimes } from '@fortawesome/free-solid-svg-icons';
 export class NavbarComponent {
   faMagnifyingGlass = faMagnifyingGlass;
   faTimes = faTimes;
+  faHouse = faHouse;
+  faBoxesStacked = faBoxesStacked;
+  faList = faList;
+  faDesktop = faDesktop;
+  faWallet = faWallet;
+  faCreditCard = faCreditCard;
+  faCircleInfo = faCircleInfo;
 
   searchQuery: string | null = null;
   filterText: string | null = null;

@@ -1,7 +1,8 @@
 <nav class="bg-neutral-900 h-auto w-[250px]">
     <!-- SEARCH -->
     <form (ngSubmit)="onSearch()" class="flex justify-between pl-2 py-1 mx-4 mt-4 rounded-md bg-neutral-200">
-        <input [(ngModel)]="searchQuery" name="searchQuery" class="outline-none w-full bg-inherit border-r border-neutral-500" type="text" placeholder="Search...">
+        <input [(ngModel)]="searchQuery" name="searchQuery"
+            class="outline-none w-full bg-inherit border-r border-neutral-500" type="text" placeholder="Search...">
         <button type="submit">
             <fa-icon class="px-2" [ngStyle]="{color: 'rgb(115 115 115)'}" [icon]="faMagnifyingGlass"></fa-icon>
         </button>
@@ -11,39 +12,53 @@
         <p class="text-neutral-300">Filter:</p>
         <div class="flex items-center mx-2 p-1 rounded-sm bg-neutral-300 w-fit">
             <p class="text-neutral-900 mr-2">{{filterText}}</p>
-            <fa-icon [ngStyle]="{color: 'rgb(115 115 115)'}" (click)="clearSearch()" [icon]="faTimes"></fa-icon>
+            <fa-icon (click)="clearSearch()" [icon]="faTimes"></fa-icon>
         </div>
     </div>
 
     <!-- NAVIGATION -->
     <hr class="border-t-2 border-neutral-300 mx-4 mt-4">
-    <div class="flex flex-col text-neutral-300 mt-2">
-        <a class="px-4 py-2 hover:font-bold" routerLink="/" routerLinkActive="bg-neutral-950 text-neutral-200 font-bold"
-            [routerLinkActiveOptions]="{exact: true}">
-            Dashboard</a>
-
-        <a class="px-4 py-2 hover:font-bold" routerLink="/stocks"
+    <div class="text-neutral-300 mt-2">
+        <a class="flex items-center px-4 py-2 hover:font-bold" routerLink="/"
             routerLinkActive="bg-neutral-950 text-neutral-200 font-bold" [routerLinkActiveOptions]="{exact: true}">
-            Stocks</a>
+            <fa-icon class="scale-90" [icon]="faHouse"></fa-icon>
+            <p class="ml-3">Dashboard</p>
+        </a>
 
-        <a class="px-4 py-2 hover:font-bold" routerLink="/products"
+        <a class="flex items-center px-4 py-2 hover:font-bold" routerLink="/stocks"
             routerLinkActive="bg-neutral-950 text-neutral-200 font-bold" [routerLinkActiveOptions]="{exact: true}">
-            Products</a>
+            <fa-icon class="scale-90" [icon]="faBoxesStacked"></fa-icon>
+            <p class="ml-3">Inventory</p>
+        </a>
 
-        <a class="px-4 py-2 hover:font-bold" routerLink="/pos"
+        <a class="flex items-center px-4 py-2 hover:font-bold" routerLink="/products"
             routerLinkActive="bg-neutral-950 text-neutral-200 font-bold" [routerLinkActiveOptions]="{exact: true}">
-            POS</a>
+            <fa-icon class="scale-90" [icon]="faList"></fa-icon>
+            <p class="ml-3">Menu</p>
+        </a>
 
-        <a class="px-4 py-2 hover:font-bold" routerLink="/purchases"
+        <a class="flex items-center px-4 py-2 hover:font-bold" routerLink="/pos"
             routerLinkActive="bg-neutral-950 text-neutral-200 font-bold" [routerLinkActiveOptions]="{exact: true}">
-            Purchases</a>
+            <fa-icon class="scale-90" [icon]="faDesktop"></fa-icon>
+            <p class="ml-3">POS</p>
+        </a>
 
-        <a class="px-4 py-2 hover:font-bold" routerLink="/sales"
+        <a class="flex items-center px-4 py-2 hover:font-bold" routerLink="/purchases"
             routerLinkActive="bg-neutral-950 text-neutral-200 font-bold" [routerLinkActiveOptions]="{exact: true}">
-            Sales</a>
+            <fa-icon class="scale-90" [icon]="faCreditCard"></fa-icon>
+            <p class="ml-3">Purchases</p>
+        </a>
 
-        <a class="px-4 py-2 hover:font-bold" routerLink="/about"
+        <a class="flex items-center px-4 py-2 hover:font-bold" routerLink="/sales"
             routerLinkActive="bg-neutral-950 text-neutral-200 font-bold" [routerLinkActiveOptions]="{exact: true}">
-            About</a>
+            <fa-icon class="scale-90" [icon]="faWallet"></fa-icon>
+            <p class="ml-3">Sales</p>
+        </a>
+
+        <a class="flex items-center px-4 py-2 hover:font-bold" routerLink="/about"
+            routerLinkActive="bg-neutral-950 text-neutral-200 font-bold" [routerLinkActiveOptions]="{exact: true}">
+            <fa-icon class="scale-90" [icon]="faCircleInfo"></fa-icon>
+            <p class="ml-3">About</p>
+        </a>
     </div>
 </nav>

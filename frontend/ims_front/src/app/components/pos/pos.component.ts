@@ -6,7 +6,6 @@ import { UiService } from 'src/app/services/ui/ui.service';
 import { faPen, faTrashCan, faXmark, faEye, faPlus, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { Router } from '@angular/router';
 import { SalesService } from 'src/app/services/sales/sales.service';
-import { DecimalPipe } from '@angular/common';
 
 @Component({
   selector: 'app-pos',
@@ -317,6 +316,7 @@ export class PosComponent implements OnInit {
       .subscribe(async (saleItem) => {
         this.saleItems.push(saleItem);
         this.getCurrentItems(this.saleBill);
+        this.resetItemForm();
         await this.uiService.wait(100);
         window.alert("New customer has been added successfully!");
       });

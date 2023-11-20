@@ -11,7 +11,7 @@ export interface SaleItem {
     id?: number
     billno?: number,
     product_id?: number,
-    quantity_sold: number,
+    quantity_sold: number   ,
     sale_date?: string,
     sub_total?: number,
 }

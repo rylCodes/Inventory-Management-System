@@ -52,7 +52,7 @@ class Supplier(models.Model):
 class PurchaseBill(models.Model):
     billno = models.CharField(max_length=100)
     time = models.DateTimeField(auto_now=True)
-    supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE, related_name="bills")
+    supplier_id = models.ForeignKey(Supplier, on_delete=models.CASCADE, related_name="bills")
     grand_total = models.FloatField(validators=[MinValueValidator(0)], blank=True, null=True)
 
     def __str__(self):
@@ -60,15 +60,15 @@ class PurchaseBill(models.Model):
 
 # PURCHASE ITEM
 class PurchaseItem(models.Model):
-    stock = models.ForeignKey(Stock, on_delete=models.CASCADE, related_name="purchase_items")
-    billno = models.ForeignKey(PurchaseBill, on_delete=models.CASCADE)
+    stock_id = models.ForeignKey(Stock, on_delete=models.CASCADE, related_name="purchase_items")
+    purchaseBill_id = models.ForeignKey(PurchaseBill, on_delete=models.CASCADE)
     purchase_date = models.DateTimeField(auto_now_add=True)
     quantity_purchased = models.FloatField(validators=[MinValueValidator(0)])
     item_price = models.FloatField(validators=[MinValueValidator(0)])
     sub_total = models.FloatField(validators=[MinValueValidator(0)], blank=True, null=True)
 
     def __str__(self):
-        return f"Bill no: {self.billno.billno}, Item = {self.stock.stock_name}"
+        return f"Bill no: {self.purchaseBill_id.billno}, Item = {self.stock_id.stock_name}"
 
 
 # SALES BILL

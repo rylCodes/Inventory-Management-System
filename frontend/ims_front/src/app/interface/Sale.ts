@@ -9,7 +9,7 @@ export interface SaleBill {
 
 export interface SaleItem {
     id?: number
-    billno?: string,
+    billno?: number,
     product_id?: number,
     quantity_sold: number,
     sale_date?: string,

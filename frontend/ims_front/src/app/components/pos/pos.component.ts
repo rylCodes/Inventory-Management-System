@@ -3,7 +3,7 @@ import { SaleBill, SaleItem } from 'src/app/interface/Sale';
 import { Product } from 'src/app/interface/Product';
 import { ProductsService } from 'src/app/services/products/products.service';
 import { UiService } from 'src/app/services/ui/ui.service';
-import { faPen, faTrashCan, faXmark, faEye, faPlusMinus, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faPen, faTrashCan, faXmark, faEye, faPlus, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { Router } from '@angular/router';
 import { SalesService } from 'src/app/services/sales/sales.service';
 import { DecimalPipe } from '@angular/common';
@@ -21,8 +21,8 @@ export class PosComponent implements OnInit {
   proceedEditBill: boolean = false;
   proceedEditItem: boolean = false;
 
-  showBillForm: boolean = false;  
-  showItemForm: boolean = false;
+  showBillForm: boolean = false;
+  showBillTable: boolean = true;  
   showItemTable: boolean = false;
 
   showBillActionModal: boolean = false;
@@ -32,7 +32,7 @@ export class PosComponent implements OnInit {
   faPen = faPen;
   faTrashCan = faTrashCan;
   faEye = faEye;
-  faPlusMinus = faPlusMinus;
+  faPlus = faPlus;
   faTimes = faTimes;
 
   saleBills: SaleBill[] = [];
@@ -50,7 +50,7 @@ export class PosComponent implements OnInit {
 
   saleItem: SaleItem = {
     id: undefined,
-    billno: "",
+    billno: undefined,
     product_id: undefined,
     quantity_sold:  0,
     sale_date: "",
@@ -73,27 +73,46 @@ export class PosComponent implements OnInit {
       remarks: "",
     };
   }
+  
+  resetItemForm() {
+    this.proceedEditItem = false;
+    this.saleItem.billno = undefined;
+    this.saleItem.product_id = undefined;
+    this.saleItem.quantity_sold = 0;
+    this.saleItem.sale_date = "";
+    this.saleItem.sub_total = 0;
+  }
+
+  toggleBillActionModal() {
+    this.showBillActionModal = !this.showBillActionModal;
+  }
+
+  toggleItemActionModal() {
+    this.showItemActionModal = !this.showItemActionModal;
+  }
+
+  toggleBillTable() {
+    this.showBillTable = !this.showBillTable;
+  }
+
+  toggleItemTable(saleBill: SaleBill) {
+    this.saleBill = saleBill;
+    this.getCurrentItems(saleBill);
+
+    this.toggleBillTable();
+    this.showItemTable = !this.showItemTable;
+    if (!this.showItemTable) {
+      this.resetBillForm();
+    }
+
+    console.log(this.saleBill.id);
+  }
 
   toggleBillForm() {
     this.showBillForm = !this.showBillForm;
     if (!this.showBillForm) {
       this.resetBillForm();
     }
-  }
-
-  toggleActionModal() {
-    this.showBillActionModal = !this.showBillActionModal;
-  }
-
-  toggleItemTable(saleBill: SaleBill) {
-    this.showItemTable = !this.showItemTable;
-    this.saleBill = saleBill;
-
-    this.salesService
-    .getSaleItems()
-    .subscribe((saleItems) => {
-      this.saleItems = saleItems.filter(item => item.billno === saleBill.id);
-    });
   }
 
   calculateGrandtotal(): number {
@@ -118,6 +137,12 @@ export class PosComponent implements OnInit {
         const activeProducts = products.filter(product => product.status === true);
         this.products = activeProducts;
       })
+
+    this.salesService
+      .getSaleItems()
+      .subscribe((saleItems) => {
+        this.saleItems = saleItems;
+      });
   }  
 
   onSubmit() {
@@ -143,11 +168,12 @@ export class PosComponent implements OnInit {
 
     if (lastItem) {
       lastItemNumber = Number(lastItem.billno.split('-')[2]);
+      this.saleBill.billno = this.uiService.generateSequentialCode('SBI', lastItemNumber);
     } else {
       lastItemNumber = 0;
+      this.saleBill.billno = this.uiService.generateSequentialCode('SBI', lastItemNumber);
     }
 
-    this.saleBill.billno = this.uiService.generateSequentialCode('SBI', lastItemNumber);
     this.saleBill.grand_total = this.calculateGrandtotal();
     
     const newSaleBill = {
@@ -161,12 +187,14 @@ export class PosComponent implements OnInit {
         this.saleBills.push(saleBill);
         this.toggleBillForm();
         await this.uiService.wait(100);
-        window.alert("New saleBill has been created successfully!");
+        window.alert("New transaction has been added successfully!");
       });
   }
 
   // UPDATE SALE BILL
   updateSaleBill(saleBill: SaleBill) {
+    this.proceedEditBill = true;
+
     saleBill.customer_name.toUpperCase();
     saleBill.remarks.toUpperCase();
 
@@ -191,7 +219,7 @@ export class PosComponent implements OnInit {
         this.toggleBillForm();
 
         await this.uiService.wait(100);
-        window.alert("Successfully saved changes to the bill.");
+        window.alert("Successfully saved changes to the customer details.");
 
         this.saleBills[index] = saleBillData;
       });
@@ -200,12 +228,12 @@ export class PosComponent implements OnInit {
   // DELETE BILL
   deleteSaleBill(saleBill: SaleBill) {
     if (this.saleBills.length <= 1) {
-      window.alert("Please create a new bill before deleting this one! Consider editing this bill instead of deletion.");
+      window.alert("Please add new transaction before deleting this one! Consider editing this instead of deletion.");
       return;
     }
     else {
       this.deletingSaleBill = saleBill;
-      this.toggleActionModal();
+      this.toggleBillActionModal();
     }
   }
 
@@ -219,30 +247,10 @@ export class PosComponent implements OnInit {
       .subscribe(async () => {
         this.saleBills = this.saleBills.filter(s => s.id !== this.deletingSaleBill?.id);
         this.deletingSaleBill = null;
-        this.toggleActionModal()
+        this.toggleBillActionModal()
         await this.uiService.wait(100);
-        window.alert("SaleBill has been deleted successfully!");
+        window.alert("Transaction has been deleted successfully!");
       });
-  }
-
-  resetItemForm() {
-    this.proceedEditItem = false;
-    this.saleItem.billno = "";
-    this.saleItem.product_id = undefined;
-    this.saleItem.quantity_sold = 0;
-    this.saleItem.sale_date = "";
-    this.saleItem.sub_total = 0;
-  }
-
-  toggleItemForm() {
-    this.showItemForm = !this.showItemForm;
-    if (!this.showItemForm) {
-      this.resetItemForm();
-    }
-  }
-
-  toggleItemActionModal() {
-    this.showItemActionModal = !this.showItemActionModal;
   }
 
   // SHOW ITEMS
@@ -276,6 +284,18 @@ export class PosComponent implements OnInit {
     }
   }
 
+  getCurrentItems(saleBill: SaleBill) {
+    this.salesService
+      .getSaleItems()
+      .subscribe((saleItems) => {
+        this.saleItems = saleItems.filter(item => item.billno === saleBill.id);
+        this.saleItems.forEach(item => {
+          item.sub_total = item.quantity_sold * this.getProductDetails(item.product_id).productPrice;
+        })
+        this.saleBill.grand_total = this.calculateGrandtotal();
+      });
+  }
+
   // ADD SALE ITEM
   addSaleItem() {
     if (!this.saleItem.product_id) {
@@ -286,7 +306,8 @@ export class PosComponent implements OnInit {
       return;
     }
     
-    this.saleItem.sub_total = this.saleItem.quantity_sold * this.getProductDetails(this.saleItem.product_id).productPrice; 
+    this.saleItem.sub_total = this.saleItem.quantity_sold * this.getProductDetails(this.saleItem.product_id).productPrice;
+    this.saleItem.billno = this.saleBill.id;
 
     const newSaleItem = {
       ...this.saleItem,
@@ -295,16 +316,15 @@ export class PosComponent implements OnInit {
     this.salesService.addSaleItem(newSaleItem)
       .subscribe(async (saleItem) => {
         this.saleItems.push(saleItem);
-        this.toggleItemForm();
+        this.getCurrentItems(this.saleBill);
         await this.uiService.wait(100);
-        window.alert("New saleBill has been created successfully!");
+        window.alert("New customer has been added successfully!");
       });
   }
 
   onProductSelectionChange(event: Event) {
     const target = event?.target as HTMLSelectElement;
     if (target.value === 'addNewProduct') {
-      this.toggleItemForm();
       this.router.navigate(['products/']);
     }
   }
@@ -315,8 +335,6 @@ export class PosComponent implements OnInit {
     console.log(this.getProductDetails(saleItem.product_id).productPrice);
     this.proceedEditItem = true;
     this.saleItem = {...saleItem};
-
-    this.toggleItemForm();
   }
 
   saveItemUpdate() {
@@ -331,8 +349,6 @@ export class PosComponent implements OnInit {
       .editSaleItem(editingSaleItem)
       .subscribe(async (saleItemData) => {
         const index = this.saleItems.findIndex(saleItem => saleItem.id === saleItemData.id);
-
-        this.toggleItemForm();
 
         await this.uiService.wait(100);
         window.alert("Successfully saved changes to the item.");
@@ -358,6 +374,7 @@ export class PosComponent implements OnInit {
         this.saleBills = this.saleBills.filter(s => s.id !== this.deletingSaleItem?.id);
         this.deletingSaleItem = null;
         this.toggleItemActionModal()
+        this.getCurrentItems(this.saleBill);
         await this.uiService.wait(100);
         window.alert("SaleBill has been deleted successfully!");
       });

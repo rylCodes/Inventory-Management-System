@@ -53,7 +53,7 @@ class PurchaseBill(models.Model):
     billno = models.CharField(max_length=100)
     time = models.DateTimeField(auto_now=True)
     supplier_id = models.ForeignKey(Supplier, on_delete=models.CASCADE, related_name="bills")
-    grand_total = models.FloatField(validators=[MinValueValidator(0)], blank=True, null=True)
+    grand_total = models.FloatField(validators=[MinValueValidator(0)], default=0)
 
     def __str__(self):
         return "Bill no: " + self.billno
@@ -65,7 +65,7 @@ class PurchaseItem(models.Model):
     purchase_date = models.DateTimeField(auto_now_add=True)
     quantity_purchased = models.FloatField(validators=[MinValueValidator(0)])
     item_price = models.FloatField(validators=[MinValueValidator(0)])
-    sub_total = models.FloatField(validators=[MinValueValidator(0)], blank=True, null=True)
+    sub_total = models.FloatField(validators=[MinValueValidator(0)], default=0)
 
     def __str__(self):
         return f"Bill no: {self.purchaseBill_id.billno}, Item = {self.stock_id.stock_name}"
@@ -77,18 +77,19 @@ class SalesBill(models.Model):
     time = models.DateTimeField(auto_now=True)
     customer_name = models.CharField(max_length=200)
     remarks = models.CharField(max_length=100)
-    grand_total = models.FloatField(validators=[MinValueValidator(0)], blank=True, null=True)
+    grand_total = models.FloatField(validators=[MinValueValidator(0)], default=0)
 
     def __str__(self):
         return "Bill no: " + self.billno
 
 # SALES ITEM
 class SalesItem(models.Model):
-    billno = models.ForeignKey(SalesBill, on_delete=models.CASCADE, related_name="sales_items")
+    billno = models.ForeignKey(SalesBill, on_delete=models.CASCADE, related_name="sales_items", blank=True, null=True)
     product_id = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity_sold = models.FloatField(validators=[MinValueValidator(0)])
+    quantity = models.FloatField(validators=[MinValueValidator(0)])
+    price = models.FloatField(validators=[MinValueValidator(0)], default=0)
     sale_date = models.DateTimeField(auto_now_add=True)
-    sub_total = models.FloatField(validators=[MinValueValidator(0)], blank=True, null=True)
+    sub_total = models.FloatField(validators=[MinValueValidator(0)], default=0)
     
     def __str__(self):
         return f"{self.quantity_sold} of {self.product_id.product_name} on {self.sale_date}"

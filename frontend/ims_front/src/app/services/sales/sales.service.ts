@@ -56,7 +56,7 @@ export class SalesService {
     return this.http.post<SaleItem>(`${this.apiUrl}sales-item/`, saleItem, httpOptions)
       .pipe(
         catchError((error) => {
-          console.log("Error here:", error);
+          console.log("Error here:", error.error);
           return throwError(() => 'Failed to add new saleItem!');
         })
       );
@@ -71,7 +71,7 @@ export class SalesService {
     return this.http.put<SaleItem>(url, saleItem, httpOptions)
     .pipe(
       catchError((error) => {
-        console.log("Error here:", error)
+        console.log("Error here:", error.error);
         return throwError(() => "Failed to edit saleItem!");
       })
     );

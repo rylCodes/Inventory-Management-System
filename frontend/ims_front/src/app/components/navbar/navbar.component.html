@@ -43,6 +43,12 @@
             <p class="ml-3">POS</p>
         </a>
 
+        <a class="flex items-center px-4 py-2 hover:font-bold" routerLink="/suppliers"
+            routerLinkActive="bg-neutral-950 text-neutral-200 font-bold" [routerLinkActiveOptions]="{exact: true}">
+            <fa-icon class="scale-90" [icon]="faHandshake"></fa-icon>
+            <p class="ml-3">Suppliers</p>
+        </a>
+
         <a class="flex items-center px-4 py-2 hover:font-bold" routerLink="/purchases"
             routerLinkActive="bg-neutral-950 text-neutral-200 font-bold" [routerLinkActiveOptions]="{exact: true}">
             <fa-icon class="scale-90" [icon]="faCreditCard"></fa-icon>

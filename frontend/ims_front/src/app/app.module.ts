@@ -20,6 +20,7 @@ import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { ButtonComponent } from './components/button/button.component';
 import { PosComponent } from './components/pos/pos.component';
 import { PurchasesComponent } from './components/purchases/purchases.component';
+import { SuppliersComponent } from './components/suppliers/suppliers.component';
 
 const appRoutes: Routes = [
   {path: 'login', component: LoginComponent},
@@ -27,8 +28,8 @@ const appRoutes: Routes = [
   {path: 'stocks', component: StocksComponent, canActivate: [authGuard]},
   {path: 'products', component: ProductsComponent, canActivate: [authGuard]},
   {path: 'pos', component: PosComponent, canActivate: [authGuard]},
+  {path: 'suppliers', component: SuppliersComponent, canActivate: [authGuard]},
   {path: 'purchases', component: PurchasesComponent, canActivate: [authGuard]},
-
 ]
 
 @NgModule({
@@ -44,6 +45,7 @@ const appRoutes: Routes = [
     PosComponent,
     ProductsComponent,
     PurchasesComponent,
+    SuppliersComponent,
   ],
   imports: [
     BrowserModule,

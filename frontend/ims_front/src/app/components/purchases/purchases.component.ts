@@ -3,10 +3,12 @@ import { PurchaseBill, PurchaseItem } from 'src/app/interface/Purchase';
 import { Stock } from 'src/app/interface/Stock';
 import { StocksService } from 'src/app/services/stocks/stocks';
 import { UiService } from 'src/app/services/ui/ui.service';
-import { faPen, faTrashCan, faXmark, faEye, faPlus, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faPen, faTrashCan, faXmark, faEye, faPlus, faMinus, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { Router } from '@angular/router';
 import { PurchasesService } from 'src/app/services/purchases/purchases.service';
 import { SaleItem } from 'src/app/interface/Sale';
+import { SuppliersService } from 'src/app/services/suppliers/suppliers.service';
+import { Supplier } from 'src/app/interface/Supplier';
 
 @Component({
   selector: 'app-purchases',
@@ -33,11 +35,13 @@ export class PurchasesComponent implements OnInit {
   faTrashCan = faTrashCan;
   faEye = faEye;
   faPlus = faPlus;
+  faMinus = faMinus;
   faTimes = faTimes;
 
   bills: PurchaseBill[] = [];
   items: PurchaseItem[] = [];
   stocks: Stock[] = [];
+  suppliers: Supplier[] = [];
 
   bill: PurchaseBill = {
     id: undefined,
@@ -60,7 +64,8 @@ export class PurchasesComponent implements OnInit {
       private purchasesService: PurchasesService,
       private stocksService: StocksService,
       private uiService: UiService,
-      private router: Router
+      private router: Router,
+      private suppliersService: SuppliersService
     ) {}
 
   resetBillForm() {
@@ -121,6 +126,17 @@ export class PurchasesComponent implements OnInit {
     return grandTotal;
   }
 
+  increaseQtyInput(): void {
+    this.item.quantity_purchased ++;
+  }
+
+  decreaseQtyInput(): void {
+    if (this.item.quantity_purchased < 1) {
+      return;
+    }
+    this.item.quantity_purchased --;
+  }
+
   // SHOW BILLS
   ngOnInit(): void {
     this.purchasesService
@@ -136,9 +152,11 @@ export class PurchasesComponent implements OnInit {
 
     this.purchasesService
       .getPurchaseItems()
-      .subscribe((items) => {
-        this.items = items;
-      });
+      .subscribe((items) => this.items = items);
+
+    this.suppliersService
+      .getSuppliers()
+      .subscribe(suppliers => this.suppliers = suppliers);
   }  
 
   onSubmit() {
@@ -159,12 +177,14 @@ export class PurchasesComponent implements OnInit {
     const lastItem = this.bills[this.bills.length - 1];
     let lastItemNumber;
 
-    if (lastItem) {
-      lastItemNumber = Number(lastItem.billno.split('-')[2]);
-      this.bill.billno = this.uiService.generateSequentialCode('SBI', lastItemNumber);
-    } else {
-      lastItemNumber = 0;
-      this.bill.billno = this.uiService.generateSequentialCode('SBI', lastItemNumber);
+    if (!this.bill.billno) {
+      if (lastItem) {
+        lastItemNumber = Number(lastItem.billno.split('-')[2]);
+        this.bill.billno = this.uiService.generateSequentialCode('SBI', lastItemNumber);
+      } else {
+        lastItemNumber = 0;
+        this.bill.billno = this.uiService.generateSequentialCode('SBI', lastItemNumber);
+      }
     }
 
     this.bill.grand_total = this.calculateGrandtotal();
@@ -183,7 +203,7 @@ export class PurchasesComponent implements OnInit {
   }
 
   // UPDATE SALE BILL
-  updateSaleBill(bill: PurchaseBill) {
+  updateBill(bill: PurchaseBill) {
     this.proceedEditBill = true;
     this.bill = bill;
 
@@ -303,6 +323,13 @@ export class PurchasesComponent implements OnInit {
         await this.uiService.wait(100);
         window.alert("New customer has been added successfully!");
       });
+  }
+
+  onSupplierSelectionChange(event: Event) {
+    const target = event?.target as HTMLSelectElement;
+    if (target.value === 'addNewSupplier') {
+      this.router.navigate(['suppliers/']);
+    }
   }
 
   onProductSelectionChange(event: Event) {

@@ -35,53 +35,56 @@
         </div>
 
         <!-- HEADING: ITEM TABLE -->
-        <div *ngIf="showItemTable" class="flex justify-between mt-8">
-            <h1 class="font-bold text-2xl">Order List:</h1>
+        <div class="flex justify-between mt-8">
+            <h1 class="font-bold text-2xl">Add products:</h1>
             <!-- BACK TO BILL TABLE BUTTON -->
-            <app-button txtContent="Back" bgColor="rgb(38 38 38)" (btnClick)="toggleItemTable(saleBill)"></app-button>
+            <app-button *ngIf="updatingItemTable" txtContent="Back" bgColor="rgb(38 38 38)" (btnClick)="filterItemTable(saleBill)"></app-button>
         </div>
 
+        <!-- ITEM FORM -->
+        <form class="flex items-end text-start justify-between w-3/4 bg-[#fff] h-fit mt-4 px-4 py-2 rounded-lg shadow-xl text-neutral-900"
+            (ngSubmit)="onSubmitItem()">
+            <div class="flex flex-col w-2/5">
+                <label for="product_name">Product:</label>
+                <select class="border border-neutral-900 px-1 py-0.5 rounded-sm mt-1 w-full" name="product_name"
+                    id="product_name" [(ngModel)]="saleItem.product_id"
+                    (change)="onProductSelectionChange($event)">
+                    <option *ngFor="let product of products" selected value="{{product.id}}">
+                        {{product.product_name}}</option>
+                    <option class="text-neutral-500" value="addNewProduct">add new product ...</option>
+                </select>
+            </div>
+
+            <div class="flex flex-col w-2/5">
+                <label for="quantity">Quantity:</label>
+                <div class="flex items-center space-x-1">
+                    <fa-icon [icon]="faPlus" (click)="increaseQtyInput()"></fa-icon>
+                    <input
+                    class="text-center uppercase border border-neutral-900 px-1 py-0.5    rounded-sm mt-1 w-2/3"
+                    type="number" name="quantity" id="quantity" [(ngModel)]="saleItem.quantity">
+                    <fa-icon [icon]="faMinus" (click)="decreaseQtyInput()"></fa-icon>
+                </div>
+            </div>
+
+            <!-- BUTTON: Add or Edit Item -->
+            <button class="flex px-1.5 py-1 h-fit items-center space-x-1 rounded-md bg-neutral-800"
+                type="submit">
+                <fa-icon class="scale-75" [icon]="faPlus" [ngStyle]="{color: 'rgb(212 212 212)'}">
+                </fa-icon>
+                <p class="text-neutral-300 text-xs">{{ proceedEditItem? 'Update': 'Add' }}</p>
+            </button>
+        </form>
+
         <!-- FLEX CONTAINER: ORDER LIST -->
-        <div *ngIf="showItemTable" class="flex justify-center space-x-2 w-full">
-            <div
-                class="table-container w-3/4 text-center shadow-xl rounded-xl mt-4 {{showBillTable? 'hidden': 'block'}}">
-                <!-- ITEM FORM -->
-                <form
-                    class="flex items-end text-start justify-between w-full bg-[#fff] h-fit mx-auto px-4 py-2 rounded-lg shadow-xl text-neutral-900"
-                    (ngSubmit)="onSubmitItem()">
-                    <div class="flex flex-col w-2/5">
-                        <label for="product_name">Product:</label>
-                        <select class="border border-neutral-900 px-1 py-0.5 rounded-sm mt-1 w-full" name="product_name"
-                            id="product_name" [(ngModel)]="saleItem.product_id"
-                            (change)="onProductSelectionChange($event)">
-                            <option *ngFor="let product of products" selected value="{{product.id}}">
-                                {{product.product_name}}</option>
-                            <option class="text-neutral-500" value="addNewProduct">add new product ...</option>
-                        </select>
-                    </div>
-
-                    <div class="flex flex-col w-2/5">
-                        <label for="quantity_sold">Quantity:</label>
-                        <input
-                            class="text-center uppercase border border-neutral-900 px-1 py-0.5    rounded-sm mt-1 w-full"
-                            type="number" name="quantity_sold" id="quantity_sold" [(ngModel)]="saleItem.quantity_sold">
-                    </div>
-
-                    <!-- BUTTON: Add or Edit Item -->
-                    <button class="flex px-1.5 py-1 h-fit items-center space-x-1 rounded-md bg-neutral-800"
-                        type="submit">
-                        <fa-icon class="scale-75" [icon]="faPlus" [ngStyle]="{color: 'rgb(212 212 212)'}">
-                        </fa-icon>
-                        <p class="text-neutral-300 text-xs">{{ proceedEditItem? 'Update': 'Add' }}</p>
-                    </button>
-                </form>
-
+        <div class="flex justify-center space-x-2 w-full">
+            <div class="table-container w-3/4 text-center shadow-xl mt-4">
                 <!-- ITEM TABLE -->
-                <table class="w-full table-fixed rounded-xl mt-4">
+                <table class="w-full table-fixed">
                     <thead class="text-neutral-300 bg-neutral-900">
-                        <th>Code</th>
+                        <th>Time</th>
                         <th>Product</th>
                         <th>Quantity</th>
+                        <th>Price</th>  
                         <th>Sub Total</th>
                     </thead>
                     <tbody>
@@ -92,12 +95,13 @@
                                         [ngStyle]="{color: 'rgb(212 212 212)'}">
                                     </fa-icon>
                                 </button>
-                                <p>{{getProductDetails(item.product_id).productCode}}</p>
+                                <p>{{item.sale_date | date: 'hh:mm a'}}</p>
                             </td>
+                            <td class="p-2">{{getProductDetails(item.product_id).productName}}</td>
+                            <td class="p-2">{{item.quantity}}</td>
                             <td class="p-2">
-                                <p>{{getProductDetails(item.product_id).productName}}</p>
+                                <p>{{item.price| number: '1.2-2'}}</p>
                             </td>
-                            <td class="p-2">{{item.quantity_sold}}</td>
                             <td class="p-2">{{item.sub_total | number: '1.2-2'}}</td>
                         </tr>
                     </tbody>
@@ -105,8 +109,8 @@
             </div>
 
             <!-- BILL DIV -->
-            <div class="bg-[#fff] flex-1 h-auto mx-auto p-4 rounded-lg shadow-xl text-neutral-900 mt-4">
-                <div class="flex flex-col">
+            <div *ngIf="updatingItemTable" class="bg-[#fff] self-start flex-1 h-auto mx-auto p-4 rounded-lg shadow-xl text-neutral-900 mt-4">
+                <form class="flex flex-col">
                     <h3 class="" for="saleBill.customer_name">Bill No.:</h3>
                     <p class="uppercase border border-neutral-900 px-1 py-0.5 rounded-sm mt-1 text-center">
                         {{saleBill.billno}}
@@ -124,32 +128,53 @@
 
                     <h3 class="mt-4" for="remarks">Total Amount:</h3>
                     <p class="uppercase border border-neutral-900 px-1 py-0.5 rounded-sm mt-1 text-center">
-                        {{saleBill.grand_total | number: '1.2-2'}}
+                        &#8369;{{saleBill.grand_total | number: '1.2-2'}}
                     </p>
+
+                    <!-- Proceed Payment Button -->
+                    <button class="mt-10 bg-neutral-800 text-neutral-300 font-bold p-2 rounded hover:bg-[rgb(48,48,48)]"
+                        type="button" (click)="transactionFunc()">
+                        {{updatingItemTable? 'Proceed Payment' : 'Add transaction' }}
+                    </button>
+                </form>
+            </div>
+
+            <!-- BILL FORM: Add -->
+            <div *ngIf="!updatingItemTable" class="bg-[#fff] self-start flex-1 h-auto mx-auto p-4 rounded-lg shadow-xl text-neutral-900 mt-4">
+                <form class="flex flex-col mt-2" (ngSubmit)="onSubmitBill()">
+                    <label class="mt-4" for="saleBill.customer_name">Customer Name:</label>
+                    <input class="uppercase border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text"
+                        name="saleBill.customer_name" id="saleBill.customer_name" [(ngModel)]="saleBill.customer_name">
+
+                    <label class="mt-4" for="remarks">Remarks:</label>
+                    <input class="uppercase border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text" name="remarks"
+                        id="remarks" [(ngModel)]="saleBill.remarks">
 
                     <!-- Submit Button -->
                     <button class="mt-10 bg-neutral-800 text-neutral-300 font-bold p-2 rounded hover:bg-[rgb(48,48,48)]"
-                        type="button">
-                        Proceed Payment
+                        type="submit">
+                        Add transaction
                     </button>
-                </div>
+                </form>
             </div>
+
         </div>
 
         <!-- HEADING: BILL TABLE -->
         <div *ngIf="showBillTable" class="flex justify-between mt-8">
             <h1 class="font-bold text-2xl">{{showBillForm? '': 'Ongoing Transactions:'}}</h1>
             <!-- ADD BUTTON -->
-            <app-button txtContent="{{showBillForm? 'Cancel': 'Add'}}" bgColor="{{showBillForm? 'red': 'green'}}"
+            <app-button *ngIf="showBillForm" txtContent="Cancel" bgColor="red"
                 (btnClick)="toggleBillForm()"></app-button>
         </div>
 
-        <!-- BILL FORM -->
+        <!-- BILL FORM: Edit -->
         <div *ngIf="showBillForm"
             class="bg-[#fff] max-w-xl h-auto mx-auto px-8 py-10 rounded-lg shadow-xl text-neutral-900 mt-4">
-            <h2 class="font-bold text-center text-2xl"> {{ proceedEditBill? 'Edit transaction details' : 'Add new
-                transaction' }}</h2>
-            <form class="flex flex-col mt-2" (ngSubmit)="onSubmit()">
+            <h2 class="font-bold text-center text-2xl">
+                {{ proceedEditBill? "Edit transaction details" : "Add new transaction" }}
+            </h2>
+            <form class="flex flex-col mt-2" (ngSubmit)="onSubmitBill()">
                 <label class="mt-4" for="saleBill.customer_name">Customer Name:</label>
                 <input class="uppercase border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text"
                     name="saleBill.customer_name" id="saleBill.customer_name" [(ngModel)]="saleBill.customer_name">
@@ -161,7 +186,7 @@
                 <!-- Submit Button -->
                 <button class="mt-10 bg-neutral-800 text-neutral-300 font-bold p-2 rounded hover:bg-[rgb(48,48,48)]"
                     type="submit">
-                    {{ proceedEditBill? 'Update': 'Add' }}
+                    Update
                 </button>
             </form>
         </div>
@@ -182,7 +207,7 @@
                         <td class="flex justify-center p2">
                             <!-- View Order List -->
                             <button class="flex px-1.5 py-1 items-center space-x-1 rounded-md bg-neutral-800"
-                                (click)="toggleItemTable(saleBill)">
+                                (click)="filterItemTable(saleBill)">
                                 <fa-icon class="scale-75" [icon]="faEye" [ngStyle]="{color: 'rgb(212 212 212)'}">
                                 </fa-icon>
                                 <p class="text-neutral-300 text-xs">View</p>

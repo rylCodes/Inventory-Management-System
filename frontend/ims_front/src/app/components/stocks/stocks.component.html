@@ -36,8 +36,8 @@
                 id="description" [(ngModel)]="description">
 
             <label class="mt-4" for="quantity">Quantity:</label>
-            <input appSelectAllText class="border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="number" name="quantity"
-                id="quantity" [(ngModel)]="quantity">
+            <input appSelectAllText class="border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="number"
+                name="quantity" id="quantity" [(ngModel)]="quantity">
 
             <label class="mt-4" for="unit">Unit:</label>
             <select class="lowercase border border-neutral-900 px-2 py-1 rounded-sm mt-1" name="unit" id="unit"
@@ -85,7 +85,7 @@
                 <th>Action</th>
             </thead>
             <tbody>
-                <tr class="{{stock.status? 'active' : 'inactive'}}" *ngFor="let stock of stocks">
+                <tr class="{{stock.status? 'active' : 'inactive'}}" *ngFor="let stock of activeStocks">
                     <td class="p-2">{{stock.code}}</td>
                     <td class="p-2">{{stock.stock_name}}</td>
                     <td class="p-2">{{stock.description}}</td>

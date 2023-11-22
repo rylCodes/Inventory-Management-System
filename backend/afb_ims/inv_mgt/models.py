@@ -1,8 +1,9 @@
 from django.core.validators import MinValueValidator
-from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import F
 from django.utils import timezone
+# from django.db.models.signals import pre_save
+# from django.dispatch import receiver
+# from .utils import get_padded_pk, year_last_digits
 
 STATUS_CHOICES = ((True, "Active"), (False, "Inactive"))
 
@@ -19,6 +20,11 @@ class Stock(models.Model):
 
     def __str__(self):
         return self.stock_name
+    
+# @receiver(pre_save, sender=Stock)
+# def update_stock_code(sender, instance, **kwargs):
+#     if not instance.code:
+#         instance.code = f'STO-{year_last_digits()}-{get_padded_pk(instance)}'
 
 # PRODUCT    
 class Product(models.Model):

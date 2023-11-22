@@ -15,8 +15,8 @@
                 </fa-icon>
                 <p class="mb-8 mt-6 text-center">Are you sure you want to delete this item?<br>This action cannot be
                     undone.</p>
-                <app-button appFocusOnShow="showBillActionModal" (btnClick)="onConfirmDeleteItem()" bgColor="red" txtColor="bg-white"
-                    txtContent="Delete"></app-button>
+                <app-button appFocusOnShow="showBillActionModal" (btnClick)="onConfirmDeleteItem()" bgColor="red"
+                    txtColor="bg-white" txtContent="Delete"></app-button>
             </div>
         </div>
 
@@ -41,13 +41,13 @@
         </div>
 
         <!-- ITEM FORM -->
-        <form class="flex items-end text-start justify-between w-3/4 bg-[#fff] h-fit mt-4 px-4 py-2 rounded-lg shadow-xl text-neutral-900"
+        <form
+            class="flex items-end text-start justify-between w-3/4 bg-[#fff] h-fit mt-4 px-4 py-2 rounded-lg shadow-xl text-neutral-900"
             (ngSubmit)="onSubmitItem()">
             <div class="flex flex-col w-2/5">
                 <label for="product_name">Product:</label>
                 <select class="border border-neutral-900 px-1 py-0.5 rounded-sm mt-1 w-full" name="product_name"
-                    id="product_name" [(ngModel)]="saleItem.product_id"
-                    (change)="onProductSelectionChange($event)">
+                    id="product_name" [(ngModel)]="saleItem.product_id" (change)="onProductSelectionChange($event)">
                     <option *ngFor="let product of products" selected value="{{product.id}}">
                         {{product.product_name}}</option>
                     <option class="text-neutral-500" value="addNewProduct">add new product ...</option>
@@ -58,15 +58,15 @@
                 <label for="quantity">Quantity:</label>
                 <div class="flex items-center space-x-1">
                     <fa-icon [icon]="faPlus" (click)="increaseQtyInput()"></fa-icon>
-                    <input appSelectAllText class="text-center uppercase border border-neutral-900 px-1 py-0.5    rounded-sm mt-1 w-2/3"
-                    type="number" name="quantity" id="quantity" [(ngModel)]="saleItem.quantity">
+                    <input appSelectAllText
+                        class="text-center uppercase border border-neutral-900 px-1 py-0.5    rounded-sm mt-1 w-2/3"
+                        type="number" name="quantity" id="quantity" [(ngModel)]="saleItem.quantity">
                     <fa-icon [icon]="faMinus" (click)="decreaseQtyInput()"></fa-icon>
                 </div>
             </div>
 
             <!-- BUTTON: Add or Edit Item -->
-            <button class="flex px-1.5 py-1 h-fit items-center space-x-1 rounded-md bg-neutral-800"
-                type="submit">
+            <button class="flex px-1.5 py-1 h-fit items-center space-x-1 rounded-md bg-neutral-800" type="submit">
                 <fa-icon class="scale-75" [icon]="faPlus" [ngStyle]="{color: 'rgb(212 212 212)'}">
                 </fa-icon>
                 <p class="text-neutral-300 text-xs">{{ proceedEditItem? 'Update': 'Add' }}</p>
@@ -82,7 +82,7 @@
                         <th>Time</th>
                         <th>Product</th>
                         <th>Quantity</th>
-                        <th>Price</th>  
+                        <th>Price</th>
                         <th>Sub Total</th>
                     </thead>
                     <tbody>
@@ -107,7 +107,8 @@
             </div>
 
             <!-- BILL DIV -->
-            <div *ngIf="updatingItemTable" class="bg-[#fff] self-start flex-1 h-auto mx-auto p-4 rounded-lg shadow-xl text-neutral-900 mt-4">
+            <div *ngIf="updatingItemTable"
+                class="bg-[#fff] self-start flex-1 h-auto mx-auto p-4 rounded-lg shadow-xl text-neutral-900 mt-4">
                 <form class="flex flex-col">
                     <h3 for="saleBill.customer_name">Bill No.:</h3>
                     <p class="uppercase border border-neutral-900 px-1 py-0.5 rounded-sm mt-1 text-center">
@@ -131,10 +132,13 @@
 
                     <!-- Proceed Payment Button -->
                     <div class="flex justify-center mt-6 space-x-2">
-                        <button *ngIf="updatingItemTable" class="bg-neutral-800 text-neutral-300 font-bold p-2 rounded hover:bg-[rgb(48,48,48)]" type="button" (click)="viewOrder(saleBill)">
+                        <button *ngIf="updatingItemTable"
+                            class="bg-neutral-800 text-neutral-300 font-bold p-2 rounded hover:bg-[rgb(48,48,48)]"
+                            type="button" (click)="viewOrder(saleBill)">
                             Back
                         </button>
-                        <button class="bg-[#008000] text-neutral-300 font-bold p-2 rounded hover:bg-[#009000]" type="button" (click)="transactionFunc()">
+                        <button class="bg-[#008000] text-neutral-300 font-bold p-2 rounded hover:bg-[#009000]"
+                            type="button" (click)="transactionFunc()">
                             {{updatingItemTable? 'Proceed Payment' : 'Add transaction' }}
                         </button>
                     </div>
@@ -142,15 +146,17 @@
             </div>
 
             <!-- BILL FORM: Add -->
-            <div *ngIf="!updatingItemTable" class="bg-[#fff] self-start flex-1 h-auto mx-auto p-4 rounded-lg shadow-xl text-neutral-900 mt-4">
+            <div *ngIf="!updatingItemTable"
+                class="bg-[#fff] self-start flex-1 h-auto mx-auto p-4 rounded-lg shadow-xl text-neutral-900 mt-4">
                 <form class="flex flex-col" (ngSubmit)="onSubmitBill()">
                     <label for="saleBill.customer_name">Customer Name:</label>
-                    <input class="text-center uppercase border border-neutral-900 px-1 py-0.5 rounded-sm mt-1" type="text"
-                        name="saleBill.customer_name" id="saleBill.customer_name" [(ngModel)]="saleBill.customer_name">
+                    <input class="text-center uppercase border border-neutral-900 px-1 py-0.5 rounded-sm mt-1"
+                        type="text" name="saleBill.customer_name" id="saleBill.customer_name"
+                        [(ngModel)]="saleBill.customer_name">
 
                     <label class="mt-2" for="remarks">Remarks:</label>
-                    <input class="text-center uppercase border border-neutral-900 px-1 py-0.5 rounded-sm mt-1" type="text" name="remarks"
-                        id="remarks" [(ngModel)]="saleBill.remarks">
+                    <input class="text-center uppercase border border-neutral-900 px-1 py-0.5 rounded-sm mt-1"
+                        type="text" name="remarks" id="remarks" [(ngModel)]="saleBill.remarks">
 
                     <h3 class="mt-2" for="remarks">Total Amount:</h3>
                     <p class="text-center uppercase border border-neutral-900 px-1 py-0.5 rounded-sm mt-1">
@@ -211,29 +217,29 @@
                     <th>Action</th>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let saleBill of saleBills"> 
+                    <tr *ngFor="let bill of activeBills">
                         <td class="flex items-center space-x-3 p2">
                             <!-- View Order List -->
                             <button class="flex px-1.5 py-1 items-center space-x-1 rounded-md bg-neutral-800"
-                                (click)="viewOrder(saleBill)">
+                                (click)="viewOrder(bill)">
                                 <fa-icon class="scale-75" [icon]="faEye" [ngStyle]="{color: 'rgb(212 212 212)'}">
                                 </fa-icon>
                                 <p class="text-neutral-300 text-xs">View</p>
                             </button>
-                            <p>{{saleBill.time | date: 'hh:mm a'}}</p>
+                            <p>{{bill.time | date: 'hh:mm a'}}</p>
                         </td>
-                        <td class="p-2">{{saleBill.billno}}</td>
-                        <td class="p-2">{{saleBill.customer_name}}</td>
-                        <td class="p-2">{{saleBill.remarks}}</td>
-                        <td class="p-2">&#8369;{{saleBill.grand_total | number: '1.2-2'}}</td>
+                        <td class="p-2">{{bill.billno}}</td>
+                        <td class="p-2">{{bill.customer_name}}</td>
+                        <td class="p-2">{{bill.remarks}}</td>
+                        <td class="p-2">&#8369;{{bill.grand_total | number: '1.2-2'}}</td>
                         <td class="flex justify-center p-2 space-x-6">
                             <!-- Edit Sale Bill -->
                             <fa-icon class="hover:scale-110" [ngStyle]="{color: 'green'}" [icon]="faPen"
-                                (click)="updateSaleBill(saleBill)">
+                                (click)="updateSaleBill(bill)">
                             </fa-icon>
                             <!-- Delete SaleBill -->
                             <fa-icon class="hover:scale-110" [ngStyle]="{color: 'red'}" [icon]="faTrashCan"
-                                (click)="deleteSaleBill(saleBill)">
+                                (click)="deleteSaleBill(bill)">
                             </fa-icon>
                         </td>
                     </tr>

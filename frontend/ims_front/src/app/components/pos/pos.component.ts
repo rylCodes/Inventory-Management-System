@@ -35,7 +35,8 @@ export class PosComponent implements OnInit {
   faMinus = faMinus;
   faTimes = faTimes;
 
-  saleBills: SaleBill[] = [];
+  activeBills: SaleBill[] = [];
+  allBills: SaleBill[] = [];
   saleItems: SaleItem[] = [];
   products: Product[] = [];
 
@@ -147,7 +148,9 @@ export class PosComponent implements OnInit {
     this.salesService
       .getSaleBills()
       .subscribe(salesBills => {
-        this.saleBills = salesBills.filter(item => !item.status);
+        this.activeBills = salesBills.filter(item => !item.status);
+        this.allBills = salesBills;
+        console.log(this.allBills.length, this.activeBills.length);
       });
   }
 
@@ -182,7 +185,9 @@ export class PosComponent implements OnInit {
     }
   }
 
-  // CREATE PRODUCT
+  /* ADD BILLS AND ITEMS */
+  
+  // Add Bills
   addSaleBill() {
     if (!this.saleBill.customer_name) {
       window.alert("Enter customer name");
@@ -192,15 +197,15 @@ export class PosComponent implements OnInit {
       return;
     }
 
-    const lastItem = this.saleBills[this.saleBills.length - 1];
-    let lastItemNumber;
+    const lastBill = this.allBills[this.allBills.length - 1];
+    let lastBillNumber;
 
-    if (lastItem && lastItem.billno) {
-      lastItemNumber = Number(lastItem.billno.split('-')[2]);
-      this.saleBill.billno = this.uiService.generateSequentialCode('SBI', lastItemNumber);
+    if (lastBill && lastBill.billno) {
+      lastBillNumber = Number(lastBill.billno.split('-')[2]);
+      this.saleBill.billno = this.uiService.generateSequentialCode('SBI', lastBillNumber);
     } else {
-      lastItemNumber = 0;
-      this.saleBill.billno = this.uiService.generateSequentialCode('SBI', lastItemNumber);
+      lastBillNumber = 0;
+      this.saleBill.billno = this.uiService.generateSequentialCode('SBI', lastBillNumber);
     }
     
     const newSaleBill = {
@@ -211,20 +216,47 @@ export class PosComponent implements OnInit {
 
     this.salesService.addSaleBill(newSaleBill)
       .subscribe(async (saleBill) => {
-        this.saleBills.push(saleBill);
-        const lastBillId = this.saleBills.length - 1;
+        this.activeBills.push(saleBill);
+        const lastBillId = this.activeBills.length - 1;
         this.saleItems.map(item => {
           if (!item.billno) {
-            item.billno = this.saleBills[lastBillId].id;
+            item.billno = this.activeBills[lastBillId].id;
           }
           this.salesService.editSaleItem(item).subscribe(item => {
             const index = this.saleItems.findIndex(i => i.id === item.id);
             this.saleItems[index] = item;
+            this.loadItems();
           })
-          this.loadItems();
         })
         await this.uiService.wait(100);
         window.alert("New transaction has been added successfully!");
+      });
+  }
+
+  // Add Items
+  addSaleItem() {
+    if (!this.saleItem.product_id) {
+      window.alert("Select a product!");
+      return;
+    } else if (!this.saleItem.quantity || this.saleItem.quantity <= 0) {
+      window.alert("Enter quantity!");
+      return;
+    }
+    
+    this.saleItem.billno = this.saleBill.id;
+    this.saleItem.price = this.getProductDetails(Number(this.saleItem.product_id)).productPrice;
+    this.saleItem.sub_total = this.saleItem.quantity * this.saleItem.price;
+
+    const newSaleItem = {
+      ...this.saleItem,
+    }
+
+    this.salesService.addSaleItem(newSaleItem)
+      .subscribe(async (saleItem) => {
+        this.saleItems.push(saleItem);
+        this.loadItems();
+        this.resetItemForm();
+        await this.uiService.wait(100);
       });
   }
 
@@ -251,8 +283,8 @@ export class PosComponent implements OnInit {
     this.salesService
       .editSaleBill(editingSaleBill)
       .subscribe(async (saleBillData) => {
-        const index = this.saleBills.findIndex(saleBill => saleBill.id === saleBillData.id);
-        this.saleBills[index] = saleBillData;
+        const index = this.activeBills.findIndex(saleBill => saleBill.id === saleBillData.id);
+        this.activeBills[index] = saleBillData;
         this.toggleBillForm();
 
         await this.uiService.wait(100);
@@ -262,7 +294,7 @@ export class PosComponent implements OnInit {
   
   // DELETE BILL
   deleteSaleBill(saleBill: SaleBill) {
-    if (this.saleBills.length <= 1) {
+    if (this.activeBills.length <= 1) {
       window.alert("Please add new transaction before deleting this one! Consider editing this instead of deletion.");
       return;
     }
@@ -280,7 +312,7 @@ export class PosComponent implements OnInit {
     this.salesService
       .deleteSaleBill(this.deletingSaleBill)
       .subscribe(async () => {
-        this.saleBills = this.saleBills.filter(s => s.id !== this.deletingSaleBill?.id);
+        this.activeBills = this.activeBills.filter(s => s.id !== this.deletingSaleBill?.id);
         this.deletingSaleBill = null;
         this.toggleBillActionModal()
         await this.uiService.wait(100);
@@ -290,7 +322,7 @@ export class PosComponent implements OnInit {
 
   // SHOW ITEMS
   getSaleBill(saleBillId: any): string {
-    const foundSaleBill = this.saleBills.find(saleBill => saleBill.id === saleBillId);
+    const foundSaleBill = this.activeBills.find(saleBill => saleBill.id === saleBillId);
     return foundSaleBill ? foundSaleBill.customer_name : 'Bill Not Found';
   }
   
@@ -317,33 +349,6 @@ export class PosComponent implements OnInit {
     } else {
       this.addSaleItem();
     }
-  }
-
-  // ADD SALE ITEM
-  addSaleItem() {
-    if (!this.saleItem.product_id) {
-      window.alert("Select a product!");
-      return;
-    } else if (!this.saleItem.quantity || this.saleItem.quantity <= 0) {
-      window.alert("Enter quantity!");
-      return;
-    }
-   
-    this.saleItem.billno = this.saleBill.id;
-    this.saleItem.price = this.getProductDetails(Number(this.saleItem.product_id)).productPrice;
-    this.saleItem.sub_total = this.saleItem.quantity * this.saleItem.price;
-
-    const newSaleItem = {
-      ...this.saleItem,
-    }
-
-    this.salesService.addSaleItem(newSaleItem)
-      .subscribe(async (saleItem) => {
-        this.saleItems.push(saleItem);
-        this.loadItems();
-        this.resetItemForm();
-        await this.uiService.wait(100);
-      });
   }
 
   onProductSelectionChange(event: Event) {
@@ -392,7 +397,7 @@ export class PosComponent implements OnInit {
     this.salesService
       .deleteSaleItem(this.deletingSaleItem)
       .subscribe(async () => {
-        this.saleBills = this.saleBills.filter(s => s.id !== this.deletingSaleItem?.id);
+        this.activeBills = this.activeBills.filter(s => s.id !== this.deletingSaleItem?.id);
         this.deletingSaleItem = null;
         this.toggleItemActionModal()
         this.loadItems();
@@ -413,8 +418,8 @@ export class PosComponent implements OnInit {
     this.saleBill.status = true;
     this.salesService.editSaleBill(this.saleBill)
       .subscribe(data => {
-        const index = this.saleBills.findIndex(saleBill => saleBill.id === data.id);
-        this.saleBills[index] = data;
+        const index = this.activeBills.findIndex(saleBill => saleBill.id === data.id);
+        this.activeBills[index] = data;
         this.viewOrder(this.saleBill);
         this.loadBills();
       });

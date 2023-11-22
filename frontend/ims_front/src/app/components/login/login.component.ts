@@ -45,7 +45,6 @@ export class LoginComponent implements OnInit {
       .subscribe(
         async (data) => {
         if (data) {
-          console.log(data);
           this.router.navigate(['']);
           await this.uiService.wait(100);
           window.alert("You've successfully logged in!");

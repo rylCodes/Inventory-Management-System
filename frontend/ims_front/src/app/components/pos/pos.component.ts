@@ -46,6 +46,7 @@ export class PosComponent implements OnInit {
     customer_name: "",
     remarks: "",
     grand_total: 0,
+    status: false,
   };
 
   saleItem: SaleItem = {
@@ -79,7 +80,7 @@ export class PosComponent implements OnInit {
     this.proceedEditItem = false;
     this.saleItem.billno = undefined;
     this.saleItem.product_id = undefined;
-    this.saleItem.quantity = 1;
+    this.saleItem.quantity = 0;
     this.saleItem.sale_date = "";
     this.saleItem.sub_total = 0;
   }
@@ -96,20 +97,6 @@ export class PosComponent implements OnInit {
     this.showBillTable = !this.showBillTable;
   }
 
-  filterItemTable(saleBill: SaleBill) {
-    this.saleBill = saleBill;
-    this.getCurrentItems(saleBill);
-    this.toggleBillTable();
-
-    this.updatingItemTable = !this.updatingItemTable;
-    if (!this.updatingItemTable) {
-      this.resetBillForm();
-      this.loadItems();
-    }
-
-    console.log(this.saleBill.id);
-  }
-
   toggleBillForm() {
     this.showBillForm = !this.showBillForm;
     if (!this.showBillForm) {
@@ -117,22 +104,25 @@ export class PosComponent implements OnInit {
     }
   }
 
-  calculateGrandtotal(): number {
+  viewOrder(saleBill: SaleBill) {
+    this.saleBill = saleBill;
+    this.loadItems();
+    this.toggleBillTable();
+
+    this.updatingItemTable = !this.updatingItemTable;
+    if (!this.updatingItemTable) {
+      this.resetBillForm();
+      this.loadItems();
+    }
+  }
+
+  calculateGrandtotal(saleItems: SaleItem[]): number {
     let grandTotal = 0;
-    this.saleItems.forEach(item => {
+    saleItems.forEach(item => {
       grandTotal += item.sub_total || 0;
     });
 
     return grandTotal;
-  }
-
-  calculateSubTotal(): number {
-    if (this.saleItem.quantity && this.saleItem.product_id) {
-      const subTotal = this.saleItem.quantity * this.getProductDetails(this.saleItem.product_id).productPrice;
-      return subTotal;
-    } else {
-      return 0;
-    }
   }
 
   increaseQtyInput(): void {
@@ -148,21 +138,43 @@ export class PosComponent implements OnInit {
 
   // SHOW BILLS
   ngOnInit(): void {
+    this.loadBills();
+    this.loadItems();
+    this.loadProducts();
+  }  
+
+  loadBills() {
     this.salesService
       .getSaleBills()
-      .subscribe(salesBill => this.saleBills = salesBill);
+      .subscribe(salesBills => {
+        this.saleBills = salesBills.filter(item => !item.status);
+      });
+  }
 
+  loadItems() {
+    this.salesService
+      .getSaleItems()
+      .subscribe((saleItems) => {
+        if (this.updatingItemTable) {
+          this.saleItems = saleItems.filter(item => item.billno === this.saleBill.id);
+          this.saleBill.grand_total = this.calculateGrandtotal(this.saleItems);
+        } else {
+          this.saleItems = saleItems.filter(item => item.billno === null);
+          this.saleBill.grand_total = this.calculateGrandtotal(this.saleItems);
+        }
+      });
+  }
+
+  loadProducts() {
     this.productService
       .getProducts()
       .subscribe(products => {
         const activeProducts = products.filter(product => product.status === true);
         this.products = activeProducts;
       })
+  }
 
-    this.loadItems();
-  }  
-
-  onSubmitBill() {
+  async onSubmitBill() {
     if (this.proceedEditBill) {
       this.onSaveUpdate();
     } else {
@@ -190,8 +202,6 @@ export class PosComponent implements OnInit {
       lastItemNumber = 0;
       this.saleBill.billno = this.uiService.generateSequentialCode('SBI', lastItemNumber);
     }
-
-    this.saleBill.grand_total = this.calculateGrandtotal();
     
     const newSaleBill = {
       ...this.saleBill,
@@ -202,6 +212,17 @@ export class PosComponent implements OnInit {
     this.salesService.addSaleBill(newSaleBill)
       .subscribe(async (saleBill) => {
         this.saleBills.push(saleBill);
+        const lastBillId = this.saleBills.length - 1;
+        this.saleItems.map(item => {
+          if (!item.billno) {
+            item.billno = this.saleBills[lastBillId].id;
+          }
+          this.salesService.editSaleItem(item).subscribe(item => {
+            const index = this.saleItems.findIndex(i => i.id === item.id);
+            this.saleItems[index] = item;
+          })
+          this.loadItems();
+        })
         await this.uiService.wait(100);
         window.alert("New transaction has been added successfully!");
       });
@@ -231,13 +252,11 @@ export class PosComponent implements OnInit {
       .editSaleBill(editingSaleBill)
       .subscribe(async (saleBillData) => {
         const index = this.saleBills.findIndex(saleBill => saleBill.id === saleBillData.id);
-
+        this.saleBills[index] = saleBillData;
         this.toggleBillForm();
 
         await this.uiService.wait(100);
         window.alert("Successfully saved changes to the customer details.");
-
-        this.saleBills[index] = saleBillData;
       });
   }
   
@@ -300,26 +319,6 @@ export class PosComponent implements OnInit {
     }
   }
 
-  loadItems() {
-    this.salesService
-      .getSaleItems()
-      .subscribe((saleItems) => {
-        this.saleItems = saleItems.filter(item => item.billno === null);
-      });
-  }
-
-  getCurrentItems(saleBill: SaleBill) {
-    this.salesService
-      .getSaleItems()
-      .subscribe((saleItems) => {
-        this.saleItems = saleItems.filter(item => item.billno === saleBill.id);
-        this.saleItems.forEach(item => {
-          item.sub_total = item.quantity * this.getProductDetails(item.product_id).productPrice;
-        })
-        this.saleBill.grand_total = this.calculateGrandtotal();
-      });
-  }
-
   // ADD SALE ITEM
   addSaleItem() {
     if (!this.saleItem.product_id) {
@@ -331,8 +330,8 @@ export class PosComponent implements OnInit {
     }
    
     this.saleItem.billno = this.saleBill.id;
-    this.saleItem.price = this.getProductDetails(this.saleItem.product_id).productPrice;
-    this.saleItem.sub_total = this.calculateSubTotal();
+    this.saleItem.price = this.getProductDetails(Number(this.saleItem.product_id)).productPrice;
+    this.saleItem.sub_total = this.saleItem.quantity * this.saleItem.price;
 
     const newSaleItem = {
       ...this.saleItem,
@@ -341,12 +340,7 @@ export class PosComponent implements OnInit {
     this.salesService.addSaleItem(newSaleItem)
       .subscribe(async (saleItem) => {
         this.saleItems.push(saleItem);
-        if (this.updatingItemTable) {
-          this.getCurrentItems(this.saleBill);
-        } else {
-          this.loadItems();
-        }
-
+        this.loadItems();
         this.resetItemForm();
         await this.uiService.wait(100);
       });
@@ -361,15 +355,12 @@ export class PosComponent implements OnInit {
 
   // UPDATE SALE ITEM
   updateSaleItem(saleItem: SaleItem) {
-    console.log(saleItem.billno);
-    console.log(this.getProductDetails(saleItem.product_id).productPrice);
     this.proceedEditItem = true;
     this.saleItem = {...saleItem};
   }
 
   saveItemUpdate() {
     this.saleItem.sub_total = this.saleItem.quantity * this.getProductDetails(this.saleItem.product_id).productPrice;
-    this.saleBill.grand_total = this.calculateGrandtotal();
 
     const editingSaleItem = {
       ...this.saleItem
@@ -404,13 +395,7 @@ export class PosComponent implements OnInit {
         this.saleBills = this.saleBills.filter(s => s.id !== this.deletingSaleItem?.id);
         this.deletingSaleItem = null;
         this.toggleItemActionModal()
-        
-        if (this.updatingItemTable) {
-          this.getCurrentItems(this.saleBill);
-        } else {
-          this.loadItems();
-        }
-
+        this.loadItems();
         await this.uiService.wait(100);
         window.alert("Item has been deleted successfully!");
       });
@@ -418,9 +403,20 @@ export class PosComponent implements OnInit {
 
   transactionFunc(): void {
     if (this.updatingItemTable) {
-      return;
+      this.proceedPayment();
     } else {
       this.addSaleBill();
     }
+  }
+
+  proceedPayment() {
+    this.saleBill.status = true;
+    this.salesService.editSaleBill(this.saleBill)
+      .subscribe(data => {
+        const index = this.saleBills.findIndex(saleBill => saleBill.id === data.id);
+        this.saleBills[index] = data;
+        this.viewOrder(this.saleBill);
+        this.loadBills();
+      });
   }
 }

@@ -3,9 +3,10 @@
     <app-navbar *ngIf="hasRoute('/login')" class="hidden xl:flex"></app-navbar>
     <div class="flex-1 w-full min-h-screen flex flex-col justify-between relative">
         <router-outlet class="absolute top-0"></router-outlet>
-        <p *ngIf="hasRoute('/login')" class="bg-[#fff] w-full text-neutral-700 p-4 mt-12 text-sm">
-            <span class="font-bold">&copy;2023 RylCodes-IMS</span>. All rights reserved.
-        </p>
+        <div *ngIf="hasRoute('/login')" class="flex justify-between bg-[#fff] w-full text-neutral-700 p-4 mt-12 text-xs">
+            <p><span class="font-bold">&copy;2023 RylCodes-IMS</span>. All rights reserved.</p>
+            <p><span class="font-bold">Version</span> 1.0.0</p>
+        </div>
     </div>
 </div>
 <app-footer class="my-text-base" *ngIf="hasRoute('/login')"></app-footer>

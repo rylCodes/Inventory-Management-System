@@ -21,6 +21,8 @@ import { ButtonComponent } from './components/button/button.component';
 import { PosComponent } from './components/pos/pos.component';
 import { PurchasesComponent } from './components/purchases/purchases.component';
 import { SuppliersComponent } from './components/suppliers/suppliers.component';
+import { SelectAllTextDirective } from './directives/select-all-text/select-all-text.directive';
+import { FocusOnShowDirective } from './directives/focus-on-show/focus-on-show.directive';
 
 const appRoutes: Routes = [
   {path: 'login', component: LoginComponent},
@@ -46,6 +48,8 @@ const appRoutes: Routes = [
     ProductsComponent,
     PurchasesComponent,
     SuppliersComponent,
+    SelectAllTextDirective,
+    FocusOnShowDirective,
   ],
   imports: [
     BrowserModule,

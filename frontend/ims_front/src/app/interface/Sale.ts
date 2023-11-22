@@ -5,6 +5,7 @@ export interface SaleBill {
     customer_name: string,
     remarks: string,
     grand_total?: number,
+    status?: boolean;
 }
 
 export interface SaleItem {

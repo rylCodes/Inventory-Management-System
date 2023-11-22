@@ -78,6 +78,7 @@ class SalesBill(models.Model):
     customer_name = models.CharField(max_length=200)
     remarks = models.CharField(max_length=100)
     grand_total = models.FloatField(validators=[MinValueValidator(0)], default=0)
+    status = models.BooleanField(default=False)
 
     def __str__(self):
         return "Bill no: " + self.billno

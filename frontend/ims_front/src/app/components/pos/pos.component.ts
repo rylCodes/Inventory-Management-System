@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Renderer2, HostListener } from '@angular/core';
 import { SaleBill, SaleItem } from 'src/app/interface/Sale';
 import { Product } from 'src/app/interface/Product';
 import { ProductsService } from 'src/app/services/products/products.service';
@@ -13,7 +13,6 @@ import { SalesService } from 'src/app/services/sales/sales.service';
   styleUrls: ['./pos.component.css']
 })
 export class PosComponent implements OnInit {
-  // SALE BILL
   deletingSaleBill?: SaleBill | null = null;
   deletingSaleItem?: SaleItem | null = null;
 
@@ -26,6 +25,7 @@ export class PosComponent implements OnInit {
 
   showBillActionModal: boolean = false;
   showItemActionModal: boolean = false;
+  showInvoice: boolean = false;
 
   faXmark = faXmark;
   faPen = faPen;
@@ -64,7 +64,8 @@ export class PosComponent implements OnInit {
       private salesService: SalesService,
       private productService: ProductsService,
       private uiService: UiService,
-      private router: Router
+      private router: Router,
+      private renderer: Renderer2,
     ) {}
 
   resetBillForm() {
@@ -74,6 +75,7 @@ export class PosComponent implements OnInit {
       time: "",
       customer_name: "",
       remarks: "",
+      grand_total: 0,
     };
   }
   
@@ -102,6 +104,15 @@ export class PosComponent implements OnInit {
     this.showBillForm = !this.showBillForm;
     if (!this.showBillForm) {
       this.resetBillForm();
+    }
+  }
+
+  @HostListener('document:keyup.escape', ['$event'])
+  onKeyUp(event: KeyboardEvent) {
+    if (event.key === 'Escape') {
+      if (this.showInvoice) {
+        this.showInvoice = false; 
+      }
     }
   }
 
@@ -228,6 +239,7 @@ export class PosComponent implements OnInit {
             this.loadItems();
           })
         })
+        this.resetBillForm();
         await this.uiService.wait(100);
         window.alert("New transaction has been added successfully!");
       });
@@ -415,12 +427,18 @@ export class PosComponent implements OnInit {
   }
 
   proceedPayment() {
-    this.saleBill.status = true;
+    // this.saleBill.status = true;
+    this.showInvoice = true;
+    if (this.showInvoice) {
+      this.renderer.setStyle(document.body, 'overflow', 'hidden');
+    } else {
+      this.renderer.setStyle(document.body, 'overflow', 'auto');
+    }
+
     this.salesService.editSaleBill(this.saleBill)
       .subscribe(data => {
         const index = this.activeBills.findIndex(saleBill => saleBill.id === data.id);
         this.activeBills[index] = data;
-        this.viewOrder(this.saleBill);
         this.loadBills();
       });
   }

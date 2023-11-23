@@ -119,15 +119,15 @@ export class ProductsComponent implements OnInit {
 
   // CREATE PRODUCT
   addProduct() {
-    let previousProductID;
-    if (this.products.length > 0) {
-      const previousProduct = this.products[this.products.length - 1];
-      previousProductID = previousProduct.id;
-      this.code = this.uiService.generateSequentialCode("PRO", previousProductID);
-    } else {
-      previousProductID = 0;
-      this.code = this.uiService.generateSequentialCode("PRO", previousProductID);
-    }
+    // let previousProductID;
+    // if (this.products.length > 0) {
+    //   const previousProduct = this.products[this.products.length - 1];
+    //   previousProductID = previousProduct.id;
+    //   this.code = this.uiService.generateSequentialCode("PRO", previousProductID);
+    // } else {
+    //   previousProductID = 0;
+    //   this.code = this.uiService.generateSequentialCode("PRO", previousProductID);
+    // }
 
     if (!this.product_name) {
       window.alert("Enter product name!");

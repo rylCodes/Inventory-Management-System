@@ -113,6 +113,10 @@ export class PosComponent implements OnInit {
       if (this.showInvoice) {
         this.showInvoice = false; 
       }
+
+      if (this.updatingItemTable) {
+        this.viewOrder(this.saleBill);
+      }
     }
   }
 
@@ -208,16 +212,16 @@ export class PosComponent implements OnInit {
       return;
     }
 
-    const lastBill = this.allBills[this.allBills.length - 1];
-    let lastBillNumber;
+    // const lastBill = this.allBills[this.allBills.length - 1];
+    // let lastBillNumber;
 
-    if (lastBill && lastBill.billno) {
-      lastBillNumber = Number(lastBill.billno.split('-')[2]);
-      this.saleBill.billno = this.uiService.generateSequentialCode('SBI', lastBillNumber);
-    } else {
-      lastBillNumber = 0;
-      this.saleBill.billno = this.uiService.generateSequentialCode('SBI', lastBillNumber);
-    }
+    // if (lastBill && lastBill.billno) {
+    //   lastBillNumber = Number(lastBill.billno.split('-')[2]);
+    //   this.saleBill.billno = this.uiService.generateSequentialCode('SBI', lastBillNumber);
+    // } else {
+    //   lastBillNumber = 0;
+    //   this.saleBill.billno = this.uiService.generateSequentialCode('SBI', lastBillNumber);
+    // }
     
     const newSaleBill = {
       ...this.saleBill,

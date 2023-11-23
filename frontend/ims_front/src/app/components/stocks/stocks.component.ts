@@ -80,15 +80,15 @@ export class StocksComponent implements OnInit {
 
   // CREATE STOCK
   addStock() {
-    const previousStock = this.allStocks[this.allStocks.length - 1];
-    let previousStockID;
-    if (previousStock && previousStock.code) {
-      previousStockID = Number(previousStock.code.split('-')[2]);
-      this.code = this.uiService.generateSequentialCode("STO", previousStockID);
-    } else {
-      previousStockID = 0;
-      this.code = this.uiService.generateSequentialCode("STO", previousStockID);
-    }
+    // const previousStock = this.allStocks[this.allStocks.length - 1];
+    // let previousStockID;
+    // if (previousStock && previousStock.code) {
+    //   previousStockID = Number(previousStock.code.split('-')[2]);
+    //   this.code = this.uiService.generateSequentialCode("STO", previousStockID);
+    // } else {
+    //   previousStockID = 0;
+    //   this.code = this.uiService.generateSequentialCode("STO", previousStockID);
+    // }
 
     if (!this.stock_name) {
       window.alert("Enter stock name!");

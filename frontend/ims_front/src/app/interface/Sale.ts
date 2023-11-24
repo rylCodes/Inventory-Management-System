@@ -4,6 +4,7 @@ export interface SaleBill {
     time?: string,
     customer_name: string,
     remarks: string,
+    amount_tendered: number,
     grand_total?: number,
     status?: boolean;
 }

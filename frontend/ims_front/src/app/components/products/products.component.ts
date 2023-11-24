@@ -27,7 +27,7 @@ export class ProductsComponent implements OnInit {
   id?: number; 
   code: string = "";
   product_name: string = "";
-  stock_id: number | undefined;
+  stock_id?: number;
   category: string = "liquor";
   qty_per_order: number = 0;
   price: number = 0;
@@ -49,7 +49,6 @@ export class ProductsComponent implements OnInit {
     this.proceedEdit = false;
     this.code = "";
     this.product_name = "";
-    this.stock_id = undefined;
     this.category = "liquor";
     this.qty_per_order = 0;
     this.status = true;
@@ -72,10 +71,7 @@ export class ProductsComponent implements OnInit {
     this.productService
       .getProducts()
       .subscribe((products) => {
-        const sortedProducts = products.sort((a, b) => {
-          return a.product_name.localeCompare(b.product_name) 
-        })
-        this.products = sortedProducts;
+        this.products = products;
       });
 
     this.stockService
@@ -101,13 +97,7 @@ export class ProductsComponent implements OnInit {
         stockUnit: "Stock not found!",
       }
     }
-  }
-  
-  getStockUnit(stockId: any): string {
-    const foundStock = this.stocks.find(stock => stock.id === stockId);
-    return foundStock ? foundStock.unit : 'Stock Not Found';
-  }  
-
+  } 
 
   onSubmit() {
     if (this.proceedEdit) {

@@ -1,0 +1,43 @@
+<div class="relative w-full px-8">
+    <!-- HEADING: POS PAGE -->
+    <div class="flex justify-between mt-8">
+        <h1 class="font-bold text-3xl">SALES HISTORY</h1>
+    </div>
+    <hr class="border-b-1 border-neutral-900 mt-4">
+
+    <div class="relative w-full px-8">
+        <!-- TRANSACTION TABLE -->
+        <div class="w-full text-center shadow-xl rounded-xl mt-4">
+            <table class="w-full table-fixed rounded-xl">
+                <thead class="text-neutral-300 bg-neutral-900">
+                    <th class="w-1/5">Date Time</th>
+                    <th>Transaction Code</th>
+                    <th>Customer Name</th>
+                    <th>Remarks</th>
+                    <th class="w-1/12">Items</th>
+                    <th>Total</th>
+                    <th class="w-1/12">Action</th>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let bill of bills">
+                        <td class="p-2">{{bill.time | date: "dd MMM 'at' hh:mm a"}}</td>
+                        <td class="p-2">{{bill.billno}}</td>
+                        <td class="p-2">{{bill.customer_name}}</td>
+                        <td class="p-2">{{bill.remarks}}</td>
+                        <td class="p-2">3</td>
+                        <td class="p-2">&#8369;{{bill.grand_total | number: '1.2-2'}}</td>
+                        <td class="flex justify-center p-2 space-x-4">
+                            <fa-icon class="hover:scale-110" [icon]="faRectangleList" 
+                                (click)="viewOrder(bill)">
+                            </fa-icon>
+                            <!-- Delete SaleBill -->
+                            <fa-icon class="hover:scale-110" [ngStyle]="{color: 'red'}" [icon]="faTrashCan"
+                                (click)="deleteSaleBill(bill)">
+                            </fa-icon>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

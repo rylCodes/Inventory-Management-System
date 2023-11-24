@@ -19,8 +19,7 @@ export class StocksComponent implements OnInit {
   faPen = faPen;
   faTrashCan = faTrashCan;
 
-  allStocks: Stock[] = [];
-  activeStocks: Stock[] = [];
+  stocks: Stock[] = [];
 
   id?: number; 
   code: string = "";
@@ -65,8 +64,8 @@ export class StocksComponent implements OnInit {
     this.stockService
       .getStocks()
       .subscribe((stocks) => {
-        this.activeStocks = stocks;
-        this.allStocks = stocks;
+        // const activeStocks = stocks.filter(stock => stock.status === true);
+        this.stocks = stocks;
       });
   }
 
@@ -110,14 +109,14 @@ export class StocksComponent implements OnInit {
       status: this.status,
     }
 
-    const isStockNameExist = this.activeStocks.some(stock => stock.stock_name === newStock.stock_name);
+    const isStockNameExist = this.stocks.some(stock => stock.stock_name === newStock.stock_name);
   
     if (isStockNameExist) {
       window.alert("Stock with this name already exists!");
     } else {
       this.stockService.addStock(newStock)
       .subscribe(async (stock) => {
-        this.activeStocks.push(stock);
+        this.stocks.push(stock);
         this.toggleForm();
         await this.uiService.wait(100);
         window.alert("New stock has been created successfully!");
@@ -127,7 +126,7 @@ export class StocksComponent implements OnInit {
 
   // DELETE STOCK
   deleteStock(stock: Stock) {
-    if (this.activeStocks.length <= 1) {
+    if (this.stocks.length <= 1) {
       window.alert("Please create a new stock before deleting this one! Consider editing this stock instead of deletion.");
     } else {
       this.deletingStock = stock;
@@ -143,7 +142,7 @@ export class StocksComponent implements OnInit {
     this.stockService
       .deleteStock(this.deletingStock)
       .subscribe(async () => {
-        this.activeStocks = this.activeStocks.filter(s => s.id !== this.deletingStock?.id);
+        this.stocks = this.stocks.filter(s => s.id !== this.deletingStock?.id);
         this.deletingStock = null;
         this.toggleActionModal()
         await this.uiService.wait(100);
@@ -175,7 +174,7 @@ saveUpdate() {
     status: this.status,
   }
 
-  const isStockNameExist = this.activeStocks.some(stock => stock.id !== editingStock.id && stock.stock_name === editingStock.stock_name);
+  const isStockNameExist = this.stocks.some(stock => stock.id !== editingStock.id && stock.stock_name === editingStock.stock_name);
 
   if (isStockNameExist) {
     window.alert("Stock with this name already exists!");
@@ -183,8 +182,8 @@ saveUpdate() {
       this.stockService
       .editStock(editingStock)
       .subscribe(async (stockData) => {
-        const index = this.activeStocks.findIndex(stock => stock.id === stockData.id);
-        this.activeStocks[index] = stockData;
+        const index = this.stocks.findIndex(stock => stock.id === stockData.id);
+        this.stocks[index] = stockData;
         this.toggleForm();
         await this.uiService.wait(100);
         window.alert("Successfully saved changes to the stock.");

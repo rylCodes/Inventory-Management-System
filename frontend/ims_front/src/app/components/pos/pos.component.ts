@@ -1,11 +1,13 @@
 import { Component, OnInit, Renderer2, HostListener } from '@angular/core';
 import { SaleBill, SaleItem } from 'src/app/interface/Sale';
 import { Product } from 'src/app/interface/Product';
+import { Stock } from 'src/app/interface/Stock';
 import { ProductsService } from 'src/app/services/products/products.service';
 import { UiService } from 'src/app/services/ui/ui.service';
-import { faPen, faTrashCan, faXmark, faEye, faPlus, faMinus, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faPen, faTrashCan, faXmark, faRectangleList, faPlus, faMinus, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { Router } from '@angular/router';
 import { SalesService } from 'src/app/services/sales/sales.service';
+import { StocksService } from 'src/app/services/stocks/stocks';
 
 @Component({
   selector: 'app-pos',
@@ -18,10 +20,11 @@ export class PosComponent implements OnInit {
 
   proceedEditBill: boolean = false;
   proceedEditItem: boolean = false;
+  proceedPayment: boolean = false;
 
   showBillForm: boolean = false;
   showBillTable: boolean = true;  
-  updatingItemTable: boolean = false;
+  updatingOrder: boolean = false;
 
   showBillActionModal: boolean = false;
   showItemActionModal: boolean = false;
@@ -30,7 +33,7 @@ export class PosComponent implements OnInit {
   faXmark = faXmark;
   faPen = faPen;
   faTrashCan = faTrashCan;
-  faEye = faEye;
+  faRectangleList = faRectangleList;
   faPlus = faPlus;
   faMinus = faMinus;
   faTimes = faTimes;
@@ -39,6 +42,8 @@ export class PosComponent implements OnInit {
   allBills: SaleBill[] = [];
   saleItems: SaleItem[] = [];
   products: Product[] = [];
+  stocks: Stock[] = [];
+  amountChange: number = 0;
 
   saleBill: SaleBill = {
     id: undefined,
@@ -46,6 +51,7 @@ export class PosComponent implements OnInit {
     time: "",
     customer_name: "",
     remarks: "",
+    amount_tendered: 0,
     grand_total: 0,
     status: false,
   };
@@ -63,6 +69,7 @@ export class PosComponent implements OnInit {
   constructor(
       private salesService: SalesService,
       private productService: ProductsService,
+      private stockService: StocksService,
       private uiService: UiService,
       private router: Router,
       private renderer: Renderer2,
@@ -75,6 +82,7 @@ export class PosComponent implements OnInit {
       time: "",
       customer_name: "",
       remarks: "",
+      amount_tendered: 0,
       grand_total: 0,
     };
   }
@@ -86,6 +94,26 @@ export class PosComponent implements OnInit {
     this.saleItem.quantity = 0;
     this.saleItem.sale_date = "";
     this.saleItem.sub_total = 0;
+  }
+
+  toggleProceedPayment() {
+    this.saleItems.map(item => {
+    })
+
+    this.proceedPayment = !this.proceedPayment;
+    if (!this.proceedPayment) {
+      this.saleBill.amount_tendered = 0;
+    }
+  } 
+
+  async toggleInvoice() {
+    this.showInvoice = !this.showInvoice;
+    if (!this.showInvoice) {
+      await this.uiService.wait(100);
+      window.alert('Transaction has been completed successfully!')
+      this.loadBills();
+      this.viewOrder(this.saleBill);
+    }
   }
 
   toggleBillActionModal() {
@@ -111,11 +139,15 @@ export class PosComponent implements OnInit {
   onKeyUp(event: KeyboardEvent) {
     if (event.key === 'Escape') {
       if (this.showInvoice) {
-        this.showInvoice = false; 
-      }
-
-      if (this.updatingItemTable) {
-        this.viewOrder(this.saleBill);
+        this.toggleInvoice(); 
+      } else if (this.showItemActionModal) {
+        this.toggleItemActionModal();
+      } else if (this.showBillActionModal) {
+        this.toggleBillActionModal();
+      } else if (this.showBillForm) {
+        this.toggleBillForm();
+      } else if (this.proceedPayment) {
+        this.toggleProceedPayment();
       }
     }
   }
@@ -125,8 +157,8 @@ export class PosComponent implements OnInit {
     this.loadItems();
     this.toggleBillTable();
 
-    this.updatingItemTable = !this.updatingItemTable;
-    if (!this.updatingItemTable) {
+    this.updatingOrder = !this.updatingOrder;
+    if (!this.updatingOrder) {
       this.resetBillForm();
       this.loadItems();
     }
@@ -157,6 +189,7 @@ export class PosComponent implements OnInit {
     this.loadBills();
     this.loadItems();
     this.loadProducts();
+    this.loadStocks();
   }  
 
   loadBills() {
@@ -165,7 +198,6 @@ export class PosComponent implements OnInit {
       .subscribe(salesBills => {
         this.activeBills = salesBills.filter(item => !item.status);
         this.allBills = salesBills;
-        console.log(this.allBills.length, this.activeBills.length);
       });
   }
 
@@ -173,7 +205,7 @@ export class PosComponent implements OnInit {
     this.salesService
       .getSaleItems()
       .subscribe((saleItems) => {
-        if (this.updatingItemTable) {
+        if (this.updatingOrder) {
           this.saleItems = saleItems.filter(item => item.billno === this.saleBill.id);
           this.saleBill.grand_total = this.calculateGrandtotal(this.saleItems);
         } else {
@@ -192,18 +224,44 @@ export class PosComponent implements OnInit {
       })
   }
 
-  async onSubmitBill() {
+  loadStocks() {
+    this.stockService
+      .getStocks()
+      .subscribe(stocks => {
+        const activeStocks = stocks.filter(stock => stock.status === true);
+        this.stocks = activeStocks;
+      })
+  }
+
+  onSubmitBill() {
     if (this.proceedEditBill) {
       this.onSaveUpdate();
     } else {
-      this.addSaleBill();
+      this.addBill();
+    }
+  }
+
+  async onAmountTenderedChange() {
+    if (this.saleBill.amount_tendered < 0) {
+      window.alert("Enter valid amount!");
+      return;
+    }
+
+    if (this.saleBill.grand_total) {
+      await this.uiService.wait(300);
+      if (this.saleBill.amount_tendered < this.saleBill.grand_total) {
+        this.amountChange = 0;
+      } else {
+        this.amountChange = this.saleBill.amount_tendered - this.saleBill.grand_total
+        this.saleBill.status = true;
+      }
     }
   }
 
   /* ADD BILLS AND ITEMS */
   
   // Add Bills
-  addSaleBill() {
+  addBill() {
     if (!this.saleBill.customer_name) {
       window.alert("Enter customer name");
       return;
@@ -211,27 +269,16 @@ export class PosComponent implements OnInit {
       window.alert("Enter remarks");
       return;
     }
-
-    // const lastBill = this.allBills[this.allBills.length - 1];
-    // let lastBillNumber;
-
-    // if (lastBill && lastBill.billno) {
-    //   lastBillNumber = Number(lastBill.billno.split('-')[2]);
-    //   this.saleBill.billno = this.uiService.generateSequentialCode('SBI', lastBillNumber);
-    // } else {
-    //   lastBillNumber = 0;
-    //   this.saleBill.billno = this.uiService.generateSequentialCode('SBI', lastBillNumber);
-    // }
     
-    const newSaleBill = {
+    const newBill = {
       ...this.saleBill,
       customer_name: this.saleBill.customer_name.toUpperCase(),
       remarks: this.saleBill.remarks.toUpperCase(),
     }
 
-    this.salesService.addSaleBill(newSaleBill)
-      .subscribe(async (saleBill) => {
-        this.activeBills.push(saleBill);
+    this.salesService.addSaleBill(newBill)
+      .subscribe(async (bill) => {
+        this.activeBills.push(bill);
         const lastBillId = this.activeBills.length - 1;
         this.saleItems.map(item => {
           if (!item.billno) {
@@ -250,7 +297,7 @@ export class PosComponent implements OnInit {
   }
 
   // Add Items
-  addSaleItem() {
+  addItem() {
     if (!this.saleItem.product_id) {
       window.alert("Select a product!");
       return;
@@ -363,7 +410,7 @@ export class PosComponent implements OnInit {
     if (this.proceedEditItem) {
       this.saveItemUpdate();
     } else {
-      this.addSaleItem();
+      this.addItem();
     }
   }
 
@@ -422,17 +469,8 @@ export class PosComponent implements OnInit {
       });
   }
 
-  transactionFunc(): void {
-    if (this.updatingItemTable) {
-      this.proceedPayment();
-    } else {
-      this.addSaleBill();
-    }
-  }
-
-  proceedPayment() {
-    // this.saleBill.status = true;
-    this.showInvoice = true;
+  onBillOut() {
+    this.toggleInvoice();
     if (this.showInvoice) {
       this.renderer.setStyle(document.body, 'overflow', 'hidden');
     } else {
@@ -445,5 +483,21 @@ export class PosComponent implements OnInit {
         this.activeBills[index] = data;
         this.loadBills();
       });
+  }
+
+  onPayment() {
+    if (this.saleBill.grand_total) {
+      if (this.saleBill.amount_tendered < this.saleBill.grand_total) {
+        window.alert("Invalid amount tendered!");
+        return;
+      }
+    }
+
+    this.salesService.editSaleBill(this.saleBill).subscribe((bill) => {
+      if (bill.grand_total) {
+        this.toggleInvoice();
+        this.toggleProceedPayment();
+      }
+    });
   }
 }

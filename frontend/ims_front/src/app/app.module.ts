@@ -23,6 +23,7 @@ import { PurchasesComponent } from './components/purchases/purchases.component';
 import { SuppliersComponent } from './components/suppliers/suppliers.component';
 import { SelectAllTextDirective } from './directives/select-all-text/select-all-text.directive';
 import { FocusOnShowDirective } from './directives/focus-on-show/focus-on-show.directive';
+import { SalesComponent } from './components/sales/sales.component';
 
 const appRoutes: Routes = [
   {path: 'login', component: LoginComponent},
@@ -32,6 +33,7 @@ const appRoutes: Routes = [
   {path: 'pos', component: PosComponent, canActivate: [authGuard]},
   {path: 'suppliers', component: SuppliersComponent, canActivate: [authGuard]},
   {path: 'purchases', component: PurchasesComponent, canActivate: [authGuard]},
+  {path: 'sales', component: SalesComponent, canActivate: [authGuard]},
 ]
 
 @NgModule({
@@ -50,6 +52,7 @@ const appRoutes: Routes = [
     SuppliersComponent,
     SelectAllTextDirective,
     FocusOnShowDirective,
+    SalesComponent,
   ],
   imports: [
     BrowserModule,

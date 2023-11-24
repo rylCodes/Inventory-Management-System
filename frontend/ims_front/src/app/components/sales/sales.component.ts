@@ -21,6 +21,7 @@ export class SalesComponent implements OnInit {
   showBillActionModal: boolean = false;
   showItemActionModal: boolean = false;
   showOrder: boolean = false;
+  showInvoice: boolean = false;
 
   faXmark = faXmark;
   faPen = faPen;
@@ -35,6 +36,7 @@ export class SalesComponent implements OnInit {
   products: Product[] = [];
   stocks: Stock[] = [];
   amountChange: number = 0;
+  eachBill: [] = [];
 
   bill: SaleBill = {
     id: undefined,
@@ -66,12 +68,37 @@ export class SalesComponent implements OnInit {
       private renderer: Renderer2,
     ) {}
 
+  resetBill() {
+    this.bill = {
+      billno: "",
+      time: "",
+      customer_name: "",
+      remarks: "",
+      amount_tendered: 0,
+      grand_total: 0,
+    };
+  }
+
   toggleBillActionModal() {
     this.showBillActionModal = !this.showBillActionModal;
   }
 
   toggleItemActionModal() {
     this.showItemActionModal = !this.showItemActionModal;
+  }
+
+  toggleInvoice(bill: SaleBill) {
+    this.bill = bill;
+    this.loadBills();
+    this.loadItems();
+
+    this.showInvoice = !this.showInvoice;
+    if (this.showInvoice) {
+      this.renderer.setStyle(document.body, 'overflow', 'hidden');
+    } else {
+      this.renderer.setStyle(document.body, 'overflow', 'auto');
+      this.resetBill;
+    }
   }
 
   @HostListener('document:keyup.escape', ['$event'])
@@ -107,7 +134,7 @@ export class SalesComponent implements OnInit {
     this.salesService
       .getSaleBills()
       .subscribe(bills => {
-        this.bills = bills.filter(bill => bill.status);
+        this.bills = bills.filter(bill => bill.status)
       });
   }
 
@@ -115,8 +142,7 @@ export class SalesComponent implements OnInit {
     this.salesService
       .getSaleItems()
       .subscribe((items) => {
-        this.items = items;
-
+        this.items = items.filter(item => item.billno === this.bill.id);
       });
   }
 
@@ -136,6 +162,11 @@ export class SalesComponent implements OnInit {
         const activeStocks = stocks.filter(stock => stock.status === true);
         this.stocks = activeStocks;
       })
+  }
+
+  getItemLength(bill: SaleBill) {
+    const items = this.items.filter(item => item.billno === bill.id);
+    return items.length;
   }
   
   // DELETE BILL
@@ -170,6 +201,11 @@ export class SalesComponent implements OnInit {
   getSaleBill(saleBillId: any): string {
     const foundSaleBill = this.bills.find(saleBill => saleBill.id === saleBillId);
     return foundSaleBill ? foundSaleBill.customer_name : 'Bill Not Found';
+  }
+
+  getItemsLength(bill: SaleBill) {
+    const items = this.items.filter(item => item.billno === bill.id);
+    console.log(items);
   }
   
   getProductDetails(productId: any): {productName: string, productCode: string, productPrice: number} {

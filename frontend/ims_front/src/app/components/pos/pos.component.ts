@@ -97,9 +97,6 @@ export class PosComponent implements OnInit {
   }
 
   toggleProceedPayment() {
-    this.saleItems.map(item => {
-    })
-
     this.proceedPayment = !this.proceedPayment;
     if (!this.proceedPayment) {
       this.saleBill.amount_tendered = 0;

@@ -7,8 +7,7 @@
 
     <div class="relative w-full px-8">
         <!-- BILL OUT MODAL: Amount Tendered and Change -->
-        <div *ngIf="proceedPayment"
-            class="flex justify-center top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] fixed">
+        <div *ngIf="proceedPayment" class="flex justify-center top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] fixed">
             <form class="relative flex flex-col bg-white rounded-lg w-96 h-fit p-4 mt-32" (ngSubmit)="onPayment()">
                 <fa-icon class="place-self-end scale-125 hover:scale-110" [icon]="faXmark"
                     [ngStyle]="{color: 'rgb(64 64 64 )'}" (click)="toggleProceedPayment()">
@@ -17,13 +16,17 @@
                     Bill Out
                 </h2>
                 <h4 class="mt-4">Payable Amount:</h4>
-                <p class="text-end uppercase bg-blue-50 border border-neutral-900 px-2 py-1 rounded-sm mt-1">&#8369;{{saleBill.grand_total | number: '1.2-2'}}</p>
+                <p class="text-end uppercase bg-blue-50 border border-neutral-900 px-2 py-1 rounded-sm mt-1">
+                    &#8369;{{saleBill.grand_total | number: '1.2-2'}}</p>
 
                 <label class="mt-4" for="amount_tendered">Amount Tendered:</label>
-                <input appSelectAllText class="text-end uppercase border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="number" name="amount_tendered" id="amount_tendered" [(ngModel)]="saleBill.amount_tendered" (input)="onAmountTenderedChange()">
+                <input appSelectAllText class="text-end uppercase border border-neutral-900 px-2 py-1 rounded-sm mt-1"
+                    type="number" name="amount_tendered" id="amount_tendered" [(ngModel)]="saleBill.amount_tendered"
+                    (input)="onAmountTenderedChange()">
 
                 <h4 class="mt-4">Change:</h4>
-                <p class="text-end uppercase bg-blue-50 border border-neutral-900 px-2 py-1 rounded-sm mt-1">&#8369;{{amountChange}}</p>
+                <p class="text-end uppercase bg-blue-50 border border-neutral-900 px-2 py-1 rounded-sm mt-1">
+                    &#8369;{{amountChange}}</p>
                 <button class="mt-6 bg-[#008000] text-white font-bold p-2 rounded hover:bg-[#009000]" type="submit">
                     Save
                 </button>
@@ -31,21 +34,21 @@
         </div>
 
         <!-- INVOICE -->
-        <div *ngIf="showInvoice"
-            class="top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] fixed overflow-y-auto">
+        <div *ngIf="showInvoice" class="top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] fixed overflow-y-auto">
             <div class="bg-white rounded-lg w-2/5 h-fit mt-10 mx-auto">
                 <div class="flex flex-col justify-center p-8">
-                    <h3 class="self-center text-center w-1/3 rounded-2xl text-white bg-orange-600 font-bold py-1 text-xl">
+                    <h3
+                        class="self-center text-center w-1/3 rounded-2xl text-white bg-orange-600 font-bold py-1 text-xl">
                         INVOICE</h3>
                     <div class="flex justify-between mt-8">
                         <div class="w-1/2">
                             <h4 class="font-bold text-2xl text-orange-600">ALADIN'S FOOD HUB</h4>
                             <p>Valleygolf, Brgy. San Juan, Cainta, Rizal</p>
                         </div>
-                        <div class="w-1/3">
+                        <div class="w-2/5">
                             <h4 class="font-bold text-lg text-orange-600">BILL TO</h4>
-                            <p>Account No: 123123</p>
-                            <p>Name: Customer Name</p>
+                            <p>Transaction Code: {{saleBill.billno}}</p>
+                            <p>Name: {{saleBill.customer_name}}</p>
                             <p>Bank Detail: 123123</p>
                         </div>
                     </div>
@@ -57,23 +60,12 @@
                             <th>TOTAL</th>
                         </thead>
                         <tbody>
-                            <tr class="text-center bg-inherit border-b border-neutral-900">
-                                <td class="p-1">Product 1</td>
-                                <td class="p-1">20.00</td>
-                                <td class="p-1">1</td>
-                                <td class="p-1">20.00</td>
-                            </tr>
-                            <tr class="text-center bg-inherit border-b border-neutral-900">
-                                <td class="p-1">Product 1</td>
-                                <td class="p-1">20.00</td>
-                                <td class="p-1">1</td>
-                                <td class="p-1">20.00</td>
-                            </tr>
-                            <tr class="text-center bg-inherit border-b border-neutral-900">
-                                <td class="p-1">Product 1</td>
-                                <td class="p-1">20.00</td>
-                                <td class="p-1">1</td>
-                                <td class="p-1">20.00</td>
+                            <tr class="text-center bg-inherit border-b border-neutral-900"
+                                *ngFor="let item of saleItems">
+                                <td class="p-1">{{getProductDetails(item.product_id).productName}}</td>
+                                <td class="p-1">{{item.price}}</td>
+                                <td class="p-1">{{item.quantity}}</td>
+                                <td class="p-1">{{item.sub_total}}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -82,11 +74,11 @@
                             <div class="w-2/3">
                                 <p class="flex justify-between">
                                     <span>Invoice:</span>
-                                    <span>123123</span>
+                                    <span>{{saleBill.billno}}</span>
                                 </p>
                                 <p class="flex justify-between">
                                     <span>Date:</span>
-                                    <span>01-01-2023</span>
+                                    <span>{{saleBill.time | date: 'MM-dd-yyyy hh:mm a'}}</span>
                                 </p>
                             </div>
                             <p class="text-base font-bold mt-6 text-orange-600">THANK YOU FOR YOUR BUSINESS</p>
@@ -94,7 +86,7 @@
                         <div class="w-2/5">
                             <p class="flex justify-between px-1">
                                 <span>SUBTOTAL:</span>
-                                <span class="font-bold">60.00</span>
+                                <span class="font-bold">{{saleBill.grand_total}}</span>
                             </p>
                             <p class="flex justify-between px-1">
                                 <span>SERVICE FEE:</span>
@@ -102,11 +94,11 @@
                             </p>
                             <p class="flex justify-between px-1">
                                 <span>TAX RATE:</span>
-                                <span class="font-bold">1.00</span>
+                                <span class="font-bold">0.00</span>
                             </p>
                             <p class="bg-orange-600 text-white font-bold flex justify-between mt-4 px-2 py-1">
                                 <span>TOTAL:</span>
-                                <span>60.00</span>
+                                <span>{{saleBill.grand_total}}</span>
                             </p>
                         </div>
                     </div>
@@ -155,7 +147,7 @@
         <div *ngIf="showBillForm" class="flex justify-center top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] fixed">
             <div class="relative flex flex-col items-center bg-white rounded-lg w-96 h-fit p-4 mt-32">
                 <fa-icon class="place-self-end scale-125 hover:scale-110" [icon]="faXmark"
-                    [ngStyle]="{color: 'rgb(64 64 64 )'}" (click)="toggleBillForm()">   
+                    [ngStyle]="{color: 'rgb(64 64 64 )'}" (click)="toggleBillForm()">
                 </fa-icon>
                 <h2 class="font-bold text-center text-2xl">
                     {{ proceedEditBill? "Edit transaction details" : "Add new transaction" }}
@@ -168,11 +160,11 @@
                     <label class="mt-4" for="saleBill.customer_name">Customer Name:</label>
                     <input class="uppercase border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text"
                         name="saleBill.customer_name" id="saleBill.customer_name" [(ngModel)]="saleBill.customer_name">
-    
+
                     <label class="mt-4" for="remarks">Remarks:</label>
-                    <input class="uppercase border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text" name="remarks"
-                        id="remarks" [(ngModel)]="saleBill.remarks">
-    
+                    <input class="uppercase border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text"
+                        name="remarks" id="remarks" [(ngModel)]="saleBill.remarks">
+
                     <!-- Submit Button -->
                     <button class="mt-10 bg-neutral-800 text-neutral-300 font-bold p-2 rounded hover:bg-[rgb(48,48,48)]"
                         type="submit">
@@ -306,8 +298,7 @@
                     </p>
 
                     <!-- Submit Button -->
-                    <button class="mt-6 bg-[#008000] text-white font-bold p-2 rounded hover:bg-[#009000]"
-                        type="submit">
+                    <button class="mt-6 bg-[#008000] text-white font-bold p-2 rounded hover:bg-[#009000]" type="submit">
                         Place Order
                     </button>
                 </form>
@@ -321,8 +312,7 @@
         </div>
 
         <!-- BILL TABLE -->
-        <div *ngIf="showBillTable"
-            class="w-full text-center shadow-xl rounded-xl mt-4">
+        <div *ngIf="showBillTable" class="w-full text-center shadow-xl rounded-xl mt-4">
             <table class="w-full table-fixed rounded-xl">
                 <thead class="text-neutral-300 bg-neutral-900">
                     <th>Time</th>
@@ -335,10 +325,9 @@
                 </thead>
                 <tbody>
                     <tr *ngFor="let bill of activeBills">
-                        <td class="flex items-center space-x-8">
+                        <td class="flex items-center space-x-6">
                             <!-- View Order List -->
-                            <button class="px-1.5 py-0.5 rounded-md bg-neutral-800 ml-2"
-                                (click)="viewOrder(bill)">
+                            <button class="px-1.5 py-0.5 rounded-md bg-neutral-800 ml-2" (click)="viewOrder(bill)">
                                 <fa-icon [icon]="faRectangleList" [ngStyle]="{color: 'rgb(212 212 212)'}">
                                 </fa-icon>
                             </button>

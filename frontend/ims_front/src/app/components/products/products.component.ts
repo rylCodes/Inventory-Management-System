@@ -49,9 +49,11 @@ export class ProductsComponent implements OnInit {
     this.proceedEdit = false;
     this.code = "";
     this.product_name = "";
+    this.stock_id = 0,
     this.category = "liquor";
     this.qty_per_order = 0;
     this.status = true;
+    this.price = 0,
     this.customCategory = "";
   }
 
@@ -109,16 +111,6 @@ export class ProductsComponent implements OnInit {
 
   // CREATE PRODUCT
   addProduct() {
-    // let previousProductID;
-    // if (this.products.length > 0) {
-    //   const previousProduct = this.products[this.products.length - 1];
-    //   previousProductID = previousProduct.id;
-    //   this.code = this.uiService.generateSequentialCode("PRO", previousProductID);
-    // } else {
-    //   previousProductID = 0;
-    //   this.code = this.uiService.generateSequentialCode("PRO", previousProductID);
-    // }
-
     if (!this.product_name) {
       window.alert("Enter product name!");
       return;
@@ -158,7 +150,9 @@ export class ProductsComponent implements OnInit {
       this.productService.addProduct(newProduct)
       .subscribe(async (product) => {
         this.products.push(product);
+        this.resetForm();
         this.toggleForm();
+        
         await this.uiService.wait(100);
         window.alert("New product has been created successfully!");
       });

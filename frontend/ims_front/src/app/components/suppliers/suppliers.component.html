@@ -1,1 +1,100 @@
-<p>suppliers works!</p>
+<div class="relative w-full px-8">
+    <!-- HEADING -->
+    <div class="flex justify-between mt-8">
+        <h1 class="font-bold text-3xl">SUPPLIERS</h1>
+        <!-- ADD BUTTON -->
+        <app-button txtContent="{{showForm? 'Cancel': 'Add'}}" bgColor="{{showForm? 'red': 'green'}}"
+            (btnClick)="toggleForm()"></app-button>
+    </div>
+    <hr class="border-b-1 border-neutral-900 mt-4">
+
+    <!-- Confirm to Delete Supplier Modal -->
+    <div *ngIf="showActionModal" class="flex justify-center top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] fixed">
+        <div class="relative flex flex-col items-center bg-white rounded-lg w-96 h-fit p-4 mt-32">
+            <fa-icon class="place-self-end scale-125 hover:scale-110" [icon]="faXmark"
+                [ngStyle]="{color: 'rgb(64 64 64 )'}" (click)="toggleActionModal()">
+            </fa-icon>
+            <p class="mb-8 mt-6 text-center">Are you sure you want to delete this supplier?<br>This action cannot be
+                undone.</p>
+            <app-button (btnClick)="onConfirmDelete()" bgColor="red" txtColor="bg-white"
+                txtContent="Delete"></app-button>
+        </div>
+    </div>
+
+    <!-- FORM -->
+    <div *ngIf="showForm"
+        class="bg-[#fff] max-w-xl h-auto mx-auto px-8 py-10 rounded-lg shadow-xl text-neutral-900 mt-4">
+        <h2 class="font-bold text-center text-2xl"> {{ proceedEdit? 'Edit supplier' : 'Add new supplier' }}</h2>
+        <form class="flex flex-col mt-2" (ngSubmit)="onSubmit()">
+
+            <label class="mt-4" for="supplier.name">Supplier:</label>
+            <input class="uppercase border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text"
+                name="supplier.name" id="name" [(ngModel)]="supplier.name">
+
+            <label class="mt-4" for="supplier.address">Address:</label>
+            <input class="uppercase border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text"
+                name="supplier.address" id="supplier.address" [(ngModel)]="supplier.address">
+
+            <label class="mt-4" for="supplier.phone">Phone:</label>
+            <input appSelectAllText class="border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text"
+                name="supplier.phone" id="supplier.phone" [(ngModel)]="supplier.phone">
+
+            <label class="mt-4" for="supplier.email">Email:</label>
+            <input class="lowercase border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="email"
+                name="supplier.email" id="supplier.email" [(ngModel)]="supplier.email">
+
+            <div class="flex items-center mt-4">
+                <label class="" for="supplier.status">Status:</label>
+                <div class="flex items-center ml-10">
+                    <input class="border border-neutral-900 px-2 py-1 rounded-sm w-4 h-4" type="checkbox"
+                        name="supplier.status" id="supplier.status" [(ngModel)]="supplier.status" checked>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button class="mt-10 bg-neutral-800 text-neutral-300 font-bold p-2 rounded hover:bg-[rgb(48,48,48)]"
+                type="submit">
+                {{ proceedEdit? 'Update': 'Save' }}
+            </button>
+        </form>
+    </div>
+
+    <!-- TABLE -->
+    <div class="w-full text-center shadow-xl rounded-xl mt-8 {{showForm? 'hidden': 'block'}}">
+        <table class="w-full table-fixed rounded-xl">
+            <thead class="text-neutral-300 bg-neutral-900">
+                <th>Code</th>
+                <th>Supplier</th>
+                <th>Address</th>
+                <th>Phone</th>
+                <th>Email</th>
+                <!-- <th>Date Added</th>
+                <th>Date Updated</th> -->
+                <th>Status</th>
+                <th>Action</th>
+            </thead>
+            <tbody>
+                <tr class="{{supplier.status? 'active' : 'inactive'}}" *ngFor="let supplier of suppliers">
+                    <td class="p-2">{{supplier.code}}</td>
+                    <td class="p-2">{{supplier.name}}</td>
+                    <td class="p-2">{{supplier.address}}</td>
+                    <td class="p-2">{{supplier.phone }}</td>
+                    <td class="p-2">{{supplier.email }}</td>
+                    <!-- <td class="p-2">{{supplier.date_added | date: 'dd/MM/yyyy'}}</td>
+                    <td class="p-2">{{supplier.date_updated | date: 'dd/MM/yyyy'}}</td> -->
+                    <td class="p-2">{{supplier.status? "active": "inactive"}}</td>
+                    <td class="flex justify-center p-2 space-x-6">
+                        <!-- Edit supplier -->
+                        <fa-icon class="hover:scale-110" [ngStyle]="{color: 'green'}" [icon]="faPen"
+                            (click)="updateSupplier(supplier)">
+                        </fa-icon>
+                        <!-- Delete supplier -->
+                        <fa-icon class="hover:scale-110" [ngStyle]="{color: 'red'}" [icon]="faTrashCan"
+                            (click)="deleteSupplier(supplier)">
+                        </fa-icon>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -51,10 +51,10 @@ def update_product_code(sender, instance, created, **kwargs):
 # SUPPLIER
 class Supplier(models.Model):
     code = models.CharField(max_length=100, unique=True, blank=True)
-    name = models.CharField(max_length=100)
-    phone = models.CharField(max_length=15, unique=True)
-    address = models.TextField()
-    email = models.EmailField(max_length=100, unique=True)
+    name = models.CharField(max_length=100, unique=True)
+    phone = models.CharField(max_length=15, blank=True, null=True)
+    address = models.CharField(max_length=15, blank=True)
+    email = models.EmailField(max_length=100, blank=True, null=True)
     date_added = models.DateTimeField(default=timezone.now)
     date_updated = models.DateTimeField(auto_now=True)
     status = models.BooleanField(choices=STATUS_CHOICES, default=True)
@@ -71,7 +71,7 @@ def update_supplier_code(sender, instance, created, **kwargs):
 # PURCHASE BILL
 class PurchaseBill(models.Model):
     billno = models.CharField(max_length=100)
-    time = models.DateTimeField(auto_now=True)
+    time = models.DateTimeField(default=timezone.now)
     supplier_id = models.ForeignKey(Supplier, on_delete=models.CASCADE, related_name="bills")
     grand_total = models.FloatField(validators=[MinValueValidator(0)], default=0)
 

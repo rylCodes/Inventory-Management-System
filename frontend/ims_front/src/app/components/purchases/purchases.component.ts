@@ -1,14 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Renderer2, HostListener } from '@angular/core';
 import { PurchaseBill, PurchaseItem } from 'src/app/interface/Purchase';
+import { Supplier } from 'src/app/interface/Supplier';
 import { Stock } from 'src/app/interface/Stock';
-import { StocksService } from 'src/app/services/stocks/stocks';
+import { SuppliersService } from 'src/app/services/suppliers/suppliers.service';
 import { UiService } from 'src/app/services/ui/ui.service';
-import { faPen, faTrashCan, faXmark, faEye, faPlus, faMinus, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faPen, faTrashCan, faXmark, faRectangleList, faPlus, faMinus, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { Router } from '@angular/router';
 import { PurchasesService } from 'src/app/services/purchases/purchases.service';
-import { SaleItem } from 'src/app/interface/Sale';
-import { SuppliersService } from 'src/app/services/suppliers/suppliers.service';
-import { Supplier } from 'src/app/interface/Supplier';
+import { StocksService } from 'src/app/services/stocks/stocks';
 
 @Component({
   selector: 'app-purchases',
@@ -16,72 +15,101 @@ import { Supplier } from 'src/app/interface/Supplier';
   styleUrls: ['./purchases.component.css']
 })
 export class PurchasesComponent implements OnInit {
-  // SALE BILL
-  deletingPurchaseBill?: PurchaseBill | null = null;
-  deletingPurchaseItem?: PurchaseItem | null = null;
+  deletingBill?: PurchaseBill | null = null;
+  deletingItem?: PurchaseItem | null = null;
 
   proceedEditBill: boolean = false;
   proceedEditItem: boolean = false;
+  proceedPayment: boolean = false;
 
   showBillForm: boolean = false;
   showBillTable: boolean = true;  
-  showItemTable: boolean = false;
+  updatingOrder: boolean = false;
 
   showBillActionModal: boolean = false;
   showItemActionModal: boolean = false;
+  showInvoice: boolean = false;
 
   faXmark = faXmark;
   faPen = faPen;
   faTrashCan = faTrashCan;
-  faEye = faEye;
+  faRectangleList = faRectangleList;
   faPlus = faPlus;
   faMinus = faMinus;
   faTimes = faTimes;
 
-  bills: PurchaseBill[] = [];
+  activeBills: PurchaseBill[] = [];
+  allBills: PurchaseBill[] = [];
   items: PurchaseItem[] = [];
-  stocks: Stock[] = [];
   suppliers: Supplier[] = [];
+  stocks: Stock[] = [];
+  amountChange: number = 0;
 
   bill: PurchaseBill = {
     id: undefined,
     billno: "",
-    time: "",
-    supplier_id: 0,
-    grand_total: 0,
+    time: undefined,
+    supplier_id: undefined,
+    grand_total: undefined,
   };
 
   item: PurchaseItem = {
     id: undefined,
+    stock_id: undefined,
     purchaseBill_id: undefined,
     purchase_date: "",
     quantity_purchased: 0,
     item_price: 0,
-    sub_total: 0,
+    sub_total: undefined,
   }
 
   constructor(
-      private purchasesService: PurchasesService,
-      private stocksService: StocksService,
+      private purchaseService: PurchasesService,
+      private supplierService: SuppliersService,
+      private stockService: StocksService,
       private uiService: UiService,
       private router: Router,
-      private suppliersService: SuppliersService
+      private renderer: Renderer2,
     ) {}
 
   resetBillForm() {
     this.proceedEditBill = false;
     this.bill = {
+      id: undefined,
       billno: "",
+      time: undefined,
       supplier_id: undefined,
-      grand_total: 0,
+      grand_total: undefined,
     };
   }
   
   resetItemForm() {
-    this.proceedEditItem = false;
-    this.item.purchaseBill_id = undefined;
-    this.item.quantity_purchased = 0;
-    this.item.sub_total = 0;
+    this.item = {
+      id: undefined,
+      stock_id: undefined,
+      purchaseBill_id: undefined,
+      purchase_date: "",
+      quantity_purchased: 0,
+      item_price: 0,
+      sub_total: undefined,
+    }
+  }
+
+  toggleProceedPayment() {
+    this.proceedPayment = !this.proceedPayment;
+    if (!this.proceedPayment) {
+      // this.bill.amount_tendered = 0;
+    }
+  } 
+
+  async toggleInvoice() {
+    this.showInvoice = !this.showInvoice;
+    if (!this.showInvoice) {
+      await this.uiService.wait(100);
+      window.alert('Transaction has been completed successfully!')
+      this.loadBills();
+      this.viewOrder(this.bill);
+    }
   }
 
   toggleBillActionModal() {
@@ -96,19 +124,6 @@ export class PurchasesComponent implements OnInit {
     this.showBillTable = !this.showBillTable;
   }
 
-  toggleItemTable(bill: PurchaseBill) {
-    this.bill = bill;
-    this.getCurrentItems(bill);
-
-    this.toggleBillTable();
-    this.showItemTable = !this.showItemTable;
-    if (!this.showItemTable) {
-      this.resetBillForm();
-    }
-
-    console.log(this.bill.id);
-  }
-
   toggleBillForm() {
     this.showBillForm = !this.showBillForm;
     if (!this.showBillForm) {
@@ -116,11 +131,39 @@ export class PurchasesComponent implements OnInit {
     }
   }
 
-  calculateGrandtotal(): number {
-    let grandTotal = 0;
+  @HostListener('document:keyup.escape', ['$event'])
+  onKeyUp(event: KeyboardEvent) {
+    if (event.key === 'Escape') {
+      if (this.showInvoice) {
+        this.toggleInvoice(); 
+      } else if (this.showItemActionModal) {
+        this.toggleItemActionModal();
+      } else if (this.showBillActionModal) {
+        this.toggleBillActionModal();
+      } else if (this.showBillForm) {
+        this.toggleBillForm();
+      } else if (this.proceedPayment) {
+        this.toggleProceedPayment();
+      }
+    }
+  }
 
-    this.items.forEach(item => {
-      grandTotal += item.sub_total || 0
+  viewOrder(bill: PurchaseBill) {
+    this.bill = bill;
+    this.loadItems();
+    this.toggleBillTable();
+
+    this.updatingOrder = !this.updatingOrder;
+    if (!this.updatingOrder) {
+      this.resetBillForm();
+      this.loadItems();
+    }
+  }
+
+  calculateGrandtotal(items: PurchaseItem[]): number {
+    let grandTotal = 0;
+    items.forEach(item => {
+      grandTotal += item.sub_total || 0;
     });
 
     return grandTotal;
@@ -139,27 +182,54 @@ export class PurchasesComponent implements OnInit {
 
   // SHOW BILLS
   ngOnInit(): void {
-    this.purchasesService
-      .getPurchaseBills()
-      .subscribe(bill => this.bills = bill);
+    this.loadBills();
+    this.loadItems();
+    this.loadSuppliers();
+    this.loadStocks();
+  }  
 
-    this.stocksService
+  loadBills() {
+    this.purchaseService
+      .getPurchaseBills()
+      .subscribe(salesBills => {
+        // this.activeBills = salesBills.filter(item => !item.status);
+        this.allBills = salesBills;
+      });
+  }
+
+  loadItems() {
+    this.purchaseService
+      .getPurchaseItems()
+      .subscribe((items) => {
+        if (this.updatingOrder) {
+          this.items = items.filter(item => item.purchaseBill_id === this.bill.id);
+          this.bill.grand_total = this.calculateGrandtotal(this.items);
+        } else {
+          this.items = items.filter(item => item.purchaseBill_id === null);
+          this.bill.grand_total = this.calculateGrandtotal(this.items);
+        }
+      });
+  }
+
+  loadSuppliers() {
+    this.supplierService
+      .getSuppliers()
+      .subscribe(suppliers => {
+        const activeSuppliers = suppliers.filter(supplier => supplier.status === true);
+        this.suppliers = activeSuppliers;
+      })
+  }
+
+  loadStocks() {
+    this.stockService
       .getStocks()
       .subscribe(stocks => {
         const activeStocks = stocks.filter(stock => stock.status === true);
         this.stocks = activeStocks;
       })
+  }
 
-    this.purchasesService
-      .getPurchaseItems()
-      .subscribe((items) => this.items = items);
-
-    this.suppliersService
-      .getSuppliers()
-      .subscribe(suppliers => this.suppliers = suppliers);
-  }  
-
-  onSubmit() {
+  onSubmitBill() {
     if (this.proceedEditBill) {
       this.onSaveUpdate();
     } else {
@@ -167,108 +237,165 @@ export class PurchasesComponent implements OnInit {
     }
   }
 
-  // CREATE PRODUCT
+  // async onAmountTenderedChange() {
+  //   if (this.bill.amount_tendered < 0) {
+  //     window.alert("Enter valid amount!");
+  //     return;
+  //   }
+
+  //   if (this.bill.grand_total) {
+  //     await this.uiService.wait(300);
+  //     if (this.bill.amount_tendered < this.bill.grand_total) {
+  //       this.amountChange = 0;
+  //     } else {
+  //       this.amountChange = this.bill.amount_tendered - this.bill.grand_total
+  //       this.bill.status = true;
+  //     }
+  //   }
+  // }
+
+  /* ADD BILLS AND ITEMS */
+  
+  // Add Bills
   addBill() {
-    if (!this.bill.supplier_id) {
-      window.alert("Enter supplier");
+    if (!this.bill.billno) {
+      window.alert("Enter bill no!");
+      return;
+    } else if (!this.bill.supplier_id) {
+      window.alert("Enter supplier id!");
       return;
     }
-
-    const lastItem = this.bills[this.bills.length - 1];
-    let lastItemNumber;
-
-    if (!this.bill.billno) {
-      if (lastItem) {
-        lastItemNumber = Number(lastItem.billno.split('-')[2]);
-        this.bill.billno = this.uiService.generateSequentialCode('SBI', lastItemNumber);
-      } else {
-        lastItemNumber = 0;
-        this.bill.billno = this.uiService.generateSequentialCode('SBI', lastItemNumber);
-      }
-    }
-
-    this.bill.grand_total = this.calculateGrandtotal();
     
     const newBill = {
       ...this.bill,
+      customer_name: this.bill.billno.toUpperCase(),
     }
 
-    this.purchasesService.addPurchaseBill(newBill)
+    this.purchaseService.addPurchaseBill(newBill)
       .subscribe(async (bill) => {
-        this.bills.push(bill);
-        this.toggleBillForm();
+        this.activeBills.push(bill);
+        const lastBillId = this.activeBills.length - 1;
+        this.items.map(item => {
+          if (!item.purchaseBill_id) {
+            item.purchaseBill_id = this.activeBills[lastBillId].id;
+          }
+          this.purchaseService.editPurchaseItem(item).subscribe(item => {
+            const index = this.items.findIndex(i => i.id === item.id);
+            this.items[index] = item;
+            this.loadItems();
+          })
+        })
+        this.resetBillForm();
         await this.uiService.wait(100);
         window.alert("New transaction has been added successfully!");
       });
   }
 
+  // Add Items
+  addItem() {
+    if (!this.item.stock_id) {
+      window.alert("Select a product!");
+      return;
+    } else if (!this.item.quantity_purchased || this.item.quantity_purchased <= 0) {
+      window.alert("Enter quantity!");
+      return;
+    }
+    
+    this.item.purchaseBill_id = this.bill.id;
+    this.item.sub_total = this.item.quantity_purchased * this.item.item_price;
+
+    const newSaleItem = {
+      ...this.item,
+    }
+
+    this.purchaseService.addPurchaseItem(newSaleItem)
+      .subscribe(async (item) => {
+        this.items.push(item);
+        this.loadItems();
+        this.resetItemForm();
+        await this.uiService.wait(100);
+      });
+  }
+
   // UPDATE SALE BILL
-  updateBill(bill: PurchaseBill) {
+  updateSaleBill(bill: PurchaseBill) {
     this.proceedEditBill = true;
+
+    bill.billno.toUpperCase();
+
     this.bill = bill;
 
     this.toggleBillForm();
   }
 
   onSaveUpdate() {
+    this.bill.billno.toUpperCase();
+    
     const editingPurchaseBill = {
       ...this.bill,
     }
 
-    this.purchasesService
+    this.purchaseService
       .editPurchaseBill(editingPurchaseBill)
       .subscribe(async (billData) => {
-        const index = this.bills.findIndex(bill => bill.id === billData.id);
-
+        const index = this.activeBills.findIndex(bill => bill.id === billData.id);
+        this.activeBills[index] = billData;
         this.toggleBillForm();
 
         await this.uiService.wait(100);
         window.alert("Successfully saved changes to the bill details.");
-
-        this.bills[index] = billData;
       });
   }
   
   // DELETE BILL
   deleteBill(bill: PurchaseBill) {
-    if (this.bills.length <= 1) {
+    if (this.activeBills.length <= 1) {
       window.alert("Please add new transaction before deleting this one! Consider editing this instead of deletion.");
       return;
     }
     else {
-      this.deletingPurchaseBill = bill;
+      this.deletingBill = bill;
       this.toggleBillActionModal();
     }
   }
 
   onConfirmDelete() {
-    if (!this.deletingPurchaseBill) {
+    if (!this.deletingBill) {
       return;
     }
 
-    this.purchasesService
-      .deletePurchaseBill(this.deletingPurchaseBill)
+    this.purchaseService
+      .deletePurchaseBill(this.deletingBill)
       .subscribe(async () => {
-        this.bills = this.bills.filter(s => s.id !== this.deletingPurchaseBill?.id);
-        this.deletingPurchaseBill = null;
+        this.activeBills = this.activeBills.filter(s => s.id !== this.deletingBill?.id);
+        this.deletingBill = null;
         this.toggleBillActionModal()
         await this.uiService.wait(100);
         window.alert("Transaction has been deleted successfully!");
       });
   }
 
-  // SHOW ITEMS
-  getBill(billId: any): string {
-    const foundPurchaseBill = this.bills.find(bill => bill.id === billId);
-    return foundPurchaseBill ? foundPurchaseBill.billno : 'Bill Not Found';
-  }
-  
-  getStockDetails(stockId: any): {stockName: string, stockCode: string} {
-    const foundProduct = this.stocks.find(stock => stock.id === stockId);
-    if (foundProduct) {
+  getSupplierDetails(supplierId: any): {supplierName: string, supplierCode?: string} {
+    const foundSupplier = this.suppliers.find(supplier => supplier.id === supplierId);
+    if (foundSupplier) {
       return {
-        stockName: foundProduct.stock_name,
-        stockCode: foundProduct.code,
+        supplierName: foundSupplier.name,
+        supplierCode: foundSupplier.code,
+      }
+    } else {
+      return {
+        supplierName: "Product not found!",
+        supplierCode: "Product not found!",
+      }
+    }
+  }
+
+  getStockDetails(stockId: any): {stockName: string, stockCode?: string} {
+    const foundStock = this.stocks.find(stock => stock.id === stockId);
+    if (foundStock) {
+      return {
+        stockName: foundStock.stock_name,
+        stockCode: foundStock.code,
       }
     } else {
       return {
@@ -286,77 +413,28 @@ export class PurchasesComponent implements OnInit {
     }
   }
 
-  getCurrentItems(bill: PurchaseBill) {
-    this.purchasesService
-      .getPurchaseItems()
-      .subscribe((items) => {
-        this.items = items.filter(item => item.purchaseBill_id === bill.id);
-        this.items.forEach(item => {
-          // item.sub_total = item.quantity_purchased * this.getStockDetails(item.stock_id).productPrice;
-        })
-        this.bill.grand_total = this.calculateGrandtotal();
-      });
-  }
-
-  // ADD SALE ITEM
-  addItem() {
-    if (!this.item.stock_id) {
-      window.alert("Enter customer name");
-      return;
-    } else if (!this.item.quantity_purchased || this.item.quantity_purchased < 0) {
-      window.alert("Enter quantity");
-      return;
-    }
-    
-    // this.item.sub_total = this.item.quantity_purchased * this.getStockDetails(this.item.stock_id).productPrice;
-    this.item.purchaseBill_id = this.bill.id;
-
-    const newItem = {
-      ...this.item,
-    }
-
-    this.purchasesService.addPurchaseItem(newItem)
-      .subscribe(async (saleItem) => {
-        this.items.push(saleItem);
-        this.getCurrentItems(this.bill);
-        this.resetItemForm();
-        await this.uiService.wait(100);
-        window.alert("New customer has been added successfully!");
-      });
-  }
-
-  onSupplierSelectionChange(event: Event) {
+  onStockSelectionChange(event: Event) {
     const target = event?.target as HTMLSelectElement;
-    if (target.value === 'addNewSupplier') {
-      this.router.navigate(['suppliers/']);
-    }
-  }
-
-  onProductSelectionChange(event: Event) {
-    const target = event?.target as HTMLSelectElement;
-    if (target.value === 'addNewProduct') {
-      this.router.navigate(['products/']);
+    if (target.value === 'addNewStock') {
+      this.router.navigate(['stocks/']);
     }
   }
 
   // UPDATE SALE ITEM
-  updateItem(item: PurchaseItem) {
-    console.log(item.purchaseBill_id);
-    // console.log(this.getStockDetails(item.stock_id).productPrice);
+  updateSaleItem(item: PurchaseItem) {
     this.proceedEditItem = true;
     this.item = {...item};
   }
 
   saveItemUpdate() {
-    // this.item.sub_total = this.item.quantity_purchased * this.getStockDetails(this.item.stock_id).productPrice;
-    this.bill.grand_total = this.calculateGrandtotal();
+    this.item.sub_total = this.item.quantity_purchased * this.item.item_price;
 
-    const editingItem = {
+    const editingSaleItem = {
       ...this.item
     }
 
-    this.purchasesService
-      .editPurchaseItem(editingItem)
+    this.purchaseService
+      .editPurchaseItem(editingSaleItem)
       .subscribe(async (itemData) => {
         const index = this.items.findIndex(saleItem => saleItem.id === itemData.id);
 
@@ -368,25 +446,57 @@ export class PurchasesComponent implements OnInit {
   }
 
   // DELETE SALE ITEM
-  deleteSaleItem(item: PurchaseItem) {
-    this.deletingPurchaseItem = item;
+  deleteItem(item: PurchaseItem) {
+    this.deletingItem = item;
     this.toggleItemActionModal();
   }
 
   onConfirmDeleteItem() {
-    if (!this.deletingPurchaseItem) {
+    if (!this.deletingItem) {
       return;
     }
 
-    this.purchasesService
-      .deletePurchaseItem(this.deletingPurchaseItem)
+    this.purchaseService
+      .deletePurchaseItem(this.deletingItem)
       .subscribe(async () => {
-        this.bills = this.bills.filter(s => s.id !== this.deletingPurchaseItem?.id);
-        this.deletingPurchaseItem = null;
+        this.activeBills = this.activeBills.filter(s => s.id !== this.deletingItem?.id);
+        this.deletingItem = null;
         this.toggleItemActionModal()
-        this.getCurrentItems(this.bill);
+        this.loadItems();
         await this.uiService.wait(100);
-        window.alert("SaleBill has been deleted successfully!");
+        window.alert("Item has been deleted successfully!");
       });
+  }
+
+  onBillOut() {
+    this.toggleInvoice();
+    if (this.showInvoice) {
+      this.renderer.setStyle(document.body, 'overflow', 'hidden');
+    } else {
+      this.renderer.setStyle(document.body, 'overflow', 'auto');
+    }
+
+    this.purchaseService.editPurchaseBill(this.bill)
+      .subscribe(data => {
+        const index = this.activeBills.findIndex(bill => bill.id === data.id);
+        this.activeBills[index] = data;
+        this.loadBills();
+      });
+  }
+
+  onPayment() {
+    // if (this.bill.grand_total) {
+    //   if (this.bill.amount_tendered < this.bill.grand_total) {
+    //     window.alert("Invalid amount tendered!");
+    //     return;
+    //   }
+    // }
+
+    this.purchaseService.editPurchaseBill(this.bill).subscribe((bill) => {
+      if (bill.grand_total) {
+        this.toggleInvoice();
+        this.toggleProceedPayment();
+      }
+    });
   }
 }

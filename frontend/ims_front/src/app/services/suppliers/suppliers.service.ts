@@ -19,10 +19,9 @@ export class SuppliersService {
   searchQuery: string | null = null;
 
   handleSupplierError(error:any) {
-    if (error.error.name) {
-      console.log(error.error.name[0]);
-    } else {
+    if (error.error) {
       console.log('Error here →', error.error);
+      window.alert("Unexpected error occur! Refresh the page and try again.")
     }
   }
 

@@ -2,6 +2,11 @@ from django.urls import path
 from inv_mgt import views
 
 urlpatterns = [
+    # Menu URLs
+    path('menus/', views.MenuList.as_view(), name='menu-list'),
+    path('menus/<int:pk>/', views.MenuDetail.as_view(), name='menu-detail'),
+
+
     # Product URLs
     path('products/', views.ProductList.as_view(), name='product-list'),
     path('products/<int:pk>/', views.ProductDetail.as_view(), name='product-detail'),

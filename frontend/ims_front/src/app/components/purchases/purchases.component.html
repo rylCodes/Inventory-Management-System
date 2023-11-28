@@ -185,11 +185,11 @@
             <div class="flex flex-col w-2/5">
                 <label for="quantity">Quantity:</label>
                 <div class="flex items-center space-x-1">
-                    <fa-icon [icon]="faPlus" (click)="increaseQtyInput()"></fa-icon>
+                    <fa-icon [icon]="faMinus" (click)="decreaseQtyInput()"></fa-icon>
                     <input appSelectAllText
                         class="text-center uppercase border border-neutral-900 px-1 py-0.5    rounded-sm mt-1 w-2/3"
                         type="number" name="quantity" id="quantity" [(ngModel)]="item.quantity_purchased">
-                    <fa-icon [icon]="faMinus" (click)="decreaseQtyInput()"></fa-icon>
+                    <fa-icon [icon]="faPlus" (click)="increaseQtyInput()"></fa-icon>
                 </div>
             </div>
 

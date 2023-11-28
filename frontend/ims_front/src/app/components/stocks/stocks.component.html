@@ -27,7 +27,7 @@
         <h2 class="font-bold text-center text-2xl"> {{ proceedEdit? 'Edit stock' : 'Create new stock' }}</h2>
         <form class="flex flex-col mt-2" (ngSubmit)="onSubmit()">
 
-            <label class="mt-4" for="name">Stock Name:</label>
+            <label class="mt-4" for="name">Name:</label>
             <input class="uppercase border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text" name="stock_name"
                 id="stock_name" [(ngModel)]="stock_name">
 
@@ -76,7 +76,7 @@
         <table class="w-full table-fixed rounded-xl">
             <thead class="text-neutral-300 bg-neutral-900">
                 <th>Code</th>
-                <th>Stock Name</th>
+                <th>Name</th>
                 <th>Description</th>
                 <th>Quantity</th>
                 <th>Date Added</th>

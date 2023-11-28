@@ -1,9 +1,14 @@
 from rest_framework import serializers
-from inv_mgt.models import Product, Stock, Supplier, PurchaseBill, PurchaseItem, SalesBill, SalesItem
+from inv_mgt.models import Menu, Product, Stock, Supplier, PurchaseBill, PurchaseItem, SalesBill, SalesItem
 
 class StockSerializer(serializers.ModelSerializer):
     class Meta:
         model = Stock
+        fields = '__all__'
+
+class MenuSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Menu
         fields = '__all__'
 
 class ProductSerializer(serializers.ModelSerializer):

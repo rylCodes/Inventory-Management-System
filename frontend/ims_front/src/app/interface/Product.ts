@@ -1,12 +1,18 @@
 export interface Product {
     id?: number,
-    code: string,
-    product_name: string,
+    code?: number,
     stock_id?: number,
-    category: string,
     qty_per_order: number,
+    date_added?: string,
+}
+
+export interface Menu {
+    id?: number,
+    code?: string,
+    name: string,
+    category: string,
     price: number,
-    date_added?: Date,
-    date_updated?: Date,
+    date_added?: string,
+    date_updated?: string,
     status: boolean,
 }

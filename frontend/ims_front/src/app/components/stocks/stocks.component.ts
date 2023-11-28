@@ -27,6 +27,8 @@ export class StocksComponent implements OnInit {
   description: string = "";
   quantity: number = 0;
   unit: string = "piece";
+  date_added?: string;
+  date_updated?: string;
   status: boolean = true;
   customUnit: string = "";
 
@@ -79,16 +81,6 @@ export class StocksComponent implements OnInit {
 
   // CREATE STOCK
   addStock() {
-    // const previousStock = this.allStocks[this.allStocks.length - 1];
-    // let previousStockID;
-    // if (previousStock && previousStock.code) {
-    //   previousStockID = Number(previousStock.code.split('-')[2]);
-    //   this.code = this.uiService.generateSequentialCode("STO", previousStockID);
-    // } else {
-    //   previousStockID = 0;
-    //   this.code = this.uiService.generateSequentialCode("STO", previousStockID);
-    // }
-
     if (!this.stock_name) {
       window.alert("Enter stock name!");
       return;
@@ -106,6 +98,8 @@ export class StocksComponent implements OnInit {
       description: this.description.toUpperCase(),
       quantity: this.quantity,
       unit: this.unit || this.customUnit,
+      date_added: this.date_added,
+      date_updated: this.date_updated,
       status: this.status,
     }
 
@@ -126,12 +120,8 @@ export class StocksComponent implements OnInit {
 
   // DELETE STOCK
   deleteStock(stock: Stock) {
-    if (this.stocks.length <= 1) {
-      window.alert("Please create a new stock before deleting this one! Consider editing this stock instead of deletion.");
-    } else {
-      this.deletingStock = stock;
-      this.toggleActionModal();
-    }
+    this.deletingStock = stock;
+    this.toggleActionModal();
   }
 
   onConfirmDelete() {
@@ -159,6 +149,8 @@ updateStock(stock: Stock) {
   this.description = stock.description.toUpperCase();
   this.quantity = stock.quantity;
   this.unit = stock.unit;
+  this.date_added = stock.date_added;
+  this.date_updated = stock.date_updated;
   this.status = stock.status;
   this.toggleForm();
 }
@@ -171,6 +163,8 @@ saveUpdate() {
     description: this.description.toUpperCase(),
     quantity: this.quantity,
     unit: this.unit || this.customUnit,
+    date_added: this.date_added,
+    date_updated: this.date_updated,
     status: this.status,
   }
 
@@ -178,6 +172,7 @@ saveUpdate() {
 
   if (isStockNameExist) {
     window.alert("Stock with this name already exists!");
+    return;
   } else {
       this.stockService
       .editStock(editingStock)

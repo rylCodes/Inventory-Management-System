@@ -1,12 +1,11 @@
-import { Component, OnInit } from '@angular/core';
-import { Product } from 'src/app/interface/Product';
+import { Component, OnInit, Renderer2, HostListener } from '@angular/core';
+import { Product, Menu } from 'src/app/interface/Product';
 import { Stock } from 'src/app/interface/Stock';
 import { ProductsService } from 'src/app/services/products/products.service';
 import { StocksService } from 'src/app/services/stocks/stocks';
 import { UiService } from 'src/app/services/ui/ui.service';
-import { faPen, faTrashCan, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { faPen, faTrashCan, faXmark, faRectangleList, faPlus, faMinus, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { Router } from '@angular/router';
-import { DecimalPipe } from '@angular/common';
 
 @Component({
   selector: 'app-products',
@@ -14,218 +13,393 @@ import { DecimalPipe } from '@angular/common';
   styleUrls: ['./products.component.css'],
 })
 export class ProductsComponent implements OnInit {
+  deletingMenu?: Menu | null = null;
   deletingProduct?: Product | null = null;
-  proceedEdit: boolean = false;
+
+  proceedEditMenu: boolean = false;
+  proceedEditProduct: boolean = false;
+  proceedPayment: boolean = false;
+
+  showMenuForm: boolean = false;
+  showMenuTable: boolean = true;  
+  updatingMenuItems: boolean = false;
+
+  showMenuActionModal: boolean = false;
+  showProductActionModal: boolean = false;
+  showInvoice: boolean = false;
 
   faXmark = faXmark;
   faPen = faPen;
   faTrashCan = faTrashCan;
+  faRectangleList = faRectangleList;
+  faPlus = faPlus;
+  faMinus = faMinus;
+  faTimes = faTimes;
 
+  menus: Menu[] = [];
   products: Product[] = [];
   stocks: Stock[] = [];
+  amountChange: number = 0;
 
-  id?: number; 
-  code: string = "";
-  product_name: string = "";
-  stock_id?: number;
-  category: string = "liquor";
-  qty_per_order: number = 0;
-  price: number = 0;
-  status: boolean = true;
+  menu: Menu = {
+    id: undefined,
+    code: undefined,
+    name: "",
+    category: "",
+    price: 0,
+    status: true,
+  };
 
   customCategory: string = "";
 
-  showForm: boolean = false;
-  showActionModal: boolean = false;
+  product: Product = {
+    id: undefined,
+    code: undefined,
+    stock_id: undefined,
+    qty_per_order: 1,
+  }
 
   constructor(
       private productService: ProductsService,
       private stockService: StocksService,
       private uiService: UiService,
       private router: Router,
+      private renderer: Renderer2,
     ) {}
 
-  resetForm() {
-    this.proceedEdit = false;
-    this.code = "";
-    this.product_name = "";
-    this.stock_id = 0,
-    this.category = "liquor";
-    this.qty_per_order = 0;
-    this.status = true;
-    this.price = 0,
+  resetMenuForm() {
+    this.proceedEditProduct = false;
+
+    this.menu = {
+    code: undefined,
+    name: "",
+    category: "liquor",
+    status: true,
+    price: 0,
+    }
+
     this.customCategory = "";
   }
+  
+  resetProductForm() {
+    this.proceedEditProduct = false;
+    this.product.code = undefined;
+    this.product.stock_id = undefined,
+    this.product.qty_per_order = 0;
+  }
 
-  toggleForm() {
-    this.showForm = !this.showForm;
-    if (!this.showForm) {
-      this.resetForm();
+  toggleProceedPayment() {
+    this.proceedPayment = !this.proceedPayment;
+    if (!this.proceedPayment) {
+      // this.menu.amount_tendered = 0;
+    }
+  } 
+
+  async toggleInvoice() {
+    this.showInvoice = !this.showInvoice;
+    if (!this.showInvoice) {
+      await this.uiService.wait(100);
+      window.alert('Transaction has been completed successfully!')
+      this.loadMenus();
+      this.viewMenuProducts(this.menu);
     }
   }
 
-  toggleActionModal() {
-    this.showActionModal = !this.showActionModal;
+  toggleMenuActionModal() {
+    this.showMenuActionModal = !this.showMenuActionModal;
   }
 
-  // SHOW PRODUCTS
+  toggleProductActionModal() {
+    this.showProductActionModal = !this.showProductActionModal;
+  }
+
+  toggleMenuTable() {
+    this.showMenuTable = !this.showMenuTable;
+  }
+
+  toggleMenuForm() {
+    this.showMenuForm = !this.showMenuForm;
+    if (!this.showMenuForm) {
+      this.resetMenuForm();
+    }
+  }
+
+  @HostListener('document:keyup.escape', ['$event'])
+  onKeyUp(event: KeyboardEvent) {
+    if (event.key === 'Escape') {
+      if (this.showInvoice) {
+        this.toggleInvoice(); 
+      } else if (this.showProductActionModal) {
+        this.toggleProductActionModal();
+      } else if (this.showMenuActionModal) {
+        this.toggleMenuActionModal();
+      } else if (this.showMenuForm) {
+        this.toggleMenuForm();
+      } else if (this.proceedPayment) {
+        this.toggleProceedPayment();
+      }
+    }
+  }
+
+  viewMenuProducts(menu: Menu) {
+    this.menu = menu;
+    this.loadProducts();
+    this.toggleMenuTable();
+
+    this.updatingMenuItems = !this.updatingMenuItems;
+    if (!this.updatingMenuItems) {
+      this.resetMenuForm();
+      this.loadProducts();
+    }
+  }
+
+  increaseQtyInput(): void {
+    this.product.qty_per_order ++;
+  }
+
+  decreaseQtyInput(): void {
+    if (this.product.qty_per_order < 1) {
+      return;
+    }
+    this.product.qty_per_order --;
+  }
+
+  // SHOW BILLS
   ngOnInit(): void {
+    this.loadMenus();
+    this.loadProducts();
+    this.loadMenus();
+    this.loadStocks();
+  }  
+
+  loadMenus() {
+    this.productService
+      .getMenus()
+      .subscribe(menus => {
+        this.menus = menus;
+      });
+  }
+
+  loadProducts() {
     this.productService
       .getProducts()
       .subscribe((products) => {
-        this.products = products;
+        if (this.updatingMenuItems) {
+          this.products = products.filter(product => product.code === this.menu.id);
+        } else {
+          this.products = products.filter(product => product.code === null);
+        }
       });
+  }
 
+  loadStocks() {
     this.stockService
       .getStocks()
       .subscribe(stocks => {
         const activeStocks = stocks.filter(stock => stock.status === true);
         this.stocks = activeStocks;
+      })
+  }
+
+  onSubmitMenu() {
+    if (this.proceedEditMenu) {
+      this.onSaveUpdateMenu();
+    } else {
+      this.addMenu();
+    }
+  }
+
+  // Add Menu
+  addMenu() {
+
+    if (!this.menu.name) {
+      window.alert("Enter name");
+      return;
+    } else if (!this.menu.category) {
+      window.alert("Enter category");
+      return;
+    }
+    
+    const newMenu = {
+      ...this.menu,
+      name: this.menu.name.toUpperCase(),
+      category: this.menu.category.toUpperCase() || this.customCategory.toUpperCase(),
+    }
+
+    const isMenuNameExist = this.menus.some(menu => menu.name === newMenu.name);
+  
+    if (isMenuNameExist) {
+      window.alert("Menu with this name already exists!");
+      return;
+    } else {
+      this.productService.addMenu(newMenu)
+      .subscribe(async (menu) => {
+        this.menus.push(menu);
+        const lastMenuId = this.menus.length - 1;
+        this.products.map(product => {
+          if (!product.code) {
+            product.code = this.menus[lastMenuId].id;
+          }
+          this.productService.updateProduct(product).subscribe(product => {
+            const index = this.products.findIndex(i => i.id === product.id);
+            this.products[index] = product;
+            this.loadProducts();
+          })
+        })
+        this.resetMenuForm();
+        await this.uiService.wait(100);
+        window.alert("New menu has been created successfully!");
       });
-  }
-
-  getStockDetails(stockId: any): {stockName: string, stockUnit: string, stockCode: string} {
-    const foundStock = this.stocks.find(stock => stock.id === stockId);
-    if (foundStock) {
-      return {
-        stockName: foundStock.stock_name,
-        stockCode: foundStock.code,
-        stockUnit: foundStock.unit
-      }
-    } else {
-      return {
-        stockName: "Stock not found!",
-        stockCode: "Stock not found!",
-        stockUnit: "Stock not found!",
-      }
-    }
-  } 
-
-  onSubmit() {
-    if (this.proceedEdit) {
-      this.onSaveUpdate();
-    } else {
-      this.addProduct();
     }
   }
 
-  // CREATE PRODUCT
+  // Add Items
   addProduct() {
-    if (!this.product_name) {
-      window.alert("Enter product name!");
+    if (!this.product.stock_id) {
+      window.alert("Select a product!");
       return;
-    } else if (this.qty_per_order <= 0) {
-      window.alert("Enter quantity per order!")
-      return;
-    } else if (this.price < 0) {
-      window.alert("Invalid price!");
+    } else if (!this.product.qty_per_order || this.product.qty_per_order <= 0) {
+      window.alert("Enter quantity!");
       return;
     }
+    
+    this.product.code = this.menu.id;
 
     const newProduct = {
-      id: this.id,
-      code: this.code,
-      product_name: this.product_name.toUpperCase(),
-      stock_id: this.stock_id,
-      category: this.category.toUpperCase() || this.customCategory.toUpperCase(),
-      qty_per_order: this.qty_per_order,
-      price: this.price,
-      status: this.status,
+      ...this.product,
     }
 
-    const isNameExist = this.products.some(product => product.product_name === newProduct.product_name);
-  
-    if (isNameExist) {
-      window.alert("Product with this name already exists!");
-    } else if (!this.product_name) {
-      window.alert("Enter product name!");
-      return;
-    } else if (this.qty_per_order <= 0) {
-      window.alert("Enter quantity per order!")
-      return;
-    } else if (this.price < 0) {
-      window.alert("Invalid price!");
-      return;
-    } else {
-      this.productService.addProduct(newProduct)
+    this.productService.addProduct(newProduct)
       .subscribe(async (product) => {
         this.products.push(product);
-        this.resetForm();
-        this.toggleForm();
-        
+        this.loadProducts();
+        this.resetProductForm();
         await this.uiService.wait(100);
-        window.alert("New product has been created successfully!");
       });
+  }
+
+  // UPDATE SALE BILL
+  updateMenu(menu: Menu) {
+    this.proceedEditMenu = true;
+
+    menu.name.toUpperCase();
+    menu.category.toUpperCase();
+    
+    this.menu = menu;
+
+    this.toggleMenuForm();
+  }
+
+  onSaveUpdateMenu() {
+    this.menu.name.toUpperCase();
+    this.menu.category.toUpperCase();
+    this.customCategory.toUpperCase();
+    
+    const editingMenu = {
+      ...this.menu,
+    }
+
+    const isMenuNameExist = this.menus.some(menu => menu.id !== editingMenu.id && menu.name === editingMenu.name);
+
+    if (isMenuNameExist) {
+      window.alert("Menu with this name already exists!");
+      return;
+    } else {
+      this.productService
+      .updateMenu(editingMenu)
+      .subscribe(async (menuData) => {
+        const index = this.menus.findIndex(menu => menu.id === menuData.id);
+        this.menus[index] = menuData;
+        this.toggleMenuForm();
+
+        await this.uiService.wait(100);
+        window.alert("Successfully saved changes to the menu details.");
+      });
+    }
+  }
+  
+  // DELETE BILL
+  deleteMenu(menu: Menu) {
+    this.deletingMenu = menu;
+    this.toggleMenuActionModal();
+  }
+
+  onConfirmDeleteMenu() {
+    if (!this.deletingMenu) {
+      return;
+    }
+
+    this.productService
+      .deleteMenu(this.deletingMenu)
+      .subscribe(async () => {
+        this.menus = this.menus.filter(s => s.id !== this.deletingMenu?.id);
+        this.deletingMenu = null;
+        this.toggleMenuActionModal()
+        await this.uiService.wait(100);
+        window.alert("Menu has been deleted successfully!");
+      });
+  }
+
+  getStockDetails(stockId: any): {stock_name: string, code?: string} {
+    const foundStock = this.stocks.find(menu => menu.id === stockId);
+    if (foundStock) {
+      return {
+        stock_name: foundStock.stock_name,
+        code: foundStock.code,
+      }
+    } else {
+      return {
+        stock_name: "Stock not found!",
+        code: "Stock not found!",
+      }
+    }
+  }
+
+  onSubmitProduct() {
+    if (this.proceedEditProduct) {
+      this.saveProductUpdate();
+    } else {
+      this.addProduct();
     }
   }
 
   onStockSelectionChange(event: Event) {
     const target = event?.target as HTMLSelectElement;
     if (target.value === 'addNewStock') {
-      this.toggleForm();
       this.router.navigate(['stocks/']);
     }
   }
 
-// UPDATE PRODUCT
-updateProduct(product: Product) {
-  this.proceedEdit = true;
-
-  this.id = product.id;
-  this.code = product.code;
-  this.product_name = product.product_name.toUpperCase();
-  this.stock_id = product.stock_id;
-  this.category = product.category.toUpperCase();
-  this.qty_per_order = product.qty_per_order;
-  this.price = product.price;
-  this.status = product.status;
-
-  this.toggleForm();
-}
-
-onSaveUpdate() {
-  const editingProduct = {
-    id: this.id,
-    code: this.code,
-    product_name: this.product_name.toUpperCase(),
-    stock_id: this.stock_id,
-    category: this.category.toUpperCase() || this.customCategory.toUpperCase(),
-    qty_per_order: this.qty_per_order,
-    price: this.price,
-    status: this.status,
+  // UPDATE SALE ITEM
+  updateProduct(product: Product) {
+    this.proceedEditProduct = true;
+    this.product = {...product};
   }
-  const isNameExist = this.products.some(product => product.id !== editingProduct.id && product.product_name === editingProduct.product_name);
 
-  if (isNameExist) {
-    window.alert("Product with this name already exists!");
-  } else {
-      this.productService
-      .editProduct(editingProduct)
+  saveProductUpdate() {
+    const editingProduct = {
+      ...this.product
+    }
+
+    this.productService
+      .updateProduct(editingProduct)
       .subscribe(async (productData) => {
         const index = this.products.findIndex(product => product.id === productData.id);
 
-        this.toggleForm();
-
         await this.uiService.wait(100);
-        window.alert("Successfully saved changes to the product.");
+        window.alert("Successfully saved changes to the item.");
 
         this.products[index] = productData;
       });
-    }
   }
 
   // DELETE PRODUCT
   deleteProduct(product: Product) {
-    if (this.products.length <= 1) {
-      window.alert("Please create a new product before deleting this one! Consider editing this product instead of deletion.");
-      return;
-    } else {
-      this.deletingProduct = product;
-      this.toggleActionModal();
-    }
+    this.deletingProduct = product;
+    this.toggleProductActionModal();
   }
 
-  onConfirmDelete() {
+  onConfirmDeleteProduct() {
     if (!this.deletingProduct) {
       return;
     }
@@ -233,12 +407,44 @@ onSaveUpdate() {
     this.productService
       .deleteProduct(this.deletingProduct)
       .subscribe(async () => {
-        this.products = this.products.filter(s => s.id !== this.deletingProduct?.id);
+        this.menus = this.menus.filter(s => s.id !== this.deletingProduct?.id);
         this.deletingProduct = null;
-        this.toggleActionModal()
+        this.toggleProductActionModal()
+        this.loadProducts();
         await this.uiService.wait(100);
         window.alert("Product has been deleted successfully!");
       });
   }
 
+  onBillOut() {
+    this.toggleInvoice();
+    if (this.showInvoice) {
+      this.renderer.setStyle(document.body, 'overflow', 'hidden');
+    } else {
+      this.renderer.setStyle(document.body, 'overflow', 'auto');
+    }
+
+    this.productService.updateMenu(this.menu)
+      .subscribe(menu => {
+        const index = this.menus.findIndex(menu => menu.id === menu.id);
+        this.menus[index] = menu;
+        this.loadMenus();
+      });
+  }
+
+  onPayment() {
+    // if (this.menu.grand_total) {
+    //   if (this.menu.amount_tendered < this.menu.grand_total) {
+    //     window.alert("Invalid amount tendered!");
+    //     return;
+    //   }
+    // }
+
+    this.productService.updateMenu(this.menu).subscribe((menu) => {
+      if (menu.price) {
+        this.toggleInvoice();
+        this.toggleProceedPayment();
+      }
+    });
+  }
 }

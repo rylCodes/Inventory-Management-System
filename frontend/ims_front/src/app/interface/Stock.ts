@@ -5,7 +5,7 @@ export interface Stock {
     description: string,
     quantity: number,
     unit: string,
-    date_added?: Date,
-    date_updated?: Date,
+    date_added?: string,
+    date_updated?: string,
     status: boolean,
 }

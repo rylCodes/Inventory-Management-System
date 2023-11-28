@@ -31,6 +31,7 @@ def update_stock_code(sender, instance, created, **kwargs):
 class Menu(models.Model):
     code = models.CharField(max_length=100, unique=True, blank=True)
     name = models.CharField(max_length=100, unique=True)
+    description = models.CharField(max_length=200, blank=True, null=True)
     category = models.TextField(blank=True, null=True)
     price = models.FloatField(validators=[MinValueValidator(0)], default=0)
     date_added = models.DateTimeField(default=timezone.now)

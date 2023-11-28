@@ -332,11 +332,10 @@ export class PosComponent implements OnInit {
   }
 
   onSaveUpdate() {
-    this.saleBill.customer_name.toUpperCase();
-    this.saleBill.remarks.toUpperCase();
-    
     const editingSaleBill = {
       ...this.saleBill,
+      customer_name: this.saleBill.customer_name.toUpperCase(),
+      remarks: this.saleBill.remarks.toUpperCase(),
     }
 
     this.salesService
@@ -353,14 +352,8 @@ export class PosComponent implements OnInit {
   
   // DELETE BILL
   deleteSaleBill(saleBill: SaleBill) {
-    if (this.activeBills.length <= 1) {
-      window.alert("Please add new transaction before deleting this one! Consider editing this instead of deletion.");
-      return;
-    }
-    else {
-      this.deletingSaleBill = saleBill;
-      this.toggleBillActionModal();
-    }
+    this.deletingSaleBill = saleBill;
+    this.toggleBillActionModal();
   }
 
   onConfirmDelete() {

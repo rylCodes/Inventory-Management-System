@@ -6,6 +6,7 @@ import { StocksService } from 'src/app/services/stocks/stocks';
 import { UiService } from 'src/app/services/ui/ui.service';
 import { faPen, faTrashCan, faXmark, faRectangleList, faPlus, faMinus, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { Router } from '@angular/router';
+import { DecimalPipe } from '@angular/common';
 
 @Component({
   selector: 'app-products',
@@ -21,7 +22,8 @@ export class ProductsComponent implements OnInit {
   proceedPayment: boolean = false;
 
   showMenuForm: boolean = false;
-  showMenuTable: boolean = true;  
+  showMenuTable: boolean = true; 
+  showFormContainer: boolean = false; 
   updatingMenuItems: boolean = false;
 
   showMenuActionModal: boolean = false;
@@ -45,6 +47,7 @@ export class ProductsComponent implements OnInit {
     id: undefined,
     code: undefined,
     name: "",
+    description: "",
     category: "",
     price: 0,
     status: true,
@@ -73,6 +76,7 @@ export class ProductsComponent implements OnInit {
     this.menu = {
     code: undefined,
     name: "",
+    description: "",
     category: "liquor",
     status: true,
     price: 0,
@@ -117,6 +121,10 @@ export class ProductsComponent implements OnInit {
     this.showMenuTable = !this.showMenuTable;
   }
 
+  toggleFormContainer() {
+    this.showFormContainer = !this.showFormContainer;
+  }
+
   toggleMenuForm() {
     this.showMenuForm = !this.showMenuForm;
     if (!this.showMenuForm) {
@@ -144,6 +152,7 @@ export class ProductsComponent implements OnInit {
   viewMenuProducts(menu: Menu) {
     this.menu = menu;
     this.loadProducts();
+    this.toggleFormContainer();
     this.toggleMenuTable();
 
     this.updatingMenuItems = !this.updatingMenuItems;
@@ -247,6 +256,7 @@ export class ProductsComponent implements OnInit {
           })
         })
         this.resetMenuForm();
+        this.toggleFormContainer();
         await this.uiService.wait(100);
         window.alert("New menu has been created successfully!");
       });
@@ -278,7 +288,7 @@ export class ProductsComponent implements OnInit {
       });
   }
 
-  // UPDATE SALE BILL
+  // UPDATE MENU
   updateMenu(menu: Menu) {
     this.proceedEditMenu = true;
 
@@ -291,12 +301,11 @@ export class ProductsComponent implements OnInit {
   }
 
   onSaveUpdateMenu() {
-    this.menu.name.toUpperCase();
-    this.menu.category.toUpperCase();
-    this.customCategory.toUpperCase();
-    
     const editingMenu = {
       ...this.menu,
+      name: this.menu.name.toUpperCase(),
+      category: this.menu.category.toUpperCase(),
+      description: this.menu.description.toUpperCase(),
     }
 
     const isMenuNameExist = this.menus.some(menu => menu.id !== editingMenu.id && menu.name === editingMenu.name);
@@ -318,7 +327,7 @@ export class ProductsComponent implements OnInit {
     }
   }
   
-  // DELETE BILL
+  // DELETE MENU
   deleteMenu(menu: Menu) {
     this.deletingMenu = menu;
     this.toggleMenuActionModal();
@@ -370,7 +379,7 @@ export class ProductsComponent implements OnInit {
     }
   }
 
-  // UPDATE SALE ITEM
+  // UPDATE PRODUCT
   updateProduct(product: Product) {
     this.proceedEditProduct = true;
     this.product = {...product};

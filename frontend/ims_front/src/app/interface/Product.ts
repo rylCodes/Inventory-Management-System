@@ -10,6 +10,7 @@ export interface Menu {
     id?: number,
     code?: string,
     name: string,
+    description: string,
     category: string,
     price: number,
     date_added?: string,

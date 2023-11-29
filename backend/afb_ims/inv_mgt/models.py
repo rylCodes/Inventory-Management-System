@@ -90,7 +90,7 @@ class PurchaseBill(models.Model):
 # PURCHASE ITEM
 class PurchaseItem(models.Model):
     stock_id = models.ForeignKey(Stock, on_delete=models.CASCADE, related_name="purchase_items")
-    purchaseBill_id = models.ForeignKey(PurchaseBill, on_delete=models.CASCADE)
+    purchaseBill_id = models.ForeignKey(PurchaseBill, on_delete=models.CASCADE, blank=True, null=True)
     purchase_date = models.DateTimeField(auto_now_add=True)
     quantity_purchased = models.FloatField(validators=[MinValueValidator(0)], default=0)
     item_price = models.FloatField(validators=[MinValueValidator(0)], default=0)

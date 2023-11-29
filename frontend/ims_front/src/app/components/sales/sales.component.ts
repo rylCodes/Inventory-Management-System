@@ -32,7 +32,8 @@ export class SalesComponent implements OnInit {
   faTimes = faTimes;
 
   bills: SaleBill[] = [];
-  items: SaleItem[] = [];
+  allItems: SaleItem[] = [];
+  eachBillItems: SaleItem[] = [];
   menus: Menu[] = [];
   stocks: Stock[] = [];
   amountChange: number = 0;
@@ -90,7 +91,7 @@ export class SalesComponent implements OnInit {
   toggleInvoice(bill: SaleBill) {
     this.bill = bill;
     this.loadBills();
-    this.loadItems();
+    this.loadEachBillItems();
 
     this.showInvoice = !this.showInvoice;
     if (this.showInvoice) {
@@ -114,18 +115,18 @@ export class SalesComponent implements OnInit {
 
   viewOrder(bill: SaleBill) {
     this.bill = bill;
-    this.loadItems();
+    this.loadEachBillItems();
 
     this.showOrder = !this.showOrder;
     if (!this.showOrder) {
-      this.loadItems();
+      this.loadEachBillItems();
     }
   }
 
   // SHOW BILLS
   ngOnInit(): void {
     this.loadBills();
-    this.loadItems();
+    this.loadAllItems();
     this.loadMenus();
     this.loadStocks();
   }  
@@ -138,11 +139,19 @@ export class SalesComponent implements OnInit {
       });
   }
 
-  loadItems() {
+  loadEachBillItems() {
     this.salesService
       .getSaleItems()
       .subscribe((items) => {
-        this.items = items.filter(item => item.billno === this.bill.id);
+        this.eachBillItems = items.filter(item => item.billno === this.bill.id);
+      });
+  }
+
+  loadAllItems() {
+    this.salesService
+      .getSaleItems()
+      .subscribe((items) => {
+        this.allItems = items;
       });
   }
 
@@ -165,7 +174,7 @@ export class SalesComponent implements OnInit {
   }
 
   getItemLength(bill: SaleBill) {
-    const items = this.items.filter(item => item.billno === bill.id);
+    const items = this.allItems.filter(item => item.billno === bill.id);
     return items.length;
   }
   
@@ -201,11 +210,6 @@ export class SalesComponent implements OnInit {
   getSaleBill(saleBillId: any): string {
     const foundSaleBill = this.bills.find(saleBill => saleBill.id === saleBillId);
     return foundSaleBill ? foundSaleBill.customer_name : 'Bill Not Found';
-  }
-
-  getItemsLength(bill: SaleBill) {
-    const items = this.items.filter(item => item.billno === bill.id);
-    console.log(items);
   }
   
   getMenuDetails(menuId: any): {name: string, code?: string, price: number} {

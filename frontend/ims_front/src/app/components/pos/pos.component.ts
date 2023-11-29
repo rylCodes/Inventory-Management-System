@@ -1,6 +1,6 @@
 import { Component, OnInit, Renderer2, HostListener } from '@angular/core';
 import { SaleBill, SaleItem } from 'src/app/interface/Sale';
-import { Product } from 'src/app/interface/Product';
+import { Menu } from 'src/app/interface/Product';
 import { Stock } from 'src/app/interface/Stock';
 import { ProductsService } from 'src/app/services/products/products.service';
 import { UiService } from 'src/app/services/ui/ui.service';
@@ -41,7 +41,7 @@ export class PosComponent implements OnInit {
   activeBills: SaleBill[] = [];
   allBills: SaleBill[] = [];
   saleItems: SaleItem[] = [];
-  products: Product[] = [];
+  menus: Menu[] = [];
   stocks: Stock[] = [];
   amountChange: number = 0;
 
@@ -185,7 +185,7 @@ export class PosComponent implements OnInit {
   ngOnInit(): void {
     this.loadBills();
     this.loadItems();
-    this.loadProducts();
+    this.loadMenus();
     this.loadStocks();
   }  
 
@@ -212,12 +212,12 @@ export class PosComponent implements OnInit {
       });
   }
 
-  loadProducts() {
+  loadMenus() {
     this.productService
-      .getProducts()
-      .subscribe(products => {
-        const activeProducts = products.filter(product => product.status === true);
-        this.products = activeProducts;
+      .getMenus()
+      .subscribe(menus => {
+        const activeMenus = menus.filter(menu => menu.status === true);
+        this.menus = activeMenus;
       })
   }
 
@@ -256,7 +256,6 @@ export class PosComponent implements OnInit {
   }
 
   /* ADD BILLS AND ITEMS */
-  
   // Add Bills
   addBill() {
     if (!this.saleBill.customer_name) {
@@ -304,7 +303,7 @@ export class PosComponent implements OnInit {
     }
     
     this.saleItem.billno = this.saleBill.id;
-    this.saleItem.price = this.getProductDetails(Number(this.saleItem.product_id)).productPrice;
+    this.saleItem.price = this.getMenuDetails(Number(this.saleItem.product_id)).price;
     this.saleItem.sub_total = this.saleItem.quantity * this.saleItem.price;
 
     const newSaleItem = {
@@ -333,11 +332,10 @@ export class PosComponent implements OnInit {
   }
 
   onSaveUpdate() {
-    this.saleBill.customer_name.toUpperCase();
-    this.saleBill.remarks.toUpperCase();
-    
     const editingSaleBill = {
       ...this.saleBill,
+      customer_name: this.saleBill.customer_name.toUpperCase(),
+      remarks: this.saleBill.remarks.toUpperCase(),
     }
 
     this.salesService
@@ -354,14 +352,8 @@ export class PosComponent implements OnInit {
   
   // DELETE BILL
   deleteSaleBill(saleBill: SaleBill) {
-    if (this.activeBills.length <= 1) {
-      window.alert("Please add new transaction before deleting this one! Consider editing this instead of deletion.");
-      return;
-    }
-    else {
-      this.deletingSaleBill = saleBill;
-      this.toggleBillActionModal();
-    }
+    this.deletingSaleBill = saleBill;
+    this.toggleBillActionModal();
   }
 
   onConfirmDelete() {
@@ -380,25 +372,19 @@ export class PosComponent implements OnInit {
       });
   }
 
-  // SHOW ITEMS
-  getSaleBill(saleBillId: any): string {
-    const foundSaleBill = this.activeBills.find(saleBill => saleBill.id === saleBillId);
-    return foundSaleBill ? foundSaleBill.customer_name : 'Bill Not Found';
-  }
-  
-  getProductDetails(productId: any): {productName: string, productCode: string, productPrice: number} {
-    const foundProduct = this.products.find(product => product.id === productId);
-    if (foundProduct) {
+  getMenuDetails(menuId: any): {name: string, code?: string, price: number} {
+    const foundMenu = this.menus.find(menu => menu.id === menuId);
+    if (foundMenu) {
       return {
-        productName: foundProduct.product_name,
-        productCode: foundProduct.code,
-        productPrice: foundProduct.price,
+        name: foundMenu.name,
+        code: foundMenu.code,
+        price: foundMenu.price,
       }
     } else {
       return {
-        productName: "Product not found!",
-        productCode: "Product not found!",
-        productPrice: 0,
+        name: "Product not found!",
+        code: "Product not found!",
+        price: 0,
       }
     }
   }
@@ -411,7 +397,7 @@ export class PosComponent implements OnInit {
     }
   }
 
-  onProductSelectionChange(event: Event) {
+  onMenuSelectionChange(event: Event) {
     const target = event?.target as HTMLSelectElement;
     if (target.value === 'addNewProduct') {
       this.router.navigate(['products/']);
@@ -425,7 +411,7 @@ export class PosComponent implements OnInit {
   }
 
   saveItemUpdate() {
-    this.saleItem.sub_total = this.saleItem.quantity * this.getProductDetails(this.saleItem.product_id).productPrice;
+    this.saleItem.sub_total = this.saleItem.quantity * this.getMenuDetails(this.saleItem.product_id).price;
 
     const editingSaleItem = {
       ...this.saleItem

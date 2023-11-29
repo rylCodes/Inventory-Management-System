@@ -1,6 +1,6 @@
 import { Component, OnInit, Renderer2, HostListener } from '@angular/core';
 import { SaleBill, SaleItem } from 'src/app/interface/Sale';
-import { Product } from 'src/app/interface/Product';
+import { Menu } from 'src/app/interface/Product';
 import { Stock } from 'src/app/interface/Stock';
 import { ProductsService } from 'src/app/services/products/products.service';
 import { UiService } from 'src/app/services/ui/ui.service';
@@ -33,7 +33,7 @@ export class SalesComponent implements OnInit {
 
   bills: SaleBill[] = [];
   items: SaleItem[] = [];
-  products: Product[] = [];
+  menus: Menu[] = [];
   stocks: Stock[] = [];
   amountChange: number = 0;
   eachBill: [] = [];
@@ -126,7 +126,7 @@ export class SalesComponent implements OnInit {
   ngOnInit(): void {
     this.loadBills();
     this.loadItems();
-    this.loadProducts();
+    this.loadMenus();
     this.loadStocks();
   }  
 
@@ -146,12 +146,12 @@ export class SalesComponent implements OnInit {
       });
   }
 
-  loadProducts() {
+  loadMenus() {
     this.productService
-      .getProducts()
-      .subscribe(products => {
-        const activeProducts = products.filter(product => product.status === true);
-        this.products = activeProducts;
+      .getMenus()
+      .subscribe(menus => {
+        const activeMenus = menus.filter(menu => menu.status === true);
+        this.menus = activeMenus;
       })
   }
 
@@ -208,19 +208,19 @@ export class SalesComponent implements OnInit {
     console.log(items);
   }
   
-  getProductDetails(productId: any): {productName: string, productCode: string, productPrice: number} {
-    const foundProduct = this.products.find(product => product.id === productId);
-    if (foundProduct) {
+  getMenuDetails(menuId: any): {name: string, code?: string, price: number} {
+    const foundMenu = this.menus.find(menu => menu.id === menuId);
+    if (foundMenu) {
       return {
-        productName: foundProduct.product_name,
-        productCode: foundProduct.code,
-        productPrice: foundProduct.price,
+        name: foundMenu.name,
+        code: foundMenu.code,
+        price: foundMenu.price,
       }
     } else {
       return {
-        productName: "Product not found!",
-        productCode: "Product not found!",
-        productPrice: 0,
+        name: "Menu not found!",
+        code: "Menu not found!",
+        price: 0,
       }
     }
   }

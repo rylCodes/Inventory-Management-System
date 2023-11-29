@@ -62,7 +62,7 @@
                         <tbody>
                             <tr class="text-center bg-inherit border-b border-neutral-900"
                                 *ngFor="let item of saleItems">
-                                <td class="p-1">{{getProductDetails(item.product_id).productName}}</td>
+                                <td class="p-1">{{getMenuDetails(item.product_id).name}}</td>
                                 <td class="p-1">{{item.price}}</td>
                                 <td class="p-1">{{item.quantity}}</td>
                                 <td class="p-1">{{item.sub_total}}</td>
@@ -72,7 +72,7 @@
                     <div class="flex justify-between mt-6">
                         <div class="w-1/2">
                             <div class="w-2/3">
-                                <p class="flex justify-between">
+                                <p class="flex justify-between">sss
                                     <span>Invoice:</span>
                                     <span>{{saleBill.billno}}</span>
                                 </p>
@@ -179,11 +179,11 @@
             class="flex items-end text-start justify-between w-3/4 bg-[#fff] h-fit mt-4 px-4 py-2 rounded-lg shadow-xl text-neutral-900"
             (ngSubmit)="onSubmitItem()">
             <div class="flex flex-col w-2/5">
-                <label for="product_name">Product:</label>
-                <select class="border border-neutral-900 px-1 py-0.5 rounded-sm mt-1 w-full" name="product_name"
-                    id="product_name" [(ngModel)]="saleItem.product_id" (change)="onProductSelectionChange($event)">
-                    <option *ngFor="let product of products" selected value="{{product.id}}">
-                        {{product.product_name}}</option>
+                <label for="name">Menu:</label>
+                <select class="border border-neutral-900 px-1 py-0.5 rounded-sm mt-1 w-full" name="name"
+                    id="name" [(ngModel)]="saleItem.product_id" (change)="onMenuSelectionChange($event)">
+                    <option *ngFor="let menu of menus" selected value="{{menu.id}}">
+                        {{menu.name}}</option>
                     <option class="text-neutral-500" value="addNewProduct">add new product ...</option>
                 </select>
             </div>
@@ -191,11 +191,11 @@
             <div class="flex flex-col w-2/5">
                 <label for="quantity">Quantity:</label>
                 <div class="flex items-center space-x-1">
-                    <fa-icon [icon]="faPlus" (click)="increaseQtyInput()"></fa-icon>
+                    <fa-icon [icon]="faMinus" (click)="decreaseQtyInput()"></fa-icon>
                     <input appSelectAllText
                         class="text-center uppercase border border-neutral-900 px-1 py-0.5    rounded-sm mt-1 w-2/3"
                         type="number" name="quantity" id="quantity" [(ngModel)]="saleItem.quantity">
-                    <fa-icon [icon]="faMinus" (click)="decreaseQtyInput()"></fa-icon>
+                    <fa-icon [icon]="faPlus" (click)="increaseQtyInput()"></fa-icon>
                 </div>
             </div>
 
@@ -229,7 +229,7 @@
                                 </button>
                                 <p>{{item.sale_date | date: 'hh:mm a'}}</p>
                             </td>
-                            <td class="p-2">{{getProductDetails(item.product_id).productName}}</td>
+                            <td class="p-2">{{getMenuDetails(item.product_id).name}}</td>
                             <td class="p-2">{{item.quantity}}</td>
                             <td class="p-2">
                                 <p>{{item.price| number: '1.2-2'}}</p>

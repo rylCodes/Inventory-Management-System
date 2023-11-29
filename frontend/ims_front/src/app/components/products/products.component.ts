@@ -28,7 +28,6 @@ export class ProductsComponent implements OnInit {
 
   showMenuActionModal: boolean = false;
   showProductActionModal: boolean = false;
-  showInvoice: boolean = false;
 
   faXmark = faXmark;
   faPen = faPen;
@@ -41,7 +40,6 @@ export class ProductsComponent implements OnInit {
   menus: Menu[] = [];
   products: Product[] = [];
   stocks: Stock[] = [];
-  amountChange: number = 0;
 
   menu: Menu = {
     id: undefined,
@@ -152,7 +150,7 @@ export class ProductsComponent implements OnInit {
     this.product.qty_per_order --;
   }
 
-  // SHOW BILLS
+  // SHOW PRODUCTS
   ngOnInit(): void {
     this.loadMenus();
     this.loadProducts();
@@ -197,9 +195,8 @@ export class ProductsComponent implements OnInit {
     }
   }
 
-  // Add Menu
+  // Create Product
   addMenu() {
-
     if (!this.menu.name) {
       window.alert("Enter name");
       return;

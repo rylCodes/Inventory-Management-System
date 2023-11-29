@@ -22,6 +22,7 @@ export class PurchasesComponent implements OnInit {
   proceedEditItem: boolean = false;
   proceedPayment: boolean = false;
 
+  showFormContainer: boolean = false; 
   showBillForm: boolean = false;
   showBillTable: boolean = true;  
   updatingOrder: boolean = false;
@@ -38,12 +39,10 @@ export class PurchasesComponent implements OnInit {
   faMinus = faMinus;
   faTimes = faTimes;
 
-  activeBills: PurchaseBill[] = [];
-  allBills: PurchaseBill[] = [];
+  bills: PurchaseBill[] = [];
   items: PurchaseItem[] = [];
   suppliers: Supplier[] = [];
   stocks: Stock[] = [];
-  amountChange: number = 0;
 
   bill: PurchaseBill = {
     id: undefined,
@@ -64,13 +63,13 @@ export class PurchasesComponent implements OnInit {
   }
 
   constructor(
-      private purchaseService: PurchasesService,
-      private supplierService: SuppliersService,
-      private stockService: StocksService,
-      private uiService: UiService,
-      private router: Router,
-      private renderer: Renderer2,
-    ) {}
+    private purchaseService: PurchasesService,
+    private supplierService: SuppliersService,
+    private stockService: StocksService,
+    private uiService: UiService,
+    private router: Router,
+    private renderer: Renderer2,
+  ) {}
 
   resetBillForm() {
     this.proceedEditBill = false;
@@ -82,7 +81,7 @@ export class PurchasesComponent implements OnInit {
       grand_total: undefined,
     };
   }
-  
+
   resetItemForm() {
     this.item = {
       id: undefined,
@@ -92,23 +91,6 @@ export class PurchasesComponent implements OnInit {
       quantity_purchased: 0,
       item_price: 0,
       sub_total: undefined,
-    }
-  }
-
-  toggleProceedPayment() {
-    this.proceedPayment = !this.proceedPayment;
-    if (!this.proceedPayment) {
-      // this.bill.amount_tendered = 0;
-    }
-  } 
-
-  async toggleInvoice() {
-    this.showInvoice = !this.showInvoice;
-    if (!this.showInvoice) {
-      await this.uiService.wait(100);
-      window.alert('Transaction has been completed successfully!')
-      this.loadBills();
-      this.viewOrder(this.bill);
     }
   }
 
@@ -128,30 +110,19 @@ export class PurchasesComponent implements OnInit {
     this.showBillForm = !this.showBillForm;
     if (!this.showBillForm) {
       this.resetBillForm();
+      this.loadItems();
     }
   }
 
-  @HostListener('document:keyup.escape', ['$event'])
-  onKeyUp(event: KeyboardEvent) {
-    if (event.key === 'Escape') {
-      if (this.showInvoice) {
-        this.toggleInvoice(); 
-      } else if (this.showItemActionModal) {
-        this.toggleItemActionModal();
-      } else if (this.showBillActionModal) {
-        this.toggleBillActionModal();
-      } else if (this.showBillForm) {
-        this.toggleBillForm();
-      } else if (this.proceedPayment) {
-        this.toggleProceedPayment();
-      }
-    }
+  toggleFormContainer() {
+    this.showFormContainer = !this.showFormContainer;
+    this.toggleBillTable();
   }
 
   viewOrder(bill: PurchaseBill) {
     this.bill = bill;
     this.loadItems();
-    this.toggleBillTable();
+    this.toggleFormContainer();
 
     this.updatingOrder = !this.updatingOrder;
     if (!this.updatingOrder) {
@@ -160,13 +131,17 @@ export class PurchasesComponent implements OnInit {
     }
   }
 
-  calculateGrandtotal(items: PurchaseItem[]): number {
-    let grandTotal = 0;
-    items.forEach(item => {
-      grandTotal += item.sub_total || 0;
-    });
-
-    return grandTotal;
+  @HostListener('document:keyup.escape', ['$event'])
+  onKeyUp(event: KeyboardEvent) {
+    if (event.key === 'Escape') {
+      if (this.showItemActionModal) {
+        this.toggleItemActionModal();
+      } else if (this.showBillActionModal) {
+        this.toggleBillActionModal();
+      } else if (this.showBillForm) {
+        this.toggleBillForm();
+      }
+    }
   }
 
   increaseQtyInput(): void {
@@ -180,6 +155,15 @@ export class PurchasesComponent implements OnInit {
     this.item.quantity_purchased --;
   }
 
+  calculateGrandtotal(items: PurchaseItem[]): number {
+    let grandTotal = 0;
+    items.forEach(item => {
+      grandTotal += item.item_price * item.quantity_purchased || 0;
+    });
+
+    return grandTotal;
+  }
+
   // SHOW BILLS
   ngOnInit(): void {
     this.loadBills();
@@ -191,9 +175,8 @@ export class PurchasesComponent implements OnInit {
   loadBills() {
     this.purchaseService
       .getPurchaseBills()
-      .subscribe(salesBills => {
-        // this.activeBills = salesBills.filter(item => !item.status);
-        this.allBills = salesBills;
+      .subscribe(bills => {
+        this.bills = bills;
       });
   }
 
@@ -229,6 +212,36 @@ export class PurchasesComponent implements OnInit {
       })
   }
 
+  getSupplierDetails(supplierId: any): {supplierName: string, supplierCode?: string} {
+    const foundSupplier = this.suppliers.find(supplier => supplier.id === supplierId);
+    if (foundSupplier) {
+      return {
+        supplierName: foundSupplier.name,
+        supplierCode: foundSupplier.code,
+      }
+    } else {
+      return {
+        supplierName: "Supplier not found!",
+        supplierCode: "Supplier not found!",
+      }
+    }
+  }
+
+  getStockDetails(stockId: any): {stockName: string, stockCode?: string} {
+    const foundStock = this.stocks.find(stock => stock.id === stockId);
+    if (foundStock) {
+      return {
+        stockName: foundStock.stock_name,
+        stockCode: foundStock.code,
+      }
+    } else {
+      return {
+        stockName: "Stock not found!",
+        stockCode: "Stock not found!",
+      }
+    }
+  }
+
   onSubmitBill() {
     if (this.proceedEditBill) {
       this.onSaveUpdate();
@@ -237,25 +250,7 @@ export class PurchasesComponent implements OnInit {
     }
   }
 
-  // async onAmountTenderedChange() {
-  //   if (this.bill.amount_tendered < 0) {
-  //     window.alert("Enter valid amount!");
-  //     return;
-  //   }
-
-  //   if (this.bill.grand_total) {
-  //     await this.uiService.wait(300);
-  //     if (this.bill.amount_tendered < this.bill.grand_total) {
-  //       this.amountChange = 0;
-  //     } else {
-  //       this.amountChange = this.bill.amount_tendered - this.bill.grand_total
-  //       this.bill.status = true;
-  //     }
-  //   }
-  // }
-
   /* ADD BILLS AND ITEMS */
-  
   // Add Bills
   addBill() {
     if (!this.bill.billno) {
@@ -268,16 +263,21 @@ export class PurchasesComponent implements OnInit {
     
     const newBill = {
       ...this.bill,
-      customer_name: this.bill.billno.toUpperCase(),
+      billno: this.bill.billno.toUpperCase(),
     }
 
-    this.purchaseService.addPurchaseBill(newBill)
+    const isBillnoExist = this.bills.some(bill => bill.billno === newBill.billno);
+  
+    if (isBillnoExist) {
+      window.alert("Billno with this name already exists!");
+    } else {
+      this.purchaseService.addPurchaseBill(newBill)
       .subscribe(async (bill) => {
-        this.activeBills.push(bill);
-        const lastBillId = this.activeBills.length - 1;
+        this.bills.push(bill);
+        const lastBillId = this.bills.length - 1;
         this.items.map(item => {
           if (!item.purchaseBill_id) {
-            item.purchaseBill_id = this.activeBills[lastBillId].id;
+            item.purchaseBill_id = this.bills[lastBillId].id;
           }
           this.purchaseService.editPurchaseItem(item).subscribe(item => {
             const index = this.items.findIndex(i => i.id === item.id);
@@ -286,9 +286,11 @@ export class PurchasesComponent implements OnInit {
           })
         })
         this.resetBillForm();
+        this.toggleFormContainer();
         await this.uiService.wait(100);
-        window.alert("New transaction has been added successfully!");
+        window.alert("New purchase has been added successfully!");
       });
+    }
   }
 
   // Add Items
@@ -317,8 +319,9 @@ export class PurchasesComponent implements OnInit {
       });
   }
 
-  // UPDATE SALE BILL
-  updateSaleBill(bill: PurchaseBill) {
+  // UPDATE BILLS AND ITEMS
+  // Update Bill
+  updateBill(bill: PurchaseBill) {
     this.proceedEditBill = true;
 
     bill.billno.toUpperCase();
@@ -333,95 +336,30 @@ export class PurchasesComponent implements OnInit {
     
     const editingPurchaseBill = {
       ...this.bill,
+      billno: this.bill.billno.toUpperCase(),
     }
 
-    this.purchaseService
+    const isBillNoExist = this.bills.some(bill => bill.id !== editingPurchaseBill.id && bill.billno === editingPurchaseBill.billno);
+
+    if (isBillNoExist) {
+      window.alert("Purchase with this billno already exists!");
+      return;
+    } else {
+      this.purchaseService
       .editPurchaseBill(editingPurchaseBill)
       .subscribe(async (billData) => {
-        const index = this.activeBills.findIndex(bill => bill.id === billData.id);
-        this.activeBills[index] = billData;
+        const index = this.bills.findIndex(bill => bill.id === billData.id);
+        this.bills[index] = billData;
         this.toggleBillForm();
 
         await this.uiService.wait(100);
         window.alert("Successfully saved changes to the bill details.");
       });
-  }
-  
-  // DELETE BILL
-  deleteBill(bill: PurchaseBill) {
-    if (this.activeBills.length <= 1) {
-      window.alert("Please add new transaction before deleting this one! Consider editing this instead of deletion.");
-      return;
-    }
-    else {
-      this.deletingBill = bill;
-      this.toggleBillActionModal();
     }
   }
 
-  onConfirmDelete() {
-    if (!this.deletingBill) {
-      return;
-    }
-
-    this.purchaseService
-      .deletePurchaseBill(this.deletingBill)
-      .subscribe(async () => {
-        this.activeBills = this.activeBills.filter(s => s.id !== this.deletingBill?.id);
-        this.deletingBill = null;
-        this.toggleBillActionModal()
-        await this.uiService.wait(100);
-        window.alert("Transaction has been deleted successfully!");
-      });
-  }
-
-  getSupplierDetails(supplierId: any): {supplierName: string, supplierCode?: string} {
-    const foundSupplier = this.suppliers.find(supplier => supplier.id === supplierId);
-    if (foundSupplier) {
-      return {
-        supplierName: foundSupplier.name,
-        supplierCode: foundSupplier.code,
-      }
-    } else {
-      return {
-        supplierName: "Product not found!",
-        supplierCode: "Product not found!",
-      }
-    }
-  }
-
-  getStockDetails(stockId: any): {stockName: string, stockCode?: string} {
-    const foundStock = this.stocks.find(stock => stock.id === stockId);
-    if (foundStock) {
-      return {
-        stockName: foundStock.stock_name,
-        stockCode: foundStock.code,
-      }
-    } else {
-      return {
-        stockName: "Stock not found!",
-        stockCode: "Stock not found!",
-      }
-    }
-  }
-
-  onSubmitItem() {
-    if (this.proceedEditItem) {
-      this.saveItemUpdate();
-    } else {
-      this.addItem();
-    }
-  }
-
-  onStockSelectionChange(event: Event) {
-    const target = event?.target as HTMLSelectElement;
-    if (target.value === 'addNewStock') {
-      this.router.navigate(['stocks/']);
-    }
-  }
-
-  // UPDATE SALE ITEM
-  updateSaleItem(item: PurchaseItem) {
+  // Update Item
+  updateItem(item: PurchaseItem) {
     this.proceedEditItem = true;
     this.item = {...item};
   }
@@ -444,8 +382,59 @@ export class PurchasesComponent implements OnInit {
         this.items[index] = itemData;
       });
   }
+  
+  // UPDATE BILLS AND ITEMS
+  // Delete bill
+  deleteBill(bill: PurchaseBill) {
+    if (this.bills.length <= 1) {
+      window.alert("Please add new transaction before deleting this one! Consider editing this instead of deletion.");
+      return;
+    }
+    else {
+      this.deletingBill = bill;
+      this.toggleBillActionModal();
+    }
+  }
 
-  // DELETE SALE ITEM
+  onConfirmDeleteBill() {
+    if (!this.deletingBill) {
+      return;
+    }
+
+    this.purchaseService
+      .deletePurchaseBill(this.deletingBill)
+      .subscribe(async () => {
+        this.bills = this.bills.filter(s => s.id !== this.deletingBill?.id);
+        this.deletingBill = null;
+        this.toggleBillActionModal()
+        await this.uiService.wait(100);
+        window.alert("Transaction has been deleted successfully!");
+      });
+  }
+
+  onSubmitItem() {
+    if (this.proceedEditItem) {
+      this.saveItemUpdate();
+    } else {
+      this.addItem();
+    }
+  }
+
+  onStockSelectionChange(event: Event) {
+    const target = event?.target as HTMLSelectElement;
+    if (target.value === 'addNewItem') {
+      this.router.navigate(['stocks/']);
+    }
+  }
+
+  onSupplierSelectionChange(event: Event) {
+    const target = event?.target as HTMLSelectElement;
+    if (target.value === 'addNewSupplier') {
+      this.router.navigate(['suppliers/']);
+    }
+  }
+
+  // Delete Item
   deleteItem(item: PurchaseItem) {
     this.deletingItem = item;
     this.toggleItemActionModal();
@@ -459,44 +448,12 @@ export class PurchasesComponent implements OnInit {
     this.purchaseService
       .deletePurchaseItem(this.deletingItem)
       .subscribe(async () => {
-        this.activeBills = this.activeBills.filter(s => s.id !== this.deletingItem?.id);
+        this.bills = this.bills.filter(s => s.id !== this.deletingItem?.id);
         this.deletingItem = null;
         this.toggleItemActionModal()
         this.loadItems();
         await this.uiService.wait(100);
         window.alert("Item has been deleted successfully!");
       });
-  }
-
-  onBillOut() {
-    this.toggleInvoice();
-    if (this.showInvoice) {
-      this.renderer.setStyle(document.body, 'overflow', 'hidden');
-    } else {
-      this.renderer.setStyle(document.body, 'overflow', 'auto');
-    }
-
-    this.purchaseService.editPurchaseBill(this.bill)
-      .subscribe(data => {
-        const index = this.activeBills.findIndex(bill => bill.id === data.id);
-        this.activeBills[index] = data;
-        this.loadBills();
-      });
-  }
-
-  onPayment() {
-    // if (this.bill.grand_total) {
-    //   if (this.bill.amount_tendered < this.bill.grand_total) {
-    //     window.alert("Invalid amount tendered!");
-    //     return;
-    //   }
-    // }
-
-    this.purchaseService.editPurchaseBill(this.bill).subscribe((bill) => {
-      if (bill.grand_total) {
-        this.toggleInvoice();
-        this.toggleProceedPayment();
-      }
-    });
   }
 }

@@ -259,7 +259,7 @@
                         {{saleBill.remarks}}
                     </p>
 
-                    <h3 class="mt-2" for="remarks">Total Bill:</h3>
+                    <h3 class="mt-2">Total Bill:</h3>
                     <p class="uppercase border border-neutral-900 px-1 py-0.5 rounded-sm mt-1 text-center">
                         &#8369;{{saleBill.grand_total | number: '1.2-2'}}
                     </p>
@@ -273,7 +273,7 @@
                         </button>
                         <button class="bg-orange-500 text-white font-bold px-4 py-2 rounded hover:bg-orange-400"
                             type="button" (click)="toggleProceedPayment()">
-                            Bill Out
+                            Checkout
                         </button>
                     </div>
                 </form>

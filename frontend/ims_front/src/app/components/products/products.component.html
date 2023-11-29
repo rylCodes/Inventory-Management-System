@@ -8,28 +8,28 @@
     </div>
     <hr class="border-b-1 border-neutral-900 mt-4">
 
-    <!-- ITEM MODAL: Confirm to Delete Item -->
+    <!-- PRODUCT MODAL: Confirm to Delete Product -->
     <div *ngIf="showProductActionModal"
         class="flex justify-center top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] fixed">
         <div class="relative flex flex-col items-center bg-white rounded-lg w-96 h-fit p-4 mt-32">
             <fa-icon class="place-self-end scale-125 hover:scale-110" [icon]="faXmark"
                 [ngStyle]="{color: 'rgb(64 64 64 )'}" (click)="toggleProductActionModal()">
             </fa-icon>
-            <p class="mb-8 mt-6 text-center">Are you sure you want to delete this product?<br>This action cannot be
+            <p class="mb-8 mt-6 text-center">Are you sure you want to delete this item?<br>This action cannot be
                 undone.</p>
             <app-button (btnClick)="onConfirmDeleteProduct()" bgColor="red" txtColor="bg-white"
                 txtContent="Delete"></app-button>
         </div>
     </div>
 
-    <!-- BILL MODAL: Confirm to Delete Bill -->
+    <!-- MENU MODAL: Confirm to Delete Menu -->
     <div *ngIf="showMenuActionModal"
         class="flex justify-center top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] fixed">
         <div class="relative flex flex-col items-center bg-white rounded-lg w-96 h-fit p-4 mt-32">
             <fa-icon class="place-self-end scale-125 hover:scale-110" [icon]="faXmark"
                 [ngStyle]="{color: 'rgb(64 64 64 )'}" (click)="toggleMenuActionModal()">
             </fa-icon>
-            <p class="mb-8 mt-6 text-center">Are you sure you want to delete this bill?<br>This action cannot be
+            <p class="mb-8 mt-6 text-center">Are you sure you want to delete this product?<br>This action cannot be
                 undone.</p>
             <app-button (btnClick)="onConfirmDeleteMenu()" bgColor="red" txtColor="bg-white"
                 txtContent="Delete"></app-button>
@@ -93,17 +93,17 @@
         </div>
     </div>
 
-    <!-- ITEM FORM -->
+    <!-- PRODUCT FORM -->
     <form *ngIf="showFormContainer"
         class="flex items-end text-start justify-between w-3/4 bg-[#fff] h-fit mt-4 px-4 py-2 rounded-lg shadow-xl text-neutral-900"
         (ngSubmit)="onSubmitProduct()">
         <div class="flex flex-col w-2/5">
-            <label for="name">Product:</label>
+            <label for="name">Item:</label>
             <select class="border border-neutral-900 px-1 py-0.5 rounded-sm mt-1 w-full" name="name"
                 id="name" [(ngModel)]="product.stock_id" (change)="onStockSelectionChange($event)">
                 <option *ngFor="let stock of stocks" selected value="{{stock.id}}">
                     {{stock.stock_name}}</option>
-                <option class="text-neutral-500" value="addNewMenu">add new stock ...</option>
+                <option class="text-neutral-500" value="addNewItem">add new item ...</option>
             </select>
         </div>
 
@@ -129,11 +129,11 @@
     <!-- FORM CONTAINER: Add Products and Create Menu -->
     <div *ngIf="showFormContainer" class="flex justify-center space-x-2 w-full">
         <div class="table-container w-3/4 text-center shadow-xl mt-4">
-            <!-- ITEM TABLE -->
+            <!-- PRODUCT TABLE -->
             <table class="w-full table-fixed">
                 <thead class="text-neutral-300 bg-neutral-900">
                     <th>Date Added</th>
-                    <th>Product</th>
+                    <th>Item</th>
                     <th>Qty Per Order</th>
                 </thead>
                 <tbody>
@@ -177,26 +177,23 @@
                     &#8369;{{menu.price | number: '1.2-2'}}
                 </p>
 
-                <!-- Proceed Payment Button -->
-                <div class="flex justify-center mt-6 space-x-2">
-                    <button *ngIf="updatingMenuItems"
-                        class="bg-neutral-800 text-neutral-300 font-bold px-4 py-2 rounded hover:bg-[rgb(48,48,48)]"
-                        type="button" (click)="viewMenuProducts(menu)">
-                        Back
-                    </button>
-                    <button class="bg-orange-500 text-white font-bold px-4 py-2 rounded hover:bg-orange-400"
-                        type="button" (click)="toggleProceedPayment()">
-                        Bill Out
-                    </button>
-                </div>
+                <!-- Back Button -->
+                <button *ngIf="updatingMenuItems"
+                    class="bg-neutral-800 mt-6 text-neutral-300 font-bold px-4 py-2 rounded hover:bg-[rgb(48,48,48)]"
+                    type="button" (click)="viewMenuProducts(menu)">
+                    Back
+                </button>
             </form>
         </div>
 
-        <!-- BILL FORM: Add -->
+        <!-- MENU FORM: Add -->
         <div *ngIf="!updatingMenuItems"
             class="bg-white self-start flex-1 h-auto mx-auto p-4 rounded-lg shadow-xl text-neutral-900 mt-4">
+            <h2 class="font-bold text-center text-xl">
+                {{ proceedEditMenu? "Edit menu details" : "Add new menu" }}
+            </h2>
             <form class="flex flex-col" (ngSubmit)="onSubmitMenu()">
-                <label for="menu.name">Name:</label>
+                <label class="mt-2" for="menu.name">Name:</label>
                 <input class="text-center uppercase border border-neutral-900 px-1 py-0.5 rounded-sm mt-1"
                     type="text" name="menu.name" id="menu.name"
                     [(ngModel)]="menu.name">
@@ -214,9 +211,23 @@
                     type="text" name="customCategory" id="customCategory" [(ngModel)]="customCategory"
                     placeholder="Please specify.">
 
+                <label class="mt-2" for="menu.description">Description:</label>
+                <input class="text-center uppercase border border-neutral-900 px-1 py-0.5 rounded-sm mt-1"
+                    type="text" name="menu.description" id="menu.description"
+                    [(ngModel)]="menu.description">
+
                 <label class="mt-2" for="menu.price">Price:</label>
                 <input class="text-center uppercase border border-neutral-900 px-1 py-0.5 rounded-sm mt-1"
                     type="number" name="menu.price" id="menu.price" [(ngModel)]="menu.price">
+
+                <div class="flex items-center mt-4">
+                    <label class="" for="menu.status">Status:</label>
+                    <div class="flex items-center ml-10">
+                        <input class="border border-neutral-900 px-2 py-1 rounded-sm w-4 h-4" type="checkbox" name="menu.status"
+                            id="menu.status" [(ngModel)]="menu.status" checked>
+                        <label class="ml-1" for="menu.status">Active</label>
+                    </div>
+                </div>
 
                 <!-- Submit Button -->
                 <button class="mt-6 bg-[#008000] text-white font-bold p-2 rounded hover:bg-[#009000]" type="submit">

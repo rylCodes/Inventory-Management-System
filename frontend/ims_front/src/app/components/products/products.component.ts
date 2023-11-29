@@ -57,7 +57,7 @@ export class ProductsComponent implements OnInit {
 
   product: Product = {
     id: undefined,
-    code: undefined,
+    menu: undefined,
     stock_id: undefined,
     qty_per_order: 1,
   }
@@ -87,26 +87,9 @@ export class ProductsComponent implements OnInit {
   
   resetProductForm() {
     this.proceedEditProduct = false;
-    this.product.code = undefined;
+    this.product.menu = undefined;
     this.product.stock_id = undefined,
     this.product.qty_per_order = 0;
-  }
-
-  toggleProceedPayment() {
-    this.proceedPayment = !this.proceedPayment;
-    if (!this.proceedPayment) {
-      // this.menu.amount_tendered = 0;
-    }
-  } 
-
-  async toggleInvoice() {
-    this.showInvoice = !this.showInvoice;
-    if (!this.showInvoice) {
-      await this.uiService.wait(100);
-      window.alert('Transaction has been completed successfully!')
-      this.loadMenus();
-      this.viewMenuProducts(this.menu);
-    }
   }
 
   toggleMenuActionModal() {
@@ -123,6 +106,7 @@ export class ProductsComponent implements OnInit {
 
   toggleFormContainer() {
     this.showFormContainer = !this.showFormContainer;
+    this.toggleMenuTable();
   }
 
   toggleMenuForm() {
@@ -135,16 +119,12 @@ export class ProductsComponent implements OnInit {
   @HostListener('document:keyup.escape', ['$event'])
   onKeyUp(event: KeyboardEvent) {
     if (event.key === 'Escape') {
-      if (this.showInvoice) {
-        this.toggleInvoice(); 
-      } else if (this.showProductActionModal) {
+      if (this.showProductActionModal) {
         this.toggleProductActionModal();
       } else if (this.showMenuActionModal) {
         this.toggleMenuActionModal();
       } else if (this.showMenuForm) {
         this.toggleMenuForm();
-      } else if (this.proceedPayment) {
-        this.toggleProceedPayment();
       }
     }
   }
@@ -153,7 +133,6 @@ export class ProductsComponent implements OnInit {
     this.menu = menu;
     this.loadProducts();
     this.toggleFormContainer();
-    this.toggleMenuTable();
 
     this.updatingMenuItems = !this.updatingMenuItems;
     if (!this.updatingMenuItems) {
@@ -194,9 +173,9 @@ export class ProductsComponent implements OnInit {
       .getProducts()
       .subscribe((products) => {
         if (this.updatingMenuItems) {
-          this.products = products.filter(product => product.code === this.menu.id);
+          this.products = products.filter(product => product.menu === this.menu.id);
         } else {
-          this.products = products.filter(product => product.code === null);
+          this.products = products.filter(product => product.menu === null);
         }
       });
   }
@@ -246,8 +225,8 @@ export class ProductsComponent implements OnInit {
         this.menus.push(menu);
         const lastMenuId = this.menus.length - 1;
         this.products.map(product => {
-          if (!product.code) {
-            product.code = this.menus[lastMenuId].id;
+          if (!product.menu) {
+            product.menu = this.menus[lastMenuId].id;
           }
           this.productService.updateProduct(product).subscribe(product => {
             const index = this.products.findIndex(i => i.id === product.id);
@@ -273,7 +252,7 @@ export class ProductsComponent implements OnInit {
       return;
     }
     
-    this.product.code = this.menu.id;
+    this.product.menu = this.menu.id;
 
     const newProduct = {
       ...this.product,
@@ -374,7 +353,7 @@ export class ProductsComponent implements OnInit {
 
   onStockSelectionChange(event: Event) {
     const target = event?.target as HTMLSelectElement;
-    if (target.value === 'addNewStock') {
+    if (target.value === 'addNewItem') {
       this.router.navigate(['stocks/']);
     }
   }
@@ -423,37 +402,5 @@ export class ProductsComponent implements OnInit {
         await this.uiService.wait(100);
         window.alert("Product has been deleted successfully!");
       });
-  }
-
-  onBillOut() {
-    this.toggleInvoice();
-    if (this.showInvoice) {
-      this.renderer.setStyle(document.body, 'overflow', 'hidden');
-    } else {
-      this.renderer.setStyle(document.body, 'overflow', 'auto');
-    }
-
-    this.productService.updateMenu(this.menu)
-      .subscribe(menu => {
-        const index = this.menus.findIndex(menu => menu.id === menu.id);
-        this.menus[index] = menu;
-        this.loadMenus();
-      });
-  }
-
-  onPayment() {
-    // if (this.menu.grand_total) {
-    //   if (this.menu.amount_tendered < this.menu.grand_total) {
-    //     window.alert("Invalid amount tendered!");
-    //     return;
-    //   }
-    // }
-
-    this.productService.updateMenu(this.menu).subscribe((menu) => {
-      if (menu.price) {
-        this.toggleInvoice();
-        this.toggleProceedPayment();
-      }
-    });
   }
 }

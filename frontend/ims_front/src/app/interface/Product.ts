@@ -1,6 +1,6 @@
 export interface Product {
     id?: number,
-    code?: number,
+    menu?: number,
     stock_id?: number,
     qty_per_order: number,
     date_added?: string,

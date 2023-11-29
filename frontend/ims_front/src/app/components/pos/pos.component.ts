@@ -399,8 +399,8 @@ export class PosComponent implements OnInit {
 
   onMenuSelectionChange(event: Event) {
     const target = event?.target as HTMLSelectElement;
-    if (target.value === 'addNewMenu') {
-      this.router.navigate(['menus/']);
+    if (target.value === 'addNewProduct') {
+      this.router.navigate(['products/']);
     }
   }
 

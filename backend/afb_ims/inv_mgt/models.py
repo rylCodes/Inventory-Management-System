@@ -49,7 +49,7 @@ def update_stock_code(sender, instance, created, **kwargs):
 
 # PRODUCT    
 class Product(models.Model):
-    code = models.ForeignKey(Menu, on_delete=models.CASCADE, blank=True, null=True)
+    menu = models.ForeignKey(Menu, on_delete=models.CASCADE, blank=True, null=True)
     stock_id = models.ForeignKey(Stock, on_delete=models.CASCADE)
     qty_per_order = models.FloatField(validators=[MinValueValidator(0)], default=0)
     date_added = models.DateTimeField(default=timezone.now)

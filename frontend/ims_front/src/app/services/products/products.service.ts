@@ -17,17 +17,14 @@ export class ProductsService {
   private apiUrl = 'http://localhost:8000/ims-api/';
 
   constructor(private http: HttpClient) { }
-
+  
   handleError(error:any) {
-    if (error.error.name) {
-      console.log(error.error.name[0]);
-    } else {
-      console.log('Error here →', error.error);
-    }
+    console.log('See error here:', error.error);
   }
 
-  addProduct(product: Product) {
-    return this.http.post<Product>(`${this.apiUrl}products/`, product, httpOptions)
+  // SALE BILL
+  addMenu(menu: Menu) {
+    return this.http.post<Menu>(`${this.apiUrl}menus/`, menu, httpOptions)
       .pipe(
         catchError((error) => {
           this.handleError(error);
@@ -36,12 +33,33 @@ export class ProductsService {
       );
   }
 
-  addMenu(menu: Menu) {
-    return this.http.post<Menu>(`${this.apiUrl}menus/`, menu, httpOptions)
+  getMenus(): Observable<Menu[]> {
+    return this.http.get<Menu[]>(`${this.apiUrl}menus/`);
+  }
+
+  updateMenu(menu: Menu) {
+    const url = `${this.apiUrl}menus/` + `${menu.id}/`;
+    return this.http.put<Menu>(url, menu, httpOptions)
+    .pipe(
+      catchError((error) => { 
+        this.handleError(error);
+        return throwError(() => "Failed to edit product!");
+      })
+    );
+  }
+
+  deleteMenu(menu: Menu) {
+    const url = `${this.apiUrl}menus/` + `${menu.id}`;
+    return this.http.delete<Menu>(url);
+  }
+
+  // SALE ITEM
+  addProduct(product: Product) {
+    return this.http.post<Product>(`${this.apiUrl}products/`, product, httpOptions)
       .pipe(
         catchError((error) => {
-          this.handleError(error);
-          return throwError(() => 'Failed to add new menu!');
+          console.log("Error here:", error.error);
+          return throwError(() => 'Failed to add new product!');
         })
       );
   }
@@ -50,27 +68,12 @@ export class ProductsService {
     return this.http.get<Product[]>(`${this.apiUrl}products/`);
   }
 
-  getMenus(): Observable<Menu[]> {
-    return this.http.get<Menu[]>(`${this.apiUrl}menus/`);
-  }
-
   updateProduct(product: Product) {
     const url = `${this.apiUrl}products/` + `${product.id}/`;
     return this.http.put<Product>(url, product, httpOptions)
     .pipe(
       catchError((error) => {
-        this.handleError(error);
-        return throwError(() => "Failed to edit product!");
-      })
-    );
-  }
-
-  updateMenu(menu: Menu) {
-    const url = `${this.apiUrl}menus/` + `${menu.id}/`;
-    return this.http.put<Menu>(url, menu, httpOptions)
-    .pipe(
-      catchError((error) => {
-        this.handleError(error);
+        console.log("Error here:", error.error);
         return throwError(() => "Failed to edit product!");
       })
     );
@@ -79,11 +82,6 @@ export class ProductsService {
   deleteProduct(product: Product) {
     const url = `${this.apiUrl}products/` + `${product.id}`;
     return this.http.delete<Product>(url);
-  }
-
-  deleteMenu(menu: Menu) {
-    const url = `${this.apiUrl}menus/` + `${menu.id}`;
-    return this.http.delete<Menu>(url);
   }
 
 }

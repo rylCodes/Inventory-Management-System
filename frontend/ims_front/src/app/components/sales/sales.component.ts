@@ -53,7 +53,7 @@ export class SalesComponent implements OnInit {
   item: SaleItem = {
     id: undefined,
     billno: null,
-    product_id: undefined,
+    menu: undefined,
     quantity: 0,
     price: 0,
     sale_date: "",

@@ -96,7 +96,7 @@ export class ProductsComponent implements OnInit {
     this.proceedEditProduct = false;
     this.product.menu = undefined;
     this.product.stock_id = undefined,
-    this.product.qty_per_order = 0;
+    this.product.qty_per_order = 1;
   }
 
   toggleMenuActionModal() {
@@ -250,6 +250,7 @@ export class ProductsComponent implements OnInit {
           })
         })
         this.resetMenuForm();
+        this.resetProductForm();
         this.toggleFormContainer();
         await this.uiService.wait(100);
         window.alert("New menu has been created successfully!");

@@ -12,7 +12,7 @@ export interface SaleBill {
 export interface SaleItem {
     id?: number
     billno?: number | null,
-    product_id?: number,
+    menu?: number,
     quantity: number,
     price?: number,
     sale_date?: string,

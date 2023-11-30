@@ -35,7 +35,7 @@
                         <tbody>
                             <tr class="text-center bg-inherit border-b border-neutral-900"
                                 *ngFor="let item of eachBillItems">
-                                <td class="p-1">{{getMenuDetails(item.product_id).name}}</td>
+                                <td class="p-1">{{getMenuDetails(item.menu).name}}</td>
                                 <td class="p-1">{{item.price | number: '1.2-2'}}</td>
                                 <td class="p-1">{{item.quantity}}</td>
                                 <td class="p-1">&#8369;{{item.sub_total | number: '1.2-2'}}</td>

@@ -62,7 +62,7 @@
                         <tbody>
                             <tr class="text-center bg-inherit border-b border-neutral-900"
                                 *ngFor="let item of saleItems">
-                                <td class="p-1">{{getMenuDetails(item.product_id).name}}</td>
+                                <td class="p-1">{{getMenuDetails(item.menu).name}}</td>
                                 <td class="p-1">{{item.price}}</td>
                                 <td class="p-1">{{item.quantity}}</td>
                                 <td class="p-1">{{item.sub_total}}</td>
@@ -180,8 +180,8 @@
             (ngSubmit)="onSubmitItem()">
             <div class="flex flex-col w-2/5">
                 <label for="name">Menu:</label>
-                <select class="border border-neutral-900 px-1 py-0.5 rounded-sm mt-1 w-full" name="name"
-                    id="name" [(ngModel)]="saleItem.product_id" (change)="onMenuSelectionChange($event)">
+                <select class="border border-neutral-900 px-1 py-0.5 rounded-sm mt-1 w-full" name="name" id="name"
+                    [(ngModel)]="saleItem.menu" (change)="onMenuSelectionChange($event)">
                     <option *ngFor="let menu of menus" selected value="{{menu.id}}">
                         {{menu.name}}</option>
                     <option class="text-neutral-500" value="addNewProduct">add new product ...</option>
@@ -229,7 +229,7 @@
                                 </button>
                                 <p>{{item.sale_date | date: 'hh:mm a'}}</p>
                             </td>
-                            <td class="p-2">{{getMenuDetails(item.product_id).name}}</td>
+                            <td class="p-2">{{getMenuDetails(item.menu).name}}</td>
                             <td class="p-2">{{item.quantity}}</td>
                             <td class="p-2">
                                 <p>{{item.price| number: '1.2-2'}}</p>

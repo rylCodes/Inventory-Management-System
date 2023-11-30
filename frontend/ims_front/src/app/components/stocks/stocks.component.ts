@@ -83,6 +83,7 @@ export class StocksComponent implements OnInit {
       .getStocks()
       .subscribe((stocks) => {
         this.stocks = stocks;
+        console.log(this.stocks)
       });
   }
 

@@ -61,8 +61,8 @@ export class PosComponent implements OnInit {
   saleItem: SaleItem = {
     id: undefined,
     billno: null,
-    product_id: undefined,
-    quantity: 0,
+    menu: undefined,
+    quantity: 1,
     price: 0,
     sale_date: "",
     sub_total: 0,
@@ -92,17 +92,29 @@ export class PosComponent implements OnInit {
   resetItemForm() {
     this.proceedEditItem = false;
     this.saleItem.billno = undefined;
-    this.saleItem.product_id = undefined;
-    this.saleItem.quantity = 0;
+    this.saleItem.menu = undefined;
+    this.saleItem.quantity = 1;
     this.saleItem.sale_date = "";
     this.saleItem.sub_total = 0;
   }
 
   toggleProceedPayment() {
-    const stockIdToAdjust = this.saleItems.map(item => item.product_id);
-    console.log(this.saleItems);
-    console.log(this.menus.filter(menu => stockIdToAdjust.includes(menu.id)));
-    console.log(this.products);
+    const saleItems = this.saleItems;
+    console.log('saleItems:', saleItems);
+
+    const menuIDs = this.saleItems.map(item => item.menu);
+
+    const filteredProducts = this.products.filter(product => menuIDs.includes(product.menu));
+    console.log('filteredProducts', filteredProducts);
+
+    const stockIDs = filteredProducts.map(stock => stock.stock_id);
+
+    const filteredStocks = this.stocks.filter(stock => stockIDs.includes(stock.id))
+    console.log('filteredStocks', filteredStocks);
+
+    const quantity = saleItems.map((item, index) => item.quantity * filteredProducts[index].qty_per_order);
+    console.log(quantity);
+
     this.proceedPayment = !this.proceedPayment;
     if (!this.proceedPayment) {
       this.saleBill.amount_tendered = 0;
@@ -309,7 +321,7 @@ export class PosComponent implements OnInit {
 
   // Add Items
   addItem() {
-    if (!this.saleItem.product_id) {
+    if (!this.saleItem.menu) {
       window.alert("Select a product!");
       return;
     } else if (!this.saleItem.quantity || this.saleItem.quantity <= 0) {
@@ -318,7 +330,7 @@ export class PosComponent implements OnInit {
     }
     
     this.saleItem.billno = this.saleBill.id;
-    this.saleItem.price = this.getMenuDetails(Number(this.saleItem.product_id)).price;
+    this.saleItem.price = this.getMenuDetails(Number(this.saleItem.menu)).price;
     this.saleItem.sub_total = this.saleItem.quantity * this.saleItem.price;
 
     const newSaleItem = {
@@ -426,7 +438,7 @@ export class PosComponent implements OnInit {
   }
 
   saveItemUpdate() {
-    this.saleItem.sub_total = this.saleItem.quantity * this.getMenuDetails(this.saleItem.product_id).price;
+    this.saleItem.sub_total = this.saleItem.quantity * this.getMenuDetails(this.saleItem.menu).price;
 
     const editingSaleItem = {
       ...this.saleItem

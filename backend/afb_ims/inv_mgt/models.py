@@ -122,11 +122,11 @@ def update_billno(sender, instance, created, **kwargs):
 # SALES ITEM
 class SalesItem(models.Model):
     billno = models.ForeignKey(SalesBill, on_delete=models.CASCADE, related_name="sales_items", blank=True, null=True)
-    product_id = models.ForeignKey(Menu, on_delete=models.CASCADE)
+    menu = models.ForeignKey(Menu, on_delete=models.CASCADE)
     quantity = models.FloatField(validators=[MinValueValidator(0)], default=0)
     price = models.FloatField(validators=[MinValueValidator(0)], default=0)
     sale_date = models.DateTimeField(auto_now_add=True)
     sub_total = models.FloatField(validators=[MinValueValidator(0)], default=0)
     
     def __str__(self):
-        return f"{self.quantity} of {self.product_id.name} on {self.sale_date}"
+        return f"{self.quantity} of {self.menu.name} on {self.sale_date}"

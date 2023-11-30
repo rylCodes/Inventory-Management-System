@@ -102,7 +102,8 @@ export class PosComponent implements OnInit {
     const saleItems = this.saleItems;
     console.log('saleItems:', saleItems);
 
-    const menuIDs = this.saleItems.map(item => item.menu);
+    const menuIDs = saleItems.map(item => item.menu);
+    console.log('menuIDs →',menuIDs);
 
     const filteredProducts = this.products.filter(product => menuIDs.includes(product.menu));
     console.log('filteredProducts', filteredProducts);
@@ -112,7 +113,20 @@ export class PosComponent implements OnInit {
     const filteredStocks = this.stocks.filter(stock => stockIDs.includes(stock.id))
     console.log('filteredStocks', filteredStocks);
 
-    const quantity = saleItems.map((item, index) => item.quantity * filteredProducts[index].qty_per_order);
+    const filterItemQty = saleItems.reduce((acc: SaleItem[], obj: SaleItem) => {
+      const existingObj = acc.find(item => item.menu === obj.menu);
+      if (existingObj) {
+        existingObj.quantity += obj.quantity;
+      } else {
+        acc.push({ ...obj })
+      }
+
+      return acc;
+    }, []);
+
+    console.log(filterItemQty);
+
+    const quantity = filteredProducts.map((product, index) => product.qty_per_order * saleItems[index].quantity);
     console.log(quantity);
 
     this.proceedPayment = !this.proceedPayment;

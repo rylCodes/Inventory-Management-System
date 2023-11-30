@@ -46,46 +46,46 @@
                 {{ proceedEditMenu? "Edit menu details" : "Add new menu" }}
             </h2>
             <form class="flex flex-col mt-2 w-full" (ngSubmit)="onSubmitMenu()">
-                <h4 class="mt-4" for="menu.code">Code:</h4>
-                <p class="uppercase bg-blue-50 border border-neutral-900 px-2 py-1 rounded-sm mt-1">
+                <h4>Code:</h4>
+                <p class="uppercase bg-blue-50 border border-neutral-900 px-1 py-0.5 rounded-sm mt-1">
                     {{menu.code}}
                 </p>
-                <label class="mt-4" for="menu.name">Name:</label>
-                <input class="uppercase border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text"
+                <label class="mt-2" for="menu.name">Name:</label>
+                <input class="uppercase border border-neutral-900 px-1 py-0.5 rounded-sm mt-1" type="text"
                     name="menu.name" id="menu.name" [(ngModel)]="menu.name">
 
-                <label class="mt-4" for="menu.category">Category:</label>
-                <select class="border border-neutral-900 px-2 py-1 rounded-sm mt-1" name="menu.category" id="menu.category"
+                <label class="mt-2" for="menu.category">Category:</label>
+                <select class="border border-neutral-900 px-1 py-0.5 rounded-sm mt-1" name="menu.category" id="menu.category"
                     [(ngModel)]="menu.category">
                     <option value="LIQUOR">LIQUOR</option>
                     <option value="FOOD">FOOD</option>
                     <option value="DRINKS">DRINKS</option>
-                    <option class="text-neutral-500" value="other">other category...</option>
+                    <option class="text-neutral-500" value="otherCategory">other category...</option>
                 </select>
                 <!-- Input field for custom category when "other category..." is selected -->
-                <input class="uppercase" *ngIf="menu.category === 'other'" class="border border-neutral-900 px-2 py-1 rounded-sm mt-1"
+                <input class="uppercase" *ngIf="menu.category === 'otherCategory'" class="border border-neutral-900 px-1 py-0.5 rounded-sm mt-1"
                     type="text" name="customCategory" id="customCategory" [(ngModel)]="customCategory"
                     placeholder="Please specify.">
 
-                <label class="mt-4" for="menu.description">Description:</label>
-                <input class="uppercase border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text"
+                <label class="mt-2" for="menu.description">Description:</label>
+                <input class="uppercase border border-neutral-900 px-1 py-0.5 rounded-sm mt-1" type="text"
                     name="menu.description" id="menu.description" [(ngModel)]="menu.description">
 
-                <label class="mt-4" for="menu.price">Price:</label>
-                <input class="uppercase text-center border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text"
+                <label class="mt-2" for="menu.price">Price:</label>
+                <input class="uppercase text-center border border-neutral-900 px-1 py-0.5 rounded-sm mt-1" type="text"
                     name="menu.price" id="menu.price" [(ngModel)]="menu.price">
 
                 <div class="flex items-center mt-4">
                     <label class="" for="menu.status">Status:</label>
                     <div class="flex items-center ml-10">
-                        <input class="border border-neutral-900 px-2 py-1 rounded-sm w-4 h-4" type="checkbox" name="menu.status"
+                        <input class="border border-neutral-900 px-1 py-0.5 rounded-sm w-4 h-4" type="checkbox" name="menu.status"
                             id="menu.status" [(ngModel)]="menu.status" checked>
                         <label class="ml-1" for="menu.status">Active</label>
                     </div>
                 </div>
 
                 <!-- Submit Button -->
-                <button class="mt-10 bg-neutral-800 text-neutral-300 font-bold p-2 rounded hover:bg-[rgb(48,48,48)]"
+                <button class="mt-6 bg-neutral-800 text-neutral-300 font-bold p-2 rounded hover:bg-[rgb(48,48,48)]"
                     type="submit">
                     Update
                 </button>
@@ -144,7 +144,7 @@
                                     [ngStyle]="{color: 'rgb(212 212 212)'}">
                                 </fa-icon>
                             </button>
-                            <p>{{product.date_added | date: 'MMM dd'}}</p>
+                            <p>{{product.date_added | date: 'MM-dd-yyyy'}}</p>
                         </td>
                         <td class="p-2">{{getStockDetails(product.stock_id).stock_name}}</td>
                         <td class="p-2">{{product.qty_per_order}}</td>
@@ -204,10 +204,10 @@
                     <option value="LIQUOR">LIQUOR</option>
                     <option value="FOOD">FOOD</option>
                     <option value="DRINKS">DRINKS</option>
-                    <option class="text-neutral-500" value="other">other category...</option>
+                    <option class="text-neutral-500" value="otherCategory">other category...</option>
                 </select>
                 <!-- Input field for custom category when "other category..." is selected -->
-                <input class="uppercase" *ngIf="menu.category === 'other'" class="border border-neutral-900 px-2 py-1 rounded-sm mt-1"
+                <input class="uppercase" *ngIf="menu.category === 'otherCategory'" class="border border-neutral-900 px-2 py-1 rounded-sm mt-1"
                     type="text" name="customCategory" id="customCategory" [(ngModel)]="customCategory"
                     placeholder="Please specify.">
 
@@ -266,7 +266,7 @@
                     <td class="p-2">{{menu.description}}</td>
                     <td class="p-2">&#8369;{{menu.price | number: '1.2-2'}}</td>
                     <td class="p-2">{{menu.status? 'active' : 'inactive'}}</td>
-                    <td class="p-2">{{menu.date_added | date: 'MMM dd'}}</td>
+                    <td class="p-2">{{menu.date_added | date: 'MM-dd-yyyy'}}</td>
                     <td class="flex justify-center p-2 space-x-6">
                         <!-- Edit Menu -->
                         <fa-icon class="hover:scale-110" [ngStyle]="{color: 'green'}" [icon]="faPen"

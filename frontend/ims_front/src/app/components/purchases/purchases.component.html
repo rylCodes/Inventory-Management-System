@@ -3,7 +3,7 @@
     <div class="flex justify-between mt-8">
         <h1 class="font-bold text-3xl">PURCHASES</h1>
         <!-- ADD BUTTON -->
-        <app-button *ngIf="!updatingOrder" txtContent="{{showFormContainer? 'Cancel': 'Add'}}" bgColor="{{showFormContainer? 'red': 'green'}}"
+        <app-button *ngIf="!showEachPurchaseOrder" txtContent="{{showFormContainer? 'Cancel': 'Add'}}" bgColor="{{showFormContainer? 'red': 'green'}}"
             (btnClick)="toggleFormContainer()"></app-button>
     </div>
     <hr class="border-b-1 border-neutral-900 mt-4">
@@ -18,11 +18,29 @@
             <p class="mb-8 mt-6 text-center">Are you sure you want to delete this item?<br>This action cannot be
                 undone.</p>
             <app-button (btnClick)="onConfirmDeleteItem()" bgColor="red" txtColor="bg-white"
-                txtContent="Delete"></app-button>
+                txtContent="Save"></app-button>
         </div>
     </div>
 
-    <!-- BILL MODAL: Confirm to Delete Bill -->
+    <!-- PURCHASE MODAL: Confirm to Save Purchase -->
+    <div *ngIf="showSaveBillModal"
+        class="flex justify-center top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] fixed">
+        <div class="relative flex flex-col items-center bg-white rounded-lg w-96 h-fit p-4 mt-32">
+            <fa-icon class="place-self-end scale-125 hover:scale-110" [icon]="faXmark"
+                [ngStyle]="{color: 'rgb(64 64 64 )'}" (click)="toggleSaveBillModal()">
+            </fa-icon>
+            <p class="mb-8 mt-3 text-center">
+                Make sure the details of all items added to this purchase are correct. Stock quantities will be adjusted upon saving.
+            </p>
+            <p class="mb-8 text-center">
+                Do you want to proceed with saving this purchase?
+            </p>
+            <app-button (btnClick)="onSubmitBill()" bgColor="green" txtColor="bg-white"
+                txtContent="Save"></app-button>
+        </div>
+    </div>
+
+    <!-- PURCHASE MODAL: Confirm to Delete Purchase -->
     <div *ngIf="showBillActionModal"
         class="flex justify-center top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] fixed">
         <div class="relative flex flex-col items-center bg-white rounded-lg w-96 h-fit p-4 mt-32">
@@ -36,21 +54,21 @@
         </div>
     </div>
 
-    <!-- BILL FORM: Edit -->
+    <!-- PURCHASE FORM: Edit -->
     <div *ngIf="showBillForm" class="flex justify-center top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] fixed">
         <div class="relative flex flex-col items-center bg-white rounded-lg w-96 h-fit p-4 mt-32">
             <fa-icon class="place-self-end scale-125 hover:scale-110" [icon]="faXmark"
                 [ngStyle]="{color: 'rgb(64 64 64 )'}" (click)="toggleBillForm()">
             </fa-icon>
             <h2 class="font-bold text-center text-2xl">
-                {{ proceedEditBill? "Edit bill details" : "Add new bill" }}
+                {{ proceedEditBill? "Edit purchase details" : "Add new purchase" }}
             </h2>
             <form class="flex flex-col mt-2 w-full" (ngSubmit)="onSubmitBill()">
                 <label class="mt-4" for="bill.billno">Bill No.:</label>
                 <input class="uppercase border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text"
                     name="bill.billno" id="bill.billno" [(ngModel)]="bill.billno">
 
-                <label for="name">Supplier:</label>
+                <label class="mt-2" for="name">Supplier:</label>
                 <select class="border border-neutral-900 px-1 py-0.5 rounded-sm mt-1 w-full" name="bill.supplier_id"
                     id="bill.supplier_id" [(ngModel)]="bill.supplier_id" (change)="onSupplierSelectionChange($event)">
                     <option *ngFor="let supplier of suppliers" selected value="{{supplier.id}}">
@@ -58,9 +76,10 @@
                     <option class="text-neutral-500" value="addNewSupplier">add new supplier ...</option>
                 </select>
 
-                <label class="mt-4" for="bill.grand_total">Total:</label>
-                <input class="uppercase text-center border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text"
-                    name="bill.grand_total" id="bill.grand_total" [(ngModel)]="bill.grand_total">
+                <p class="mt-2">Total:</p>
+                <h3 class="uppercase text-center border border-neutral-900 bg-blue-50 px-2 py-1 rounded-sm mt-1">
+                    &#8369;{{bill.grand_total | number: '1.2-2'}}
+                </h3>
 
                 <!-- Submit Button -->
                 <button class="mt-10 bg-neutral-800 text-neutral-300 font-bold p-2 rounded hover:bg-[rgb(48,48,48)]"
@@ -72,7 +91,7 @@
     </div>
 
     <!-- ITEM FORM -->
-    <form *ngIf="showFormContainer"
+    <form *ngIf="showFormContainer && !showEachPurchaseOrder"
         class="flex items-end text-start justify-between w-3/4 bg-[#fff] h-fit mt-4 px-4 py-2 rounded-lg shadow-xl text-neutral-900"
         (ngSubmit)="onSubmitItem()">
         <div class="flex flex-col w-1/4">
@@ -121,11 +140,12 @@
                     <th>Item</th>
                     <th>Price</th>
                     <th>Quantity</th>
+                    <th>Sub Total</th>
                 </thead>
                 <tbody>
                     <tr *ngFor="let item of items">
-                        <td class="flex items-center p-2 space-x-6">
-                            <button class="px-1.5 py-1 rounded-md bg-[#ff0000]" (click)="deleteItem(item)">
+                        <td class="p-2 {{showEachPurchaseOrder? '': 'flex items-center space-x-6'}}">
+                            <button *ngIf="!showEachPurchaseOrder" class="px-1.5 py-1 rounded-md bg-[#ff0000]" (click)="deleteItem(item)">
                                 <fa-icon class="scale-75" [icon]="faTrashCan"
                                     [ngStyle]="{color: 'rgb(212 212 212)'}">
                                 </fa-icon>
@@ -133,15 +153,16 @@
                             <p>{{item.purchase_date | date: "MMM dd 'at' hh:mm a"}}</p>
                         </td>
                         <td class="p-2">{{getStockDetails(item.stock_id).stockName}}</td>
-                        <td class="p-2">{{item.item_price}}</td>
+                        <td class="p-2">&#8369;{{item.item_price | number: '1.2-2'}}</td>
                         <td class="p-2">{{item.quantity_purchased}}</td>
+                        <td class="p-2">&#8369;{{item.sub_total | number: '1.2-2'}}</td>
                     </tr>
                 </tbody>
             </table>
         </div>
 
         <!-- BILL DIV -->
-        <div *ngIf="updatingOrder"
+        <div *ngIf="showEachPurchaseOrder"
             class="bg-[#fff] self-start flex-1 h-auto mx-auto p-4 rounded-lg shadow-xl text-neutral-900 mt-4">
             <form class="flex flex-col">
                 <h3 for="bill.customer_name">Bill No.:</h3>
@@ -160,7 +181,7 @@
                 </p>
 
                 <!-- Back Button -->
-                <button *ngIf="updatingOrder"
+                <button *ngIf="showEachPurchaseOrder"
                     class="bg-neutral-800 mt-6 text-neutral-300 font-bold px-4 py-2 rounded hover:bg-[rgb(48,48,48)]"
                     type="button" (click)="viewOrder(bill)">
                     Back
@@ -168,8 +189,8 @@
             </form>
         </div>
 
-        <!-- BILL FORM: Add -->
-        <div *ngIf="!updatingOrder"
+        <!-- PURCHASE FORM: Add -->
+        <div *ngIf="!showEachPurchaseOrder"
             class="bg-white self-start flex-1 h-auto mx-auto p-4 rounded-lg shadow-xl text-neutral-900 mt-4">
             <h2 class="font-bold text-center text-xl">
                 {{ proceedEditBill? "Update bill details" : "Add new purchase" }}
@@ -193,9 +214,10 @@
                 </p>
 
                 <!-- Submit Button -->
-                <button class="mt-6 bg-[#008000] text-white font-bold p-2 rounded hover:bg-[#009000]" type="submit">
-                    Save
-                </button>
+                <button class="mt-6 bg-[#008000] text-white font-bold p-2 rounded hover:bg-[#009000]"
+                        type="button"
+                        (click)="toggleSaveBillModal()">
+                    Save</button>
             </form>
         </div>
 
@@ -207,13 +229,14 @@
             <thead class="text-neutral-300 bg-neutral-900">
                 <th>Code</th>
                 <th>Name</th>
+                <th >Items</th>
                 <th>Total</th>
                 <th>Datetime</th>
                 <th>Action</th>
             </thead>
             <tbody>
                 <tr *ngFor="let bill of bills">
-                    <td class="flex items-center space-x-3">
+                    <td class="flex items-center space-x-6">
                         <!-- View Order List -->
                         <button class="px-1.5 py-0.5 rounded-md bg-neutral-800 ml-2" (click)="viewOrder(bill)">
                             <fa-icon [icon]="faRectangleList" [ngStyle]="{color: 'rgb(212 212 212)'}">
@@ -222,6 +245,7 @@
                         <p>{{bill.billno}}</p>
                     </td>
                     <td class="p-2">{{getSupplierDetails(bill.supplier_id).supplierName}}</td>
+                    <td class="p-2">{{getItemLength(bill)}}</td>
                     <td class="p-2">&#8369;{{bill.grand_total | number: '1.2-2'}}</td>
                     <td class="p-2">{{bill.time | date: "MMM dd 'at' hh:mm a"}}</td>
                     <td class="flex justify-center p-2 space-x-6">

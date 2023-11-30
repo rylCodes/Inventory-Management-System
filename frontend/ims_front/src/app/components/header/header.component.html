@@ -1,3 +1,18 @@
+<!-- LOGOUT MODAL: Confirm to log out -->
+<div *ngIf="showLogOutActionModal"
+    class="flex justify-center top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] fixed z-[9999]">
+    <div class="relative flex flex-col items-center bg-white rounded-lg w-96 h-fit p-4 mt-32">
+        <fa-icon class="place-self-end scale-125 hover:scale-110" [icon]="faXmark"
+            [ngStyle]="{color: 'rgb(64 64 64 )'}" (click)="toggleLogOutActionModal()">
+        </fa-icon>
+        <p class="mb-8 mt-6 text-center">
+            Are you sure you want to log out?
+        </p>
+        <app-button (btnClick)="logOut()" bgColor="red" txtColor="bg-white"
+            txtContent="Logout"></app-button>
+    </div>
+</div>
+
 <header class="flex bg-neutral-800 h-20 px-4 w-full justify-between items-center">
     <h2 class="text-neutral-300 text-3xl font-bold text-center px-6">{{ title }}</h2>
     <nav class="flex px-8 space-x-6 text-neutral-300 xl:hidden">
@@ -9,7 +24,7 @@
         <a routerLink="/about">About</a>
     </nav>
     
-    <button class="flex hover:border-b-2" (click)="logOut()">
+    <button class="flex hover:border-b-2" (click)="toggleLogOutActionModal()">
         <fa-icon [ngStyle]="{color: 'rgb(212 212 212)'}" [icon]="logOutIcon"></fa-icon>
         <p class="text-neutral-300 ml-1 text-sm">Logout</p>
     </button>

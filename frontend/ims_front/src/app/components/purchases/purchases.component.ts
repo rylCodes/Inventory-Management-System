@@ -25,8 +25,9 @@ export class PurchasesComponent implements OnInit {
   showFormContainer: boolean = false; 
   showBillForm: boolean = false;
   showBillTable: boolean = true;  
-  updatingOrder: boolean = false;
+  showEachPurchaseOrder: boolean = false;
 
+  showSaveBillModal: boolean = false;
   showBillActionModal: boolean = false;
   showItemActionModal: boolean = false;
   showInvoice: boolean = false;
@@ -41,6 +42,7 @@ export class PurchasesComponent implements OnInit {
 
   bills: PurchaseBill[] = [];
   items: PurchaseItem[] = [];
+  allItems: PurchaseItem[] = [];
   suppliers: Supplier[] = [];
   stocks: Stock[] = [];
 
@@ -94,6 +96,25 @@ export class PurchasesComponent implements OnInit {
     }
   }
 
+  toggleSaveBillModal() {
+    this.showSaveBillModal = !this.showSaveBillModal;
+    if (this.showSaveBillModal) {
+      if (!this.bill.billno) {
+        window.alert("Failed: Please enter bill no.");
+        this.showSaveBillModal = false;
+        return;
+      } else if (!this.bill.supplier_id) {
+        window.alert("Failed: Please enter supplier.");
+        this.showSaveBillModal = false;
+        return;
+      } else if (this.items.length < 1) {
+        window.alert("Failed: Please add items to the purchase.");
+        this.showSaveBillModal = false;
+        return;
+      }
+    }
+  }
+
   toggleBillActionModal() {
     this.showBillActionModal = !this.showBillActionModal;
   }
@@ -110,7 +131,7 @@ export class PurchasesComponent implements OnInit {
     this.showBillForm = !this.showBillForm;
     if (!this.showBillForm) {
       this.resetBillForm();
-      this.loadItems();
+      this.loadFilteredItems();
     }
   }
 
@@ -121,13 +142,13 @@ export class PurchasesComponent implements OnInit {
 
   viewOrder(bill: PurchaseBill) {
     this.bill = bill;
-    this.loadItems();
+    this.loadFilteredItems();
     this.toggleFormContainer();
 
-    this.updatingOrder = !this.updatingOrder;
-    if (!this.updatingOrder) {
+    this.showEachPurchaseOrder = !this.showEachPurchaseOrder;
+    if (!this.showEachPurchaseOrder) {
       this.resetBillForm();
-      this.loadItems();
+      this.loadFilteredItems();
     }
   }
 
@@ -140,6 +161,8 @@ export class PurchasesComponent implements OnInit {
         this.toggleBillActionModal();
       } else if (this.showBillForm) {
         this.toggleBillForm();
+      } else if (this.showSaveBillModal) {
+        this.toggleSaveBillModal();
       }
     }
   }
@@ -167,7 +190,8 @@ export class PurchasesComponent implements OnInit {
   // SHOW BILLS
   ngOnInit(): void {
     this.loadBills();
-    this.loadItems();
+    this.loadFilteredItems();
+    this.loadAllItems();
     this.loadSuppliers();
     this.loadStocks();
   }  
@@ -180,11 +204,11 @@ export class PurchasesComponent implements OnInit {
       });
   }
 
-  loadItems() {
+  loadFilteredItems() {
     this.purchaseService
       .getPurchaseItems()
       .subscribe((items) => {
-        if (this.updatingOrder) {
+        if (this.showEachPurchaseOrder) {
           this.items = items.filter(item => item.purchaseBill_id === this.bill.id);
           this.bill.grand_total = this.calculateGrandtotal(this.items);
         } else {
@@ -192,6 +216,12 @@ export class PurchasesComponent implements OnInit {
           this.bill.grand_total = this.calculateGrandtotal(this.items);
         }
       });
+  }
+
+  loadAllItems() {
+    this.purchaseService
+      .getPurchaseItems()
+      .subscribe((items) => this.allItems = items);
   }
 
   loadSuppliers() {
@@ -210,6 +240,11 @@ export class PurchasesComponent implements OnInit {
         const activeStocks = stocks.filter(stock => stock.status === true);
         this.stocks = activeStocks;
       })
+  }
+
+  getItemLength(bill: PurchaseBill) {
+    const items = this.allItems.filter(item => item.purchaseBill_id === bill.id);
+    return items.length;
   }
 
   getSupplierDetails(supplierId: any): {supplierName: string, supplierCode?: string} {
@@ -253,14 +288,6 @@ export class PurchasesComponent implements OnInit {
   /* ADD BILLS AND ITEMS */
   // Add Bills
   addBill() {
-    if (!this.bill.billno) {
-      window.alert("Enter bill no!");
-      return;
-    } else if (!this.bill.supplier_id) {
-      window.alert("Enter supplier id!");
-      return;
-    }
-    
     const newBill = {
       ...this.bill,
       billno: this.bill.billno.toUpperCase(),
@@ -282,13 +309,16 @@ export class PurchasesComponent implements OnInit {
           this.purchaseService.editPurchaseItem(item).subscribe(item => {
             const index = this.items.findIndex(i => i.id === item.id);
             this.items[index] = item;
-            this.loadItems();
+            this.loadBills();
+            this.loadAllItems();
+            this.loadFilteredItems();
           })
         })
         this.resetBillForm();
+        this.toggleSaveBillModal();
         this.toggleFormContainer();
         await this.uiService.wait(100);
-        window.alert("New purchase has been added successfully!");
+        // window.alert("New purchase has been added successfully!");
       });
     }
   }
@@ -313,7 +343,7 @@ export class PurchasesComponent implements OnInit {
     this.purchaseService.addPurchaseItem(newSaleItem)
       .subscribe(async (item) => {
         this.items.push(item);
-        this.loadItems();
+        this.loadFilteredItems();
         this.resetItemForm();
         await this.uiService.wait(100);
       });
@@ -451,7 +481,7 @@ export class PurchasesComponent implements OnInit {
         this.bills = this.bills.filter(s => s.id !== this.deletingItem?.id);
         this.deletingItem = null;
         this.toggleItemActionModal()
-        this.loadItems();
+        this.loadFilteredItems();
         await this.uiService.wait(100);
         window.alert("Item has been deleted successfully!");
       });

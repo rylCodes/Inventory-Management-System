@@ -21,15 +21,26 @@ export class StocksComponent implements OnInit {
 
   stocks: Stock[] = [];
 
-  id?: number; 
-  code: string = "";
-  stock_name: string = "";
-  description: string = "";
-  quantity: number = 0;
-  unit: string = "piece";
-  date_added?: string;
-  date_updated?: string;
-  status: boolean = true;
+  stock: Stock = {
+    id: undefined,
+    code: "",
+    stock_name: "",
+    description: "",
+    quantity: 0,
+    unit: "",
+    status: true,
+  }
+
+  originalStock: Stock = {
+    id: undefined,
+    code: "",
+    stock_name: "",
+    description: "",
+    quantity: 0,
+    unit: "",
+    status: true,
+  }
+
   customUnit: string = "";
 
   showForm: boolean = false;
@@ -41,11 +52,16 @@ export class StocksComponent implements OnInit {
   constructor(private stockService: StocksService, private uiService: UiService) {}
 
   resetForm() {
-    this.stock_name = "";
-    this.description = "";
-    this.quantity = 0;
-    this.unit = "piece";
-    this.status = true;
+    this.stock = {
+      id: undefined,
+      code: "",
+      stock_name: "",
+      description: "",
+      quantity: 0,
+      unit: "",
+      status: true,
+    }
+
     this.customUnit = "";
   }
 
@@ -66,7 +82,6 @@ export class StocksComponent implements OnInit {
     this.stockService
       .getStocks()
       .subscribe((stocks) => {
-        // const activeStocks = stocks.filter(stock => stock.status === true);
         this.stocks = stocks;
       });
   }
@@ -81,26 +96,28 @@ export class StocksComponent implements OnInit {
 
   // CREATE STOCK
   addStock() {
-    if (!this.stock_name) {
+    if (!this.stock.stock_name) {
       window.alert("Enter stock name!");
       return;
-    }
-
-    if (this.quantity < 0) {
+    } else if (this.stock.quantity < 0 || this.stock.quantity === null) {
       window.alert("Invalid stock quantity!");
       return;
     }
 
+    if (this.stock.unit === "otherUnit" && this.customUnit) {
+      this.stock.unit = this.customUnit;
+    }
+
     const newStock = {
-      id: this.id,
-      code: this.code,
-      stock_name: this.stock_name.toUpperCase(),
-      description: this.description.toUpperCase(),
-      quantity: this.quantity,
-      unit: this.unit || this.customUnit,
-      date_added: this.date_added,
-      date_updated: this.date_updated,
-      status: this.status,
+      id: this.stock.id,
+      code: this.stock.code,
+      stock_name: this.stock.stock_name.toUpperCase(),
+      description: this.stock.description.toUpperCase(),
+      quantity: this.stock.quantity,
+      unit: this.stock.unit,
+      date_added: this.stock.date_added,
+      date_updated: this.stock.date_updated,
+      status: this.stock.status,
     }
 
     const isStockNameExist = this.stocks.some(stock => stock.stock_name === newStock.stock_name);
@@ -115,6 +132,56 @@ export class StocksComponent implements OnInit {
         await this.uiService.wait(100);
         window.alert("New stock has been created successfully!");
       });
+    }
+  }
+
+  // UPDATE STOCK
+  updateStock(stock: Stock) {
+    this.proceedEdit = true;
+    this.stock = { ...stock };
+    this.originalStock = { ...stock };
+    this.toggleForm();
+  }
+
+  saveUpdate() {
+    if (!this.stock.stock_name) {
+      window.alert("Enter stock name!");
+      return;
+    } else if (this.stock.quantity < 0 || this.stock.quantity === null) {
+      window.alert("Invalid stock quantity!");
+      return;
+    }
+
+    if (JSON.stringify(this.originalStock) === JSON.stringify(this.stock)) {
+      this.toggleForm();
+      return;
+    }
+
+    if (this.stock.unit === "otherUnit" && this.customUnit) {
+      this.stock.unit = this.customUnit;
+    }
+
+    const editingStock = {
+      ...this.stock,
+      stock_name: this.stock.stock_name.toUpperCase(),
+      description: this.stock.description.toUpperCase(),
+    }
+
+    const isStockNameExist = this.stocks.some(stock => stock.id !== editingStock.id && stock.stock_name === editingStock.stock_name);
+
+    if (isStockNameExist) {
+      window.alert("Stock with this name already exists!");
+      return;
+    } else {
+        this.stockService
+        .editStock(editingStock)
+        .subscribe(async (stockData) => {
+          const index = this.stocks.findIndex(stock => stock.id === stockData.id);
+          this.stocks[index] = stockData;
+          this.toggleForm();
+          await this.uiService.wait(100);
+          window.alert("Successfully saved changes to the stock.");
+        });
     }
   }
 
@@ -138,51 +205,5 @@ export class StocksComponent implements OnInit {
         await this.uiService.wait(100);
         window.alert("Stock has been deleted successfully!");
       });
-  }
-
-// UPDATE STOCK
-updateStock(stock: Stock) {
-  this.proceedEdit = true;
-  this.id = stock.id;
-  this.code = stock.code;
-  this.stock_name = stock.stock_name.toUpperCase();
-  this.description = stock.description.toUpperCase();
-  this.quantity = stock.quantity;
-  this.unit = stock.unit;
-  this.date_added = stock.date_added;
-  this.date_updated = stock.date_updated;
-  this.status = stock.status;
-  this.toggleForm();
-}
-
-saveUpdate() {
-  const editingStock = {
-    id: this.id,
-    code: this.code,
-    stock_name: this.stock_name.toUpperCase(),
-    description: this.description.toUpperCase(),
-    quantity: this.quantity,
-    unit: this.unit || this.customUnit,
-    date_added: this.date_added,
-    date_updated: this.date_updated,
-    status: this.status,
-  }
-
-  const isStockNameExist = this.stocks.some(stock => stock.id !== editingStock.id && stock.stock_name === editingStock.stock_name);
-
-  if (isStockNameExist) {
-    window.alert("Stock with this name already exists!");
-    return;
-  } else {
-      this.stockService
-      .editStock(editingStock)
-      .subscribe(async (stockData) => {
-        const index = this.stocks.findIndex(stock => stock.id === stockData.id);
-        this.stocks[index] = stockData;
-        this.toggleForm();
-        await this.uiService.wait(100);
-        window.alert("Successfully saved changes to the stock.");
-      });
-    }
   }
 }

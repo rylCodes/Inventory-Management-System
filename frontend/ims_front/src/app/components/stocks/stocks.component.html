@@ -28,36 +28,36 @@
         <form class="flex flex-col mt-2" (ngSubmit)="onSubmit()">
 
             <label class="mt-4" for="name">Name:</label>
-            <input class="uppercase border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text" name="stock_name"
-                id="stock_name" [(ngModel)]="stock_name">
+            <input class="uppercase border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text" name="stock.stock_name"
+                id="stock.stock_name" [(ngModel)]="stock.stock_name">
 
-            <label class="mt-4" for="description">Description:</label>
-            <input class="uppercase border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text" name="description"
-                id="description" [(ngModel)]="description">
+            <label class="mt-4" for="stock.description">Description:</label>
+            <input class="uppercase border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text" name="stock.description"
+                id="stock.description" [(ngModel)]="stock.description">
 
-            <label class="mt-4" for="quantity">Quantity:</label>
+            <label class="mt-4" for="stock.quantity">Quantity:</label>
             <input appSelectAllText class="border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="number"
-                name="quantity" id="quantity" [(ngModel)]="quantity">
+                name="stock.quantity" id="stock.quantity" [(ngModel)]="stock.quantity">
 
-            <label class="mt-4" for="unit">Unit:</label>
-            <select class="lowercase border border-neutral-900 px-2 py-1 rounded-sm mt-1" name="unit" id="unit"
-                [(ngModel)]="unit">
+            <label class="mt-4" for="stock.unit">Unit:</label>
+            <select class="lowercase border border-neutral-900 px-2 py-1 rounded-sm mt-1" name="stock.unit" id="stock.unit"
+                [(ngModel)]="stock.unit">
                 <option selected value="piece">piece</option>
                 <option value="bottle">bottle</option>
                 <option value="liter">liter</option>
                 <option value="kilo">kilo</option>
                 <option value="pack">pack</option>
-                <option class="text-neutral-500" value="">other unit...</option>
+                <option class="text-neutral-500" value="otherUnit">other unit...</option>
             </select>
             <!-- Input field for custom unit when "other unit..." is selected -->
-            <input class="lowercase" *ngIf="unit === ''" class="border border-neutral-900 px-2 py-1 rounded-sm mt-1"
+            <input class="lowercase" *ngIf="stock.unit === 'otherUnit'" class="border border-neutral-900 px-2 py-1 rounded-sm mt-1"
                 type="text" name="customUnit" id="customUnit" [(ngModel)]="customUnit" placeholder="Please specify.">
 
             <div class="flex items-center mt-4">
-                <label class="" for="status">Status:</label>
+                <label class="" for="stock.status">Status:</label>
                 <div class="flex items-center ml-10">
-                    <input class="border border-neutral-900 px-2 py-1 rounded-sm w-4 h-4" type="checkbox" name="status"
-                        id="active" [(ngModel)]="status" checked>
+                    <input class="border border-neutral-900 px-2 py-1 rounded-sm w-4 h-4" type="checkbox" name="stock.status"
+                        id="active" [(ngModel)]="stock.status" checked>
                     <label class="ml-1" for="active">Active</label>
 
                 </div>
@@ -79,7 +79,7 @@
                 <th>Name</th>
                 <th>Description</th>
                 <th>Quantity</th>
-                <th>Date Added</th>
+                <th>Unit</th>
                 <th>Date Updated</th>
                 <th>Status</th>
                 <th>Action</th>
@@ -89,8 +89,8 @@
                     <td class="p-2">{{stock.code}}</td>
                     <td class="p-2">{{stock.stock_name}}</td>
                     <td class="p-2">{{stock.description}}</td>
-                    <td class="p-2">{{stock.quantity | number: '1.0-3'}} {{stock.unit}}</td>
-                    <td class="p-2">{{stock.date_added | date: 'dd/MM/yyyy'}}</td>
+                    <td class="p-2">{{stock.quantity | number: '1.0-3'}}</td>
+                    <td class="p-2">{{stock.unit}}</td>
                     <td class="p-2">{{stock.date_updated | date: 'dd/MM/yyyy'}}</td>
                     <td class="p-2">{{stock.status? "active": "inactive"}}</td>
                     <td class="flex justify-center p-2 space-x-6">

@@ -2,6 +2,7 @@ import { Component, OnInit, Renderer2, HostListener } from '@angular/core';
 import { SaleBill, SaleItem } from 'src/app/interface/Sale';
 import { Menu } from 'src/app/interface/Product';
 import { Stock } from 'src/app/interface/Stock';
+import { Product } from 'src/app/interface/Product';
 import { ProductsService } from 'src/app/services/products/products.service';
 import { UiService } from 'src/app/services/ui/ui.service';
 import { faPen, faTrashCan, faXmark, faRectangleList, faPlus, faMinus, faTimes } from '@fortawesome/free-solid-svg-icons';
@@ -43,6 +44,7 @@ export class PosComponent implements OnInit {
   saleItems: SaleItem[] = [];
   menus: Menu[] = [];
   stocks: Stock[] = [];
+  products: Product[] = [];
   amountChange: number = 0;
 
   saleBill: SaleBill = {
@@ -97,6 +99,10 @@ export class PosComponent implements OnInit {
   }
 
   toggleProceedPayment() {
+    const stockIdToAdjust = this.saleItems.map(item => item.product_id);
+    console.log(this.saleItems);
+    console.log(this.menus.filter(menu => stockIdToAdjust.includes(menu.id)));
+    console.log(this.products);
     this.proceedPayment = !this.proceedPayment;
     if (!this.proceedPayment) {
       this.saleBill.amount_tendered = 0;
@@ -187,6 +193,7 @@ export class PosComponent implements OnInit {
     this.loadItems();
     this.loadMenus();
     this.loadStocks();
+    this.loadProducts();
   }  
 
   loadBills() {
@@ -227,6 +234,14 @@ export class PosComponent implements OnInit {
       .subscribe(stocks => {
         const activeStocks = stocks.filter(stock => stock.status === true);
         this.stocks = activeStocks;
+      })
+  }
+
+  loadProducts() {
+    this.productService
+      .getProducts()
+      .subscribe(products => {
+        this.products = products;
       })
   }
 
@@ -480,6 +495,9 @@ export class PosComponent implements OnInit {
       if (bill.grand_total) {
         this.toggleInvoice();
         this.toggleProceedPayment();
+      } else {
+        window.alert("No payable amount!");
+        return;
       }
     });
   }

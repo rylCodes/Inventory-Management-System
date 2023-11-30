@@ -51,6 +51,16 @@ export class ProductsComponent implements OnInit {
     status: true,
   };
 
+  originalMenu: Menu = {
+    id: undefined,
+    code: undefined,
+    name: "",
+    description: "",
+    category: "",
+    price: 0,
+    status: true,
+  };
+
   customCategory: string = "";
 
   product: Product = {
@@ -69,15 +79,14 @@ export class ProductsComponent implements OnInit {
     ) {}
 
   resetMenuForm() {
-    this.proceedEditProduct = false;
-
     this.menu = {
-    code: undefined,
-    name: "",
-    description: "",
-    category: "liquor",
-    status: true,
-    price: 0,
+      id: undefined,
+      code: "",
+      name: "",
+      description: "",
+      category: "liquor",
+      status: true,
+      price: 0,
     }
 
     this.customCategory = "";
@@ -110,6 +119,7 @@ export class ProductsComponent implements OnInit {
   toggleMenuForm() {
     this.showMenuForm = !this.showMenuForm;
     if (!this.showMenuForm) {
+      this.proceedEditMenu = false;
       this.resetMenuForm();
     }
   }
@@ -203,12 +213,20 @@ export class ProductsComponent implements OnInit {
     } else if (!this.menu.category) {
       window.alert("Enter category");
       return;
+    } else if (this.menu.price < 0 || this.menu.price === null) {
+      window.alert("Invalid price input!");
+      return;
+    }
+
+    if (this.menu.category === "otherCategory" && this.customCategory) {
+      this.menu.category = this.customCategory;
     }
     
     const newMenu = {
       ...this.menu,
       name: this.menu.name.toUpperCase(),
-      category: this.menu.category.toUpperCase() || this.customCategory.toUpperCase(),
+      category: this.menu.category.toUpperCase(),
+      description: this.menu.description.toUpperCase()
     }
 
     const isMenuNameExist = this.menus.some(menu => menu.name === newMenu.name);
@@ -267,16 +285,32 @@ export class ProductsComponent implements OnInit {
   // UPDATE MENU
   updateMenu(menu: Menu) {
     this.proceedEditMenu = true;
-
-    menu.name.toUpperCase();
-    menu.category.toUpperCase();
-    
-    this.menu = menu;
-
+    this.menu = { ...menu };
+    this.originalMenu = { ...menu };
     this.toggleMenuForm();
   }
 
   onSaveUpdateMenu() {
+    if (!this.menu.name) {
+      window.alert("Enter name");
+      return;
+    } else if (!this.menu.category) {
+      window.alert("Enter category");
+      return;
+    } else if (this.menu.price < 0 || this.menu.price === null) {
+      window.alert("Invalid price input!");
+      return;
+    }
+
+    if (JSON.stringify(this.originalMenu) === JSON.stringify(this.menu)) {
+      this.toggleMenuForm();
+      return;
+    }
+
+    if (this.menu.category === "otherCategory" && this.customCategory) {
+      this.menu.category = this.customCategory;
+    }
+
     const editingMenu = {
       ...this.menu,
       name: this.menu.name.toUpperCase(),

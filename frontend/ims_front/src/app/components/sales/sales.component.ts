@@ -113,16 +113,6 @@ export class SalesComponent implements OnInit {
     }
   }
 
-  viewOrder(bill: SaleBill) {
-    this.bill = bill;
-    this.loadEachBillItems();
-
-    this.showOrder = !this.showOrder;
-    if (!this.showOrder) {
-      this.loadEachBillItems();
-    }
-  }
-
   // SHOW BILLS
   ngOnInit(): void {
     this.loadBills();
@@ -180,14 +170,8 @@ export class SalesComponent implements OnInit {
   
   // DELETE BILL
   deleteSaleBill(saleBill: SaleBill) {
-    if (this.bills.length <= 1) {
-      window.alert("Please add new transaction before deleting this one! Consider editing this instead of deletion.");
-      return;
-    }
-    else {
-      this.deletingSaleBill = saleBill;
-      this.toggleBillActionModal();
-    }
+    this.deletingSaleBill = saleBill;
+    this.toggleBillActionModal();
   }
 
   onConfirmDelete() {

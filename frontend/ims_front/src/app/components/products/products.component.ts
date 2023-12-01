@@ -232,12 +232,16 @@ export class ProductsComponent implements OnInit {
     const isMenuNameExist = this.menus.some(menu => menu.name === newMenu.name);
   
     if (isMenuNameExist) {
-      window.alert("Menu with this name already exists!");
+      window.alert("Failed: Menu with this name already exists!");
+      return;
+    } else if (this.products.length < 1) {
+      window.alert("Failed: Please add at least one item to the product.");
       return;
     } else {
       this.productService.addMenu(newMenu)
       .subscribe(async (menu) => {
         this.menus.push(menu);
+        
         const lastMenuId = this.menus.length - 1;
         this.products.map(product => {
           if (!product.menu) {
@@ -253,7 +257,7 @@ export class ProductsComponent implements OnInit {
         this.resetProductForm();
         this.toggleFormContainer();
         await this.uiService.wait(100);
-        window.alert("New menu has been created successfully!");
+        window.alert("Success: New product has been added to the menu.");
       });
     }
   }

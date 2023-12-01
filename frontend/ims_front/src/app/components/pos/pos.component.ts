@@ -272,9 +272,6 @@ export class PosComponent implements OnInit {
     if (!this.saleBill.customer_name) {
       window.alert("Enter customer name");
       return;
-    } else if (!this.saleBill.remarks) {
-      window.alert("Enter remarks");
-      return;
     }
     
     const newBill = {
@@ -286,10 +283,10 @@ export class PosComponent implements OnInit {
     this.salesService.addSaleBill(newBill)
       .subscribe(async (bill) => {
         this.activeBills.push(bill);
-        const lastBillId = this.activeBills.length - 1;
+        
         this.saleItems.map(item => {
           if (!item.billno) {
-            item.billno = this.activeBills[lastBillId].id;
+            item.billno = bill.id;
           }
           this.salesService.editSaleItem(item).subscribe(item => {
             const index = this.saleItems.findIndex(i => i.id === item.id);
@@ -299,6 +296,9 @@ export class PosComponent implements OnInit {
         })
         this.resetBillForm();
         await this.uiService.wait(100);
+        if (!bill.grand_total || bill.grand_total > 1) {
+          window.alert("Warning: You have saved a transaction without a total bill amount. Make sure it is correct.");
+        }
         window.alert("New transaction has been added successfully!");
       });
   }

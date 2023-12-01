@@ -105,7 +105,7 @@ class SalesBill(models.Model):
     billno = models.CharField(max_length=100, unique=True, blank=True)
     time = models.DateTimeField(auto_now=True)
     customer_name = models.CharField(max_length=200)
-    remarks = models.CharField(max_length=100)
+    remarks = models.CharField(max_length=100, blank=True, null=True)
     amount_tendered = models.FloatField(validators=[MinValueValidator(0)], default=0)
     grand_total = models.FloatField(validators=[MinValueValidator(0)], default=0)
     status = models.BooleanField(default=False)

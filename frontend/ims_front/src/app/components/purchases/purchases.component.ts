@@ -108,7 +108,7 @@ export class PurchasesComponent implements OnInit {
         this.showSaveBillModal = false;
         return;
       } else if (this.items.length < 1) {
-        window.alert("Failed: Please add items to the purchase.");
+        window.alert("Failed: Please add at least one item to the purchase.");
         this.showSaveBillModal = false;
         return;
       }
@@ -293,18 +293,37 @@ export class PurchasesComponent implements OnInit {
       billno: this.bill.billno.toUpperCase(),
     }
 
+    const items = Array.from(this.items);
+    const stocks = Array.from(this.stocks);
+
+    const accumulatedItems = items.reduce((acc: PurchaseItem[], obj: PurchaseItem) => {
+      const existingObj = acc.find(item => item.stock_id === obj.stock_id);
+      if (existingObj) {
+        existingObj.quantity_purchased += obj.quantity_purchased;
+      } else {
+        acc.push({ ...obj })
+      }
+      return acc;
+    }, []);
+
+    // Stocks to be adjusted.
+    stocks.forEach(stock => {
+      const foundStock = accumulatedItems.find(item => item.stock_id === stock.id);
+      if (foundStock) {
+        stock.quantity += foundStock.quantity_purchased;
+      }
+    })
+
     const isBillnoExist = this.bills.some(bill => bill.billno === newBill.billno);
-  
     if (isBillnoExist) {
       window.alert("Billno with this name already exists!");
     } else {
       this.purchaseService.addPurchaseBill(newBill)
       .subscribe(async (bill) => {
         this.bills.push(bill);
-        const lastBillId = this.bills.length - 1;
         this.items.map(item => {
           if (!item.purchaseBill_id) {
-            item.purchaseBill_id = this.bills[lastBillId].id;
+            item.purchaseBill_id = bill.id;
           }
           this.purchaseService.editPurchaseItem(item).subscribe(item => {
             const index = this.items.findIndex(i => i.id === item.id);
@@ -312,13 +331,23 @@ export class PurchasesComponent implements OnInit {
             this.loadBills();
             this.loadAllItems();
             this.loadFilteredItems();
-          })
+          });
         })
+
+        // Adjusted inventories upon saving the purchase.
+        stocks.map(stock => {
+          this.stockService.editStock(stock).subscribe();
+        });
+
         this.resetBillForm();
         this.toggleSaveBillModal();
         this.toggleFormContainer();
+
         await this.uiService.wait(100);
-        // window.alert("New purchase has been added successfully!");
+        if (!bill.grand_total || bill.grand_total > 1) {
+          window.alert("Warning: You have saved a purchase without a total amount. Make sure it is correct.");
+        }
+        window.alert("Success: New purchase has been added.");
       });
     }
   }
@@ -345,7 +374,11 @@ export class PurchasesComponent implements OnInit {
         this.items.push(item);
         this.loadFilteredItems();
         this.resetItemForm();
+
         await this.uiService.wait(100);
+        if (!item || item.item_price < 1) {
+          window.alert("Warning: You have added an item without a price. Make sure it is correct.");
+        }
       });
   }
 
@@ -416,14 +449,8 @@ export class PurchasesComponent implements OnInit {
   // UPDATE BILLS AND ITEMS
   // Delete bill
   deleteBill(bill: PurchaseBill) {
-    if (this.bills.length <= 1) {
-      window.alert("Please add new transaction before deleting this one! Consider editing this instead of deletion.");
-      return;
-    }
-    else {
-      this.deletingBill = bill;
-      this.toggleBillActionModal();
-    }
+    this.deletingBill = bill;
+    this.toggleBillActionModal();
   }
 
   onConfirmDeleteBill() {

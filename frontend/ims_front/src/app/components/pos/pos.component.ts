@@ -99,36 +99,6 @@ export class PosComponent implements OnInit {
   }
 
   toggleProceedPayment() {
-    const saleItems = this.saleItems;
-    console.log('saleItems:', saleItems);
-
-    const menuIDs = saleItems.map(item => item.menu);
-    console.log('menuIDs →',menuIDs);
-
-    const filteredProducts = this.products.filter(product => menuIDs.includes(product.menu));
-    console.log('filteredProducts', filteredProducts);
-
-    const stockIDs = filteredProducts.map(stock => stock.stock_id);
-
-    const filteredStocks = this.stocks.filter(stock => stockIDs.includes(stock.id))
-    console.log('filteredStocks', filteredStocks);
-
-    const filterItemQty = saleItems.reduce((acc: SaleItem[], obj: SaleItem) => {
-      const existingObj = acc.find(item => item.menu === obj.menu);
-      if (existingObj) {
-        existingObj.quantity += obj.quantity;
-      } else {
-        acc.push({ ...obj })
-      }
-
-      return acc;
-    }, []);
-
-    console.log(filterItemQty);
-
-    const quantity = filteredProducts.map((product, index) => product.qty_per_order * saleItems[index].quantity);
-    console.log(quantity);
-
     this.proceedPayment = !this.proceedPayment;
     if (!this.proceedPayment) {
       this.saleBill.amount_tendered = 0;
@@ -517,8 +487,54 @@ export class PosComponent implements OnInit {
       }
     }
 
+    const saleItems = Array.from(this.saleItems);
+    const products = Array.from(this.products);
+    const stocks = Array.from(this.stocks);
+
+    const accumulatedItems = saleItems.reduce((acc: SaleItem[], obj: SaleItem) => {
+      const existingObj = acc.find(item => item.menu === obj.menu);
+      if (existingObj) {
+        existingObj.quantity += obj.quantity;
+      } else {
+        acc.push({ ...obj })
+      }
+      return acc;
+    }, []);
+
+    const menuIDs = accumulatedItems.map(item => item.menu);
+    const filteredProducts = products.filter(product => menuIDs.includes(product.menu));
+
+    filteredProducts.forEach(item => {
+      const foundProduct = accumulatedItems.find(product => product.menu === item.menu);
+      if (foundProduct) {
+        item.qty_per_order = foundProduct.quantity * item.qty_per_order;
+      }
+      return item;
+    });
+
+    const accumulatedProducts = filteredProducts.reduce((prodAccu: Product[], prodObj: Product) => {
+      const existingObj = prodAccu.find(item => item.stock_id === prodObj.stock_id);
+      if (existingObj) {
+        existingObj.qty_per_order += prodObj.qty_per_order;
+      } else {
+        prodAccu.push({...prodObj});
+      }
+      return prodAccu;
+    }, [])
+
+    stocks.forEach(stock => {
+      const foundStock = accumulatedProducts.find(product => product.stock_id === stock.id);
+      if (foundStock) {
+        stock.quantity -= foundStock.qty_per_order;
+      }
+    })
+
     this.salesService.editSaleBill(this.saleBill).subscribe((bill) => {
       if (bill.grand_total) {
+        stocks.map(stock => {
+          this.stockService.editStock(stock).subscribe();
+        });
+        
         this.toggleInvoice();
         this.toggleProceedPayment();
       } else {

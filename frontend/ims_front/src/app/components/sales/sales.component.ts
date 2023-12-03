@@ -186,7 +186,7 @@ export class SalesComponent implements OnInit {
         this.deletingSaleBill = null;
         this.toggleBillActionModal()
         await this.uiService.wait(100);
-        window.alert("Transaction has been deleted successfully!");
+        window.alert("Transaction history has been deleted successfully!");
       });
   }
 
@@ -211,5 +211,9 @@ export class SalesComponent implements OnInit {
         price: 0,
       }
     }
+  }
+
+  printReceipt(): void {
+    window.print();
   }
 }

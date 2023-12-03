@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouterModule, Routes } from '@angular/router';
-import { HttpClientModule } from '@angular/common/http'
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http'
 import { AppRoutingModule } from './app-routing.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -24,6 +24,9 @@ import { SuppliersComponent } from './components/suppliers/suppliers.component';
 import { SelectAllTextDirective } from './directives/select-all-text/select-all-text.directive';
 import { FocusOnShowDirective } from './directives/focus-on-show/focus-on-show.directive';
 import { SalesComponent } from './components/sales/sales.component';
+import { AuthService } from './services/auth/auth.service';
+import { AuthInterceptor } from './interceptor/auth.interceptor';
+import { NgxPrintModule } from 'ngx-print';
 
 const appRoutes: Routes = [
   {path: 'login', component: LoginComponent},
@@ -62,9 +65,16 @@ const appRoutes: Routes = [
     FormsModule,
     ReactiveFormsModule,
     FontAwesomeModule,
+    NgxPrintModule,
   ],
   providers: [
     DatePipe,
+    AuthService,
+      {
+        provide: HTTP_INTERCEPTORS,
+        useClass: AuthInterceptor,
+        multi: true,
+      }
   ],
   bootstrap: [AppComponent]
 })

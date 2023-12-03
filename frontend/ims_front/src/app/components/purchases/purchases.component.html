@@ -62,7 +62,7 @@
                 {{ proceedEditBill? "Edit purchase details" : "Add new purchase" }}
             </h2>
             <form class="flex flex-col mt-2 w-full" (ngSubmit)="onSubmitBill()">
-                <label class="mt-4" for="bill.billno">Bill No.:</label>
+                <label class="mt-4" for="bill.billno">OR No.:</label>
                 <input class="uppercase border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text"
                     name="bill.billno" id="bill.billno" [(ngModel)]="bill.billno">
 
@@ -164,7 +164,7 @@
         <div *ngIf="showEachPurchaseOrder"
             class="bg-[#fff] self-start flex-1 h-auto mx-auto p-4 rounded-lg shadow-xl text-neutral-900 mt-4">
             <form class="flex flex-col">
-                <h3 for="bill.customer_name">Bill No.:</h3>
+                <h3 for="bill.customer_name">OR No.:</h3>
                 <p class="uppercase border border-neutral-900 px-1 py-0.5 rounded-sm mt-1 text-center">
                     {{bill.billno}}
                 </p>
@@ -195,7 +195,7 @@
                 {{ proceedEditBill? "Update bill details" : "Add new purchase" }}
             </h2>
             <form class="flex flex-col" (ngSubmit)="onSubmitBill()">
-                <label class="mt-2" for="bill.billno">Transaction Code:</label>
+                <label class="mt-2" for="bill.billno">OR No.:</label>
                 <input class="uppercase border border-neutral-900 px-1 py-0.5 rounded-sm mt-1" type="text"
                     name="bill.billno" id="bill.billno" [(ngModel)]="bill.billno">
 
@@ -225,10 +225,11 @@
     <div *ngIf="showBillTable" class="w-full text-center shadow-xl rounded-xl mt-4">
         <table class="w-full table-fixed rounded-xl">
             <thead class="text-neutral-300 bg-neutral-900">
-                <th>Code</th>
+                <th>OR No.</th>
                 <th>Name</th>
                 <th>Items</th>
                 <th>Total</th>
+                <th>Remarks</th>
                 <th>Datetime</th>
                 <th>Action</th>
             </thead>
@@ -245,6 +246,7 @@
                     <td class="p-2">{{getSupplierDetails(bill.supplier_id).supplierName}}</td>
                     <td class="p-2">{{getItemLength(bill)}}</td>
                     <td class="p-2">&#8369;{{bill.grand_total | number: '1.2-2'}}</td>
+                    <td class="p-2">{{bill.remarks}}</td>
                     <td class="p-2">{{bill.time | date: "MMM dd 'at' hh:mm a"}}</td>
                     <td class="flex justify-center p-2 space-x-6">
                         <!-- Edit bill -->

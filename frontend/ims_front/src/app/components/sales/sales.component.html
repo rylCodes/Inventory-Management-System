@@ -1,4 +1,4 @@
-<div class="relative w-full px-8">
+<div id="sales-component" class="relative w-full px-8">
     <!-- HEADING: POS PAGE -->
     <div class="flex justify-between mt-8">
         <h1 class="font-bold text-3xl">SALES HISTORY</h1>
@@ -6,12 +6,27 @@
     <hr class="border-b-1 border-neutral-900 mt-4">
 
     <div class="relative w-full">
+        <!-- BILL MODAL: Confirm to Delete Bill -->
+        <div *ngIf="showBillActionModal"
+            class="flex justify-center top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] fixed">
+            <div class="relative flex flex-col items-center bg-white rounded-lg w-96 h-fit p-4 mt-32">
+                <fa-icon class="place-self-end scale-125 hover:scale-110" [icon]="faXmark"
+                    [ngStyle]="{color: 'rgb(64 64 64 )'}" (click)="toggleBillActionModal()">
+                </fa-icon>
+                <p class="mb-8 mt-6 text-center">Are you sure you want to delete this transaction history?<br>This action cannot be
+                    undone.</p>
+                <app-button (btnClick)="onConfirmDelete()" bgColor="red" txtColor="bg-white"
+                    txtContent="Delete"></app-button>
+            </div>
+        </div>
+
+
         <!-- INVOICE -->
         <div *ngIf="showInvoice" class="top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] fixed overflow-y-auto">
             <div class="bg-white rounded-lg w-2/5 h-fit mt-10 mx-auto">
-                <div class="flex flex-col justify-center p-8">
+                <div id="invoice-section" class="flex flex-col justify-center p-8 w-full">
                     <h3
-                        class="self-center text-center w-1/3 rounded-2xl text-white bg-orange-600 font-bold py-1 text-xl">
+                        class="self-center text-center w-1/3 rounded-2xl text-white bg-orange-600 font-bold py-1 text-xl mx-auto">
                         INVOICE</h3>
                     <div class="flex justify-between mt-8">
                         <div class="w-1/2">
@@ -25,7 +40,7 @@
                             <p>Bank Detail: 123123</p>
                         </div>
                     </div>
-                    <table class="mt-8">
+                    <table class="mt-8 w-full">
                         <thead class="bg-orange-600 text-white p-2">
                             <th>DESCRIPTIONS</th>
                             <th>PRICE</th>
@@ -82,7 +97,8 @@
                     </div>
                 </div>
                 <div class="flex justify-end space-x-1 p-2 border-t border-neutral-300">
-                    <app-button bgColor="blue" txtContent="Print"></app-button>
+                    <button styleSheetFile="..\..\..\styles.css" printSectionId="invoice-section" ngxPrint>print</button>
+                    <app-button (btnClick)="printReceipt()" bgColor="blue" txtContent="Print"></app-button>
                     <app-button (btnClick)="toggleInvoice(bill)" bgColor="red" txtContent="Close"></app-button>
                 </div>
             </div>

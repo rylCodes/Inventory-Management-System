@@ -24,8 +24,23 @@
         <a routerLink="/about">About</a>
     </nav>
     
-    <button class="flex hover:border-b-2" (click)="toggleLogOutActionModal()">
-        <fa-icon [ngStyle]="{color: 'rgb(212 212 212)'}" [icon]="logOutIcon"></fa-icon>
-        <p class="text-neutral-300 ml-1 text-sm">Logout</p>
-    </button>
+    <div class="relative flex flex-col">
+        <div class="flex flex-col items-center">
+            <fa-icon class="user-icon hover: cursor-pointer"
+             [ngStyle]="{color: 'rgb(212 212 212)', 'font-size': '30px'}"   
+             [icon]="faUserCircle"
+             (click)="toggleUserDetails()">
+            </fa-icon>
+            <p class="text-neutral-300 text-xs mt-0.5 font-semibold capitalize">{{getUser()}}</p>
+        </div>
+
+        <div *ngIf="showUserDetails"
+             class="flex flex-col items-center space-y-2 rounded-md p-3 absolute top-full right-0 w-24 bg-neutral-100 shadow-lg z-10">
+            <button class="flex hover:font-semibold" (click)="toggleLogOutActionModal()">
+                <fa-icon [ngStyle]="{color: 'rgb(64 64 64)'}" [icon]="logOutIcon"></fa-icon>
+                <p class="text-neutral-900 ml-1 text-sm">Logout</p>
+                <hr>
+            </button>
+        </div>
+    </div>
 </header>

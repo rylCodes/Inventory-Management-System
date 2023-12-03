@@ -4,6 +4,7 @@ export interface PurchaseBill {
     time?: string,
     supplier_id?: number,
     grand_total?: number,
+    remarks: string,
 }
 
 export interface PurchaseItem {

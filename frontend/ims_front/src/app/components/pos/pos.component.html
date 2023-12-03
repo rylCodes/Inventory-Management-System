@@ -34,7 +34,7 @@
         </div>
 
         <!-- INVOICE -->
-        <div *ngIf="showInvoice" class="top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] fixed overflow-y-auto">
+        <div id="invoice-section" *ngIf="showInvoice" class="top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] fixed overflow-y-auto">
             <div class="bg-white rounded-lg w-2/5 h-fit mt-10 mx-auto">
                 <div class="flex flex-col justify-center p-8">
                     <h3
@@ -109,7 +109,7 @@
                     </div>
                 </div>
                 <div class="flex justify-end space-x-1 p-2 border-t border-neutral-300">
-                    <app-button bgColor="blue" txtContent="Print"></app-button>
+                    <app-button printSectionId="invoice-section" ngxPrint bgColor="blue" txtContent="Print"></app-button>
                     <app-button (btnClick)="toggleInvoice()" bgColor="red" txtContent="Close"></app-button>
                 </div>
             </div>
@@ -136,7 +136,7 @@
                 <fa-icon class="place-self-end scale-125 hover:scale-110" [icon]="faXmark"
                     [ngStyle]="{color: 'rgb(64 64 64 )'}" (click)="toggleBillActionModal()">
                 </fa-icon>
-                <p class="mb-8 mt-6 text-center">Are you sure you want to delete this bill?<br>This action cannot be
+                <p class="mb-8 mt-6 text-center">Are you sure you want to delete this transaction?<br>This action cannot be
                     undone.</p>
                 <app-button (btnClick)="onConfirmDelete()" bgColor="red" txtColor="bg-white"
                     txtContent="Delete"></app-button>
@@ -157,7 +157,7 @@
                     <p class="uppercase bg-blue-50 border border-neutral-900 px-2 py-1 rounded-sm mt-1">
                         {{saleBill.billno}}
                     </p>
-                    <label class="mt-4" for="saleBill.customer_name">Customer Name:</label>
+                    <label class="mt-4" for="saleBill.customer_name">Customer:</label>
                     <input class="uppercase border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text"
                         name="saleBill.customer_name" id="saleBill.customer_name" [(ngModel)]="saleBill.customer_name">
 
@@ -249,13 +249,13 @@
                         {{saleBill.billno}}
                     </p>
 
-                    <h3 class="mt-2" for="saleBill.customer_name">Customer Name:</h3>
+                    <h3 class="mt-2" for="saleBill.customer_name">Customer:</h3>
                     <p class="uppercase border border-neutral-900 px-1 py-0.5 rounded-sm mt-1 text-center">
                         {{saleBill.customer_name}}
                     </p>
 
-                    <h3 class="mt-2" for="remarks">Remarks:</h3>
-                    <p class="uppercase border border-neutral-900 px-1 py-0.5 rounded-sm mt-1 text-center">
+                    <h3 class="mt-2 {{saleBill.remarks? 'block' : 'hidden'}}" for="remarks">Remarks:</h3>
+                    <p class="uppercase border border-neutral-900 px-1 py-0.5 rounded-sm mt-1 text-center {{saleBill.remarks? 'block' : 'hidden'}}">
                         {{saleBill.remarks}}
                     </p>
 
@@ -283,7 +283,7 @@
             <div *ngIf="!updatingOrder"
                 class="bg-white self-start flex-1 h-auto mx-auto p-4 rounded-lg shadow-xl text-neutral-900 mt-4">
                 <form class="flex flex-col" (ngSubmit)="onSubmitBill()">
-                    <label for="saleBill.customer_name">Customer Name:</label>
+                    <label for="saleBill.customer_name">Customer:</label>
                     <input class="text-center uppercase border border-neutral-900 px-1 py-0.5 rounded-sm mt-1"
                         type="text" name="saleBill.customer_name" id="saleBill.customer_name"
                         [(ngModel)]="saleBill.customer_name">

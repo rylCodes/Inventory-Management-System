@@ -3,8 +3,9 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { catchError, first } from 'rxjs/operators';
 import { Router } from '@angular/router';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { UiService } from 'src/app/services/ui/ui.service';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-login',
@@ -13,7 +14,7 @@ import { UiService } from 'src/app/services/ui/ui.service';
 })
 export class LoginComponent implements OnInit {
   loginForm!: FormGroup;
-  error: string | null = null;
+  errorMessage: string | null = null;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -36,25 +37,18 @@ export class LoginComponent implements OnInit {
     }
 
     this.authService.login(this.loginForm.getRawValue())
-      .pipe(
-        catchError(() => {
-          return of(null);
-        }),
-        first(),
-      )
-      .subscribe(
-        async (data) => {
-        if (data) {
+      .subscribe({
+        next: async () => {
+          console.log(this.authService.getToken());
           this.router.navigate(['']);
           await this.uiService.wait(100);
           window.alert("You've successfully logged in!");
-        }
-        else {
+              },
+        error: (err) => {
+          console.error(err);
           this.router.navigate(['login']);
-          window.alert("Invalid username or password!");
           this.loginForm.reset();
-        }
-      });
-      
+        },
+    });
   }
 }

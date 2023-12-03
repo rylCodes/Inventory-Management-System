@@ -1,7 +1,7 @@
 import { Component, HostListener } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth/auth.service';
-import { faRightFromBracket, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { faRightFromBracket, faXmark, faUserCircle } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-header',
@@ -9,13 +9,6 @@ import { faRightFromBracket, faXmark } from '@fortawesome/free-solid-svg-icons';
   styleUrls: ['./header.component.css']
 })
 export class HeaderComponent {
-  title = 'RylCodes-IMS';
-  logOutIcon = faRightFromBracket;
-  faXmark = faXmark;
-  showLogOutActionModal: boolean = false;
-
-  constructor(private authService: AuthService, private router: Router) {}
-
   @HostListener('document:keyup.escape', ['$event'])
   onKeyUp(event: KeyboardEvent) {
     if (event.key === 'Escape') {
@@ -25,12 +18,41 @@ export class HeaderComponent {
     }
   }
 
+  @HostListener('document:click', ['$event'])
+  onClick(event: MouseEvent) {
+    if(!(event.target as HTMLElement).closest('.user-icon')) {
+      this.showUserDetails = false;
+    }
+  }
+
+  title = 'RylCodes-IMS';
+
+  logOutIcon = faRightFromBracket;
+  faXmark = faXmark;
+  faUserCircle = faUserCircle;
+
+  showLogOutActionModal: boolean = false;
+  showUserDetails: boolean = false;
+
+  user: string | null = null;
+
+  constructor(private authService: AuthService, private router: Router) {}
+
   logOut() {
-    this.authService.logout();
+    this.authService.clearToken();
     this.router.navigate(["login"]);
   }
 
   toggleLogOutActionModal() {
     this.showLogOutActionModal = !this.showLogOutActionModal;
+  }
+
+  toggleUserDetails() {
+    this.showUserDetails = !this.showUserDetails;
+  }
+
+  getUser(): string | null {
+    this.user = this.authService.getUserName();
+    return this.user;
   }
 }

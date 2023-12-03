@@ -52,6 +52,7 @@ export class PurchasesComponent implements OnInit {
     time: undefined,
     supplier_id: undefined,
     grand_total: undefined,
+    remarks: "",
   };
 
   item: PurchaseItem = {
@@ -81,6 +82,7 @@ export class PurchasesComponent implements OnInit {
       time: undefined,
       supplier_id: undefined,
       grand_total: undefined,
+      remarks: "",
     };
   }
 
@@ -189,19 +191,17 @@ export class PurchasesComponent implements OnInit {
 
   // SHOW BILLS
   ngOnInit(): void {
+    this.loadSuppliers();
+    this.loadAllItems();
     this.loadBills();
     this.loadFilteredItems();
-    this.loadAllItems();
-    this.loadSuppliers();
     this.loadStocks();
   }  
 
   loadBills() {
     this.purchaseService
       .getPurchaseBills()
-      .subscribe(bills => {
-        this.bills = bills;
-      });
+      .subscribe(bills => this.bills = bills);
   }
 
   loadFilteredItems() {

@@ -12,7 +12,7 @@ class Stock(models.Model):
     code = models.CharField(max_length=100, unique=True, blank=True)
     stock_name = models.CharField(max_length=100, unique=True)
     description = models.TextField(blank=True, null=True)
-    quantity = models.FloatField(validators=[MinValueValidator(0)], default=0)
+    quantity = models.FloatField(default=0)
     unit = models.CharField(max_length=200)
     date_added = models.DateTimeField(default=timezone.now)
     date_updated = models.DateTimeField(auto_now=True)
@@ -21,10 +21,13 @@ class Stock(models.Model):
     def __str__(self):
         return self.stock_name
     
+    class Meta:
+        ordering = ['-date_updated']
+    
 @receiver(post_save, sender=Stock)
 def update_stock_code(sender, instance, created, **kwargs):
     if created and not instance.code:
-        instance.code = f'STO-0{year_last_digits()}-{get_padded_pk(instance, 4)}'
+        instance.code = f'ITM-0{year_last_digits()}-{get_padded_pk(instance, 4)}'
         instance.save()
 
 # MENU
@@ -41,6 +44,9 @@ class Menu(models.Model):
     def __str__(self):
         return self.name
     
+    class Meta:
+        ordering = ['-date_updated']
+    
 @receiver(post_save, sender=Menu)
 def update_stock_code(sender, instance, created, **kwargs):
     if created and not instance.code:
@@ -56,6 +62,9 @@ class Product(models.Model):
 
     def __str__(self):
         return self.stock_id.stock_name
+    
+    class Meta:
+        ordering = ['-date_added']
 
 # SUPPLIER
 class Supplier(models.Model):
@@ -71,10 +80,13 @@ class Supplier(models.Model):
     def __str__(self):
         return self.name
     
+    class Meta:
+        ordering = ['-date_updated']
+    
 @receiver(post_save, sender=Supplier)
 def update_supplier_code(sender, instance, created, **kwargs):
     if created and not instance.code:
-        instance.code = f'SUP-0{year_last_digits()}-{get_padded_pk(instance, 4)}'
+        instance.code = f'SPL-0{year_last_digits()}-{get_padded_pk(instance, 4)}'
         instance.save()
 
 # PURCHASE BILL
@@ -83,9 +95,13 @@ class PurchaseBill(models.Model):
     time = models.DateTimeField(default=timezone.now)
     supplier_id = models.ForeignKey(Supplier, on_delete=models.CASCADE, related_name="bills")
     grand_total = models.FloatField(validators=[MinValueValidator(0)], default=0)
+    remarks = models.CharField(max_length=200, blank=True, null=True)
 
     def __str__(self):
         return "Bill no: " + self.billno
+    
+    class Meta:
+        ordering = ['-time']
 
 # PURCHASE ITEM
 class PurchaseItem(models.Model):
@@ -99,6 +115,8 @@ class PurchaseItem(models.Model):
     def __str__(self):
         return f"Bill no: {self.purchaseBill_id.billno}, Item = {self.stock_id.stock_name}"
 
+    class Meta:
+        ordering = ['-purchase_date']
 
 # SALES BILL
 class SalesBill(models.Model):
@@ -113,10 +131,13 @@ class SalesBill(models.Model):
     def __str__(self):
         return "Bill no: " + self.billno
     
+    class Meta:
+        ordering = ['-time']
+    
 @receiver(post_save, sender=SalesBill)
 def update_billno(sender, instance, created, **kwargs):
     if created and not instance.billno:
-        instance.billno = f'SBI-0{year_last_digits()}-{get_padded_pk(instance, 4)}'
+        instance.billno = f'TRN-0{year_last_digits()}-{get_padded_pk(instance, 4)}'
         instance.save()
 
 # SALES ITEM
@@ -130,3 +151,6 @@ class SalesItem(models.Model):
     
     def __str__(self):
         return f"{self.quantity} of {self.menu.name} on {self.sale_date}"
+    
+    class Meta:
+        ordering = ['-sale_date']

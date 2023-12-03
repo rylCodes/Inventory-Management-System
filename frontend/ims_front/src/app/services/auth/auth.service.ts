@@ -17,27 +17,48 @@ export class AuthService {
 
   constructor(private http: HttpClient) { }
 
+  handleLoginError(error: any): void {
+    if (error.error.error === "Invalid username or password!") {
+      console.log("Error here →", error.error.error);
+      window.alert(error.error.error);
+    } else {
+      console.log("Error here →", error.statusText);
+      window.alert(`${error.statusText}! Please try again later.`);
+    }
+  }
+
   login(form: {username: string, password: string}) {
     return this.http.post<any>(this.apiUrl + 'accounts/auth/', form, httpOptions).pipe(
-      catchError((error: HttpErrorResponse) => {
-        if (error.status === 400) {
-           console.log("Invalid username or password!");
-        } else {
-         console.log("An expected error occured!");
+      catchError((error) => {
+        if (error) {
+          this.handleLoginError(error);
         }
         return throwError(() => {error})}),
       map((user) => {
         if (user && user.token) {
-          sessionStorage.setItem("authToken", JSON.stringify(user.token));
-          console.log("Login successfull!");
+          // const token = JSON.stringify(user.token);
+          this.setToken(user.token);
+          sessionStorage.setItem("user", user.username);
         }
         return user;
       })
     );
   }
 
-  logout() {
+  getToken(): string | null {
+    return sessionStorage.getItem("authToken");
+  }
+
+  getUserName(): string | null {
+    return sessionStorage.getItem('user');
+  }
+
+  clearToken(): void {
     sessionStorage.removeItem("authToken");
+  }
+
+  setToken(token: string): void {
+    sessionStorage.setItem("authToken", token);
   }
 
   isAuthenticated() {

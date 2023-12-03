@@ -296,7 +296,7 @@ export class PosComponent implements OnInit {
         })
         this.resetBillForm();
         await this.uiService.wait(100);
-        if (!bill.grand_total || bill.grand_total > 1) {
+        if (!bill.grand_total || bill.grand_total < 1) {
           window.alert("Warning: You have saved a transaction without a total bill amount. Make sure it is correct.");
         }
         window.alert("New transaction has been added successfully!");
@@ -543,4 +543,11 @@ export class PosComponent implements OnInit {
       }
     });
   }
+
+  printReceipt(): void {
+    window.print();
+  }
+
+
+  /* This class end here.*/
 }

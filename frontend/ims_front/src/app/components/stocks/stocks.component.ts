@@ -4,6 +4,7 @@ import { StocksService } from 'src/app/services/stocks/stocks';
 import { UiService } from 'src/app/services/ui/ui.service';
 import { Subscription } from 'rxjs';
 import { faPen, faTrashCan, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-stocks',
@@ -79,11 +80,14 @@ export class StocksComponent implements OnInit {
 
   // SHOW STOCKS
   ngOnInit(): void {
+    this.loadStocks();
+  }
+
+  loadStocks(): void {
     this.stockService
       .getStocks()
       .subscribe((stocks) => {
         this.stocks = stocks;
-        console.log(this.stocks)
       });
   }
 
@@ -179,6 +183,7 @@ export class StocksComponent implements OnInit {
         .subscribe(async (stockData) => {
           const index = this.stocks.findIndex(stock => stock.id === stockData.id);
           this.stocks[index] = stockData;
+          this.loadStocks();
           this.toggleForm();
           await this.uiService.wait(100);
           window.alert("Successfully saved changes to the stock.");
@@ -199,12 +204,23 @@ export class StocksComponent implements OnInit {
 
     this.stockService
       .deleteStock(this.deletingStock)
-      .subscribe(async () => {
-        this.stocks = this.stocks.filter(s => s.id !== this.deletingStock?.id);
-        this.deletingStock = null;
-        this.toggleActionModal()
-        await this.uiService.wait(100);
-        window.alert("Stock has been deleted successfully!");
+      .subscribe({
+        next: async () => {
+          this.stocks = this.stocks.filter(s => s.id !== this.deletingStock?.id);
+          this.deletingStock = null;
+          this.toggleActionModal()
+          await this.uiService.wait(100);
+          window.alert("Stock has been deleted successfully!");
+        },
+        error: (err) => {
+          if (err) {
+            console.log('Error here →', err.error);
+            window.alert(err.error.detail);
+            this.toggleActionModal();
+          }
+        }
       });
   }
+  
+
 }

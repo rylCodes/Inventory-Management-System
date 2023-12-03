@@ -23,6 +23,7 @@ class StockList(generics.ListCreateAPIView):
 class StockDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Stock.objects.all()
     serializer_class = StockSerializer
+    permission_classes = [IsAdminUser]
 
 # Menus views
 class MenuList(generics.ListCreateAPIView):
@@ -32,6 +33,7 @@ class MenuList(generics.ListCreateAPIView):
 class MenuDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Menu.objects.all()
     serializer_class = MenuSerializer
+    permission_classes = [IsAdminUser]
 
 # Products views
 class ProductList(generics.ListCreateAPIView):
@@ -41,6 +43,7 @@ class ProductList(generics.ListCreateAPIView):
 class ProductDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    permission_classes = [IsAdminUser]
 
 # Supplier Views
 class SupplierList(generics.ListCreateAPIView):
@@ -50,6 +53,7 @@ class SupplierList(generics.ListCreateAPIView):
 class SupplierDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Supplier.objects.all()
     serializer_class = SupplierSerializer
+    permission_classes = [IsAdminUser]
 
 # Purchase Bill views
 class PurchaseBillList(generics.ListCreateAPIView):
@@ -59,6 +63,7 @@ class PurchaseBillList(generics.ListCreateAPIView):
 class PurchaseBillDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = PurchaseBill.objects.all()
     serializer_class = PurchaseBillSerializer
+    permission_classes = [IsAdminUser]
 
 # Purchase Item views
 class PurchaseItemList(generics.ListCreateAPIView):
@@ -68,6 +73,7 @@ class PurchaseItemList(generics.ListCreateAPIView):
 class PurchaseItemDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = PurchaseItem.objects.all()
     serializer_class = PurchaseItemSerializer
+    permission_classes = [IsAdminUser]
 
 # Sale views
 class SalesBillList(generics.ListCreateAPIView):
@@ -77,6 +83,7 @@ class SalesBillList(generics.ListCreateAPIView):
 class SalesBillDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = SalesBill.objects.all()
     serializer_class = SalesBillSerializer
+    permission_classes = [IsAdminUser]
 
 # Sales Item views
 class SalesItemList(generics.ListCreateAPIView):
@@ -86,3 +93,4 @@ class SalesItemList(generics.ListCreateAPIView):
 class SalesItemDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = SalesItem.objects.all()
     serializer_class = SalesItemSerializer
+    permission_classes = [IsAdminUser]

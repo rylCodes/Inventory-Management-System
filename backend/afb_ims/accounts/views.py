@@ -12,7 +12,7 @@ class CustomAuthToken(ObtainAuthToken):
             serializer.is_valid(raise_exception=True)
         except Exception as e:
             # Handle the exception here, e.g., for invalid login credentials
-            return Response({'error': 'Invalid username or password.'}, status=400)
+            return Response({'error': 'Invalid username or password!'}, status=400)
 
         user = serializer.validated_data['user']
         token, created = Token.objects.get_or_create(user=user)
@@ -22,5 +22,5 @@ class CustomAuthToken(ObtainAuthToken):
             'username': user.username,
             'first_name': user.first_name,
             'last_name': user.last_name,
-            'email': user.email
+            'email': user.email,
         })

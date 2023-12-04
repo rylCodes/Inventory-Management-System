@@ -15,6 +15,7 @@ export class StocksComponent implements OnInit {
   searchQuery: string = "product";
   deletingStock?: Stock | null = null;
   proceedEdit: boolean = false;
+  isLoading: boolean = false;
 
   faXmark = faXmark;
   faPen = faPen;
@@ -84,10 +85,18 @@ export class StocksComponent implements OnInit {
   }
 
   loadStocks(): void {
+    this.isLoading = true;
     this.stockService
       .getStocks()
-      .subscribe((stocks) => {
-        this.stocks = stocks;
+      .subscribe({
+        next: (stocks) => {
+          this.isLoading = false;
+          this.stocks = stocks;
+        },
+        error: (err) => {
+          this.isLoading = false;
+          console.log(err);
+        }
       });
   }
 
@@ -130,9 +139,11 @@ export class StocksComponent implements OnInit {
     if (isStockNameExist) {
       window.alert("Stock with this name already exists!");
     } else {
+      this.isLoading = true;
       this.stockService.addStock(newStock)
       .subscribe(async (stock) => {
         this.stocks.push(stock);
+        this.isLoading = false;
         this.toggleForm();
         await this.uiService.wait(100);
         window.alert("New stock has been created successfully!");

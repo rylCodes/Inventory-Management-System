@@ -27,6 +27,8 @@ import { SalesComponent } from './components/sales/sales.component';
 import { AuthService } from './services/auth/auth.service';
 import { AuthInterceptor } from './interceptor/auth.interceptor';
 import { NgxPrintModule } from 'ngx-print';
+import { AboutComponent } from './components/about/about.component';
+import { LoaderComponent } from './components/loader/loader.component';
 
 const appRoutes: Routes = [
   {path: 'login', component: LoginComponent},
@@ -37,6 +39,7 @@ const appRoutes: Routes = [
   {path: 'suppliers', component: SuppliersComponent, canActivate: [authGuard]},
   {path: 'purchases', component: PurchasesComponent, canActivate: [authGuard]},
   {path: 'sales', component: SalesComponent, canActivate: [authGuard]},
+  {path: 'about', component: AboutComponent, canActivate: [authGuard]},
 ]
 
 @NgModule({
@@ -56,6 +59,8 @@ const appRoutes: Routes = [
     SelectAllTextDirective,
     FocusOnShowDirective,
     SalesComponent,
+    AboutComponent,
+    LoaderComponent,
   ],
   imports: [
     BrowserModule,

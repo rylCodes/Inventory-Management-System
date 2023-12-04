@@ -13,34 +13,88 @@
     </div>
 </div>
 
-<header class="flex bg-neutral-800 h-20 px-4 w-full justify-between items-center">
-    <h2 class="text-neutral-300 text-3xl font-bold text-center px-6">{{ title }}</h2>
-    <nav class="flex px-8 space-x-6 text-neutral-300 xl:hidden">
-        <a routerLink="/">Home</a>
-        <a routerLink="/products">Products</a>
-        <a routerLink="/stocks">Stocks</a>
-        <a routerLink="/purchases">Purchases</a>
-        <a routerLink="/sales">Sales</a>
-        <a routerLink="/about">About</a>
-    </nav>
-    
-    <div class="relative flex flex-col">
-        <div class="flex flex-col items-center">
-            <fa-icon class="user-icon hover: cursor-pointer"
-             [ngStyle]="{color: 'rgb(212 212 212)', 'font-size': '30px'}"   
-             [icon]="faUserCircle"
-             (click)="toggleUserDetails()">
-            </fa-icon>
-            <p class="text-neutral-300 text-xs mt-0.5 font-semibold capitalize">{{getUser()}}</p>
+<header class="relative flex bg-neutral-850 h-16 w-full items-center px-2">
+    <div class="flex w-full items-center justify-between flex-1 xl:justify-end">
+        <!-- Hamburger Menu -->
+        <div class="justify-self-start xl:hidden hover:scale-105">
+            <fa-icon [ngClass]="{'border': !isHidden}" class="menu-icon text-neutral-300 text-lg cursor-pointer rounded-md py-2 px-3" [icon]="faBars" (click)="toggleNavigation()"></fa-icon>
         </div>
-
-        <div *ngIf="showUserDetails"
-             class="flex flex-col items-center space-y-2 rounded-md p-3 absolute top-full right-0 w-24 bg-neutral-100 shadow-lg z-10">
-            <button class="flex hover:font-semibold" (click)="toggleLogOutActionModal()">
-                <fa-icon [ngStyle]="{color: 'rgb(64 64 64)'}" [icon]="logOutIcon"></fa-icon>
-                <p class="text-neutral-900 ml-1 text-sm">Logout</p>
-                <hr>
-            </button>
+        
+        <!-- User Icon -->
+        <div class="relative flex px-2 flex-col justify-self-end">
+            <div class="relative hover:scale-105">
+                <fa-icon class="user-icon cursor-pointer"
+                    [ngStyle]="{color: 'rgb(212 212 212)', 'font-size': '24px'}"   
+                    [icon]="faUserCircle"
+                    (click)="toggleUserDetails()">
+                </fa-icon>
+                <fa-icon></fa-icon>
+            </div>
+    
+            <div *ngIf="showUserDetails"
+                 class="flex flex-col space-y-2 rounded-md p-3 absolute top-[125%] right-0 w-40 bg-neutral-100 shadow-lg z-20">
+                <!-- Current User -->
+                <div class="flex space-x-1">
+                    <fa-icon class="" [ngStyle]="{color: 'rgb(82 82 82)', 'font-size': '15px'}"   
+                        [icon]="faUserCircle">
+                    </fa-icon>
+                    <p class="capitalize font-semibold">{{getUser()}}</p>
+                </div>
+                <hr class="border-b border-neutral-300">
+                
+                <!-- Logout Button -->
+                <button class="flex hover:font-semibold mt-4" (click)="toggleLogOutActionModal()">
+                    <fa-icon [ngStyle]="{color: 'rgb(82 82 82)'}" [icon]="logOutIcon"></fa-icon>
+                    <p class="text-neutral-900 ml-1">Logout</p>
+                    <hr>
+                </button>
+            </div>
         </div>
     </div>
+
+    <!-- Navigation: Smaller Screens -->
+    <div class="bg-neutral-50 absolute top-full left-0 w-full h-auto text-neutral-900 xl:hidden transition-all duration-500 z-10" [ngClass]="{'-translate-y-[125%] opacity-0': isHidden, 'translate-y-0 opacity-100': !isHidden}">
+        <a class="flex items-center px-4 py-2 hover:bg-neutral-200 duration-500" routerLink="/"
+            routerLinkActive="bg-neutral-700 text-neutral-200 font-semibold hover:bg-neutral-700" [routerLinkActiveOptions]="{exact: true}">
+            <fa-icon class="scale-90" [icon]="faHouse"></fa-icon>
+            <p class="ml-3">Dashboard</p>
+        </a>
+
+        <a class="flex items-center px-4 py-2 hover:bg-neutral-200 duration-500" routerLink="/stocks"
+            routerLinkActive="bg-neutral-700 text-neutral-200 font-semibold hover:bg-neutral-700" [routerLinkActiveOptions]="{exact: true}">
+            <fa-icon class="scale-90" [icon]="faBoxesStacked"></fa-icon>
+            <p class="ml-3">Inventory</p>
+        </a>
+
+        <a class="flex items-center px-4 py-2 hover:bg-neutral-200 duration-500" routerLink="/products"
+            routerLinkActive="bg-neutral-700 text-neutral-200 font-semibold hover:bg-neutral-700" [routerLinkActiveOptions]="{exact: true}">
+            <fa-icon class="scale-90" [icon]="faList"></fa-icon>
+            <p class="ml-3">Menu</p>
+        </a>
+
+        <a class="flex items-center px-4 py-2 hover:bg-neutral-200 duration-500" routerLink="/pos"
+            routerLinkActive="bg-neutral-700 text-neutral-200 font-semibold hover:bg-neutral-700" [routerLinkActiveOptions]="{exact: true}">
+            <fa-icon class="scale-90" [icon]="faDesktop"></fa-icon>
+            <p class="ml-3">POS</p>
+        </a>
+
+        <a class="flex items-center px-4 py-2 hover:bg-neutral-200 duration-500" routerLink="/suppliers"
+            routerLinkActive="bg-neutral-700 text-neutral-200 font-semibold hover:bg-neutral-700" [routerLinkActiveOptions]="{exact: true}">
+            <fa-icon class="scale-90" [icon]="faHandshake"></fa-icon>
+            <p class="ml-3">Suppliers</p>
+        </a>
+
+        <a class="flex items-center px-4 py-2 hover:bg-neutral-200 duration-500" routerLink="/purchases"
+            routerLinkActive="bg-neutral-700 text-neutral-200 font-semibold hover:bg-neutral-700" [routerLinkActiveOptions]="{exact: true}">
+            <fa-icon class="scale-90" [icon]="faCreditCard"></fa-icon>
+            <p class="ml-3">Purchases</p>
+        </a>
+
+        <a class="flex items-center px-4 py-2 hover:bg-neutral-200 duration-500" routerLink="/sales"
+            routerLinkActive="bg-neutral-700 text-neutral-200 font-semibold hover:bg-neutral-700" [routerLinkActiveOptions]="{exact: true}">
+            <fa-icon class="scale-90" [icon]="faWallet"></fa-icon>
+            <p class="ml-3">Sales</p>
+        </a>
+    </div>
 </header>
+

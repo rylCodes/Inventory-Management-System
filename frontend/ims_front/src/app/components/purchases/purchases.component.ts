@@ -344,7 +344,7 @@ export class PurchasesComponent implements OnInit {
         this.toggleFormContainer();
 
         await this.uiService.wait(100);
-        if (!bill.grand_total || bill.grand_total > 1) {
+        if (!bill.grand_total || bill.grand_total < 1) {
           window.alert("Warning: You have saved a purchase without a total amount. Make sure it is correct.");
         }
         window.alert("Success: New purchase has been added.");

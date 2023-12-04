@@ -85,17 +85,15 @@ export class StocksComponent implements OnInit {
   }
 
   loadStocks(): void {
-    this.isLoading = true;
     this.stockService
       .getStocks()
       .subscribe({
         next: (stocks) => {
-          this.isLoading = false;
           this.stocks = stocks;
         },
         error: (err) => {
-          this.isLoading = false;
           console.log(err);
+          this.uiService.handleError(err);
         }
       });
   }
@@ -141,12 +139,18 @@ export class StocksComponent implements OnInit {
     } else {
       this.isLoading = true;
       this.stockService.addStock(newStock)
-      .subscribe(async (stock) => {
-        this.stocks.push(stock);
-        this.isLoading = false;
-        this.toggleForm();
-        await this.uiService.wait(100);
-        window.alert("New stock has been created successfully!");
+      .subscribe({
+        next: async (stock) => {
+          this.isLoading = false;
+          this.stocks.push(stock);
+          this.toggleForm();
+          await this.uiService.wait(100);
+          window.alert("New stock has been created successfully!");
+        },
+        error: (err) => {
+          this.isLoading = false;
+          this.uiService.handleError(err);
+        }
       });
     }
   }
@@ -191,13 +195,20 @@ export class StocksComponent implements OnInit {
     } else {
         this.stockService
         .editStock(editingStock)
-        .subscribe(async (stockData) => {
-          const index = this.stocks.findIndex(stock => stock.id === stockData.id);
-          this.stocks[index] = stockData;
-          this.loadStocks();
-          this.toggleForm();
-          await this.uiService.wait(100);
-          window.alert("Successfully saved changes to the stock.");
+        .subscribe({
+          next: async (stockData) => {
+            this.isLoading = false;
+            const index = this.stocks.findIndex(stock => stock.id === stockData.id);
+            this.stocks[index] = stockData;
+            this.loadStocks();
+            this.toggleForm();
+            await this.uiService.wait(100);
+            window.alert("Successfully saved changes to the stock.");
+          },
+          error: (err) => {
+            this.isLoading = false;
+            this.uiService.handleError(err);
+          }
         });
     }
   }
@@ -213,10 +224,12 @@ export class StocksComponent implements OnInit {
       return;
     }
 
+    this.isLoading = true;
     this.stockService
       .deleteStock(this.deletingStock)
       .subscribe({
         next: async () => {
+          this.isLoading = false
           this.stocks = this.stocks.filter(s => s.id !== this.deletingStock?.id);
           this.deletingStock = null;
           this.toggleActionModal()
@@ -225,8 +238,8 @@ export class StocksComponent implements OnInit {
         },
         error: (err) => {
           if (err) {
-            console.log('Error here →', err.error);
-            window.alert(err.error.detail);
+            this.isLoading = false;
+            this.uiService.handleError(err);
             this.toggleActionModal();
           }
         }

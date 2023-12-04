@@ -16,70 +16,94 @@ export class SalesService {
 
   constructor(private http: HttpClient) { }
   
-  handleSaleBillError(error:any) {
-    console.log('See error here:', error.error);
+  handleSaleError(err:any) {
+    console.log('Error here →:', err);
   }
 
   // SALE BILL
   addSaleBill(saleBill: SaleBill) {
     return this.http.post<SaleBill>(`${this.apiUrl}sales-bill/`, saleBill, httpOptions)
       .pipe(
-        catchError((error) => {
-          this.handleSaleBillError(error);
-          return throwError(() => 'Failed to add new product!');
+        catchError((err) => {
+          this.handleSaleError(err);
+          return throwError(() => `${err.statusText}: Failed to add new sale transaction!`);
         })
       );
   }
 
   getSaleBills(): Observable<SaleBill[]> {
-    return this.http.get<SaleBill[]>(`${this.apiUrl}sales-bill/`);
+    return this.http.get<SaleBill[]>(`${this.apiUrl}sales-bill/`)
+      .pipe(
+        catchError((err) => {
+          this.handleSaleError(err);
+          return throwError(() => `${err.statusText}: Failed to display sale transactions!`)
+        })
+      );
   }
 
   editSaleBill(saleBill: SaleBill) {
     const url = `${this.apiUrl}sales-bill/` + `${saleBill.id}/`;
     return this.http.put<SaleBill>(url, saleBill, httpOptions)
     .pipe(
-      catchError((error) => { 
-        this.handleSaleBillError(error);
-        return throwError(() => "Failed to edit product!");
+      catchError((err) => { 
+        this.handleSaleError(err);
+        return throwError(() => `${err.statusText}: Failed to update sale transaction!`);
       })
     );
   }
 
   deleteSaleBill(saleBill: SaleBill) {
     const url = `${this.apiUrl}sales-bill/` + `${saleBill.id}`;
-    return this.http.delete<SaleBill>(url);
+    return this.http.delete<SaleBill>(url)
+      .pipe(
+        catchError((err) => {
+          this.handleSaleError(err);
+          return throwError(() => `${err.statusText}: Failed to delete sale transaction!`)
+        })
+      );
   }
 
   // SALE ITEM
   addSaleItem(saleItem: SaleItem) {
     return this.http.post<SaleItem>(`${this.apiUrl}sales-item/`, saleItem, httpOptions)
       .pipe(
-        catchError((error) => {
-          console.log("Error here:", error.error);
-          return throwError(() => 'Failed to add new saleItem!');
+        catchError((err) => {
+          this.handleSaleError(err);
+          return throwError(() => `${err.statusText}: Failed to add new sale item!`);
         })
       );
   }
 
   getSaleItems(): Observable<SaleItem[]> {
-    return this.http.get<SaleItem[]>(`${this.apiUrl}sales-item/`);
+    return this.http.get<SaleItem[]>(`${this.apiUrl}sales-item/`)
+      .pipe(
+        catchError((err) => {
+          this.handleSaleError(err);
+          return throwError(() => `${err.statusText}: Failed to display sale items!`)
+        })
+      );
   }
 
   editSaleItem(saleItem: SaleItem) {
     const url = `${this.apiUrl}sales-item/` + `${saleItem.id}/`;
     return this.http.put<SaleItem>(url, saleItem, httpOptions)
     .pipe(
-      catchError((error) => {
-        console.log("Error here:", error.error);
-        return throwError(() => "Failed to edit saleItem!");
+      catchError((err) => {
+        this.handleSaleError(err);
+        return throwError(() => `${err.statusText}: Failed to update sale item!`);
       })
     );
   }
 
   deleteSaleItem(saleItem: SaleItem) {
     const url = `${this.apiUrl}sales-item/` + `${saleItem.id}`;
-    return this.http.delete<SaleItem>(url);
+    return this.http.delete<SaleItem>(url)
+      .pipe(
+        catchError((err) => {
+          this.handleSaleError(err);
+          return throwError(() => `${err.statusText}: Failed to delete sale item!`)
+        })
+      );
   }
 
 }

@@ -8,19 +8,6 @@
     </div>
     <hr class="border-b-1 border-neutral-900 mt-4">
 
-    <!-- Confirm to Delete Stock Modal -->
-    <div *ngIf="showActionModal" class="flex justify-center top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] fixed">
-        <div class="relative flex flex-col items-center bg-white rounded-lg w-96 h-fit p-4 mt-32">
-            <fa-icon class="place-self-end scale-125 hover:scale-110" [icon]="faXmark"
-                [ngStyle]="{color: 'rgb(64 64 64 )'}" (click)="toggleActionModal()">
-            </fa-icon>
-            <p class="mb-8 mt-6 text-center">Are you sure you want to delete this stock?<br>This action cannot be
-                undone.</p>
-            <app-button (btnClick)="onConfirmDelete()" bgColor="red" txtColor="bg-white"
-                txtContent="Delete"></app-button>
-        </div>
-    </div>
-
     <!-- FORM -->
     <div *ngIf="showForm"
         class="bg-[#fff] max-w-xl h-auto mx-auto px-8 py-10 rounded-lg shadow-xl text-neutral-900 mt-4">
@@ -104,10 +91,25 @@
                         </fa-icon>
                     </td>
                 </tr>
-                <div *ngIf="isLoading" class="flex w-full h-full top-0 left-0 bg-[rgba(0,0,0,0.5)] absolute">
-                    <app-loader class="m-auto"></app-loader>
-                </div>
             </tbody>
         </table>
+    </div>
+
+    <!-- Confirm to Delete Stock Modal -->
+    <div *ngIf="showActionModal" class="flex justify-center top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] fixed">
+        <div class="relative flex flex-col items-center bg-white rounded-lg w-96 h-fit p-4 mt-32">
+            <fa-icon class="place-self-end scale-125 hover:scale-110" [icon]="faXmark"
+                [ngStyle]="{color: 'rgb(64 64 64 )'}" (click)="toggleActionModal()">
+            </fa-icon>
+            <p class="mb-8 mt-6 text-center">Are you sure you want to delete this stock?<br>This action cannot be
+                undone.</p>
+            <app-button (btnClick)="onConfirmDelete()" bgColor="red" txtColor="bg-white"
+                txtContent="Delete"></app-button>
+        </div>
+    </div>
+
+    <!-- CSS Loader -->
+    <div *ngIf="isLoading" class="top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.3)] fixed">
+        <app-loader></app-loader>
     </div>
 </div>

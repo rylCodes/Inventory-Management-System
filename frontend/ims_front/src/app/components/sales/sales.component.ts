@@ -124,24 +124,39 @@ export class SalesComponent implements OnInit {
   loadBills() {
     this.salesService
       .getSaleBills()
-      .subscribe(bills => {
-        this.bills = bills.filter(bill => bill.status)
+      .subscribe({
+        next: bills => {
+          this.bills = bills.filter(bill => bill.status)
+        },
+        error: (error) => {
+          this.uiService.handleError(error);
+        }
       });
   }
 
   loadEachBillItems() {
     this.salesService
       .getSaleItems()
-      .subscribe((items) => {
-        this.eachBillItems = items.filter(item => item.billno === this.bill.id);
+      .subscribe({
+        next: (items) => {
+          this.eachBillItems = items.filter(item => item.billno === this.bill.id);
+        },
+        error: (error) => {
+          this.uiService.handleError(error);
+        }
       });
   }
 
   loadAllItems() {
     this.salesService
       .getSaleItems()
-      .subscribe((items) => {
-        this.allItems = items;
+      .subscribe({
+        next: (items) => {
+          this.allItems = items;
+        },
+        error: (error) => {
+          this.uiService.handleError(error);
+        }
       });
   }
 

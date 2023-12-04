@@ -19,19 +19,15 @@
     constructor(private http: HttpClient) { }
 
     handleStockError(error:any) {
-      if (error.error.name) {
-        console.log(error.error.name[0]);
-      } else {
-        console.log('Error here →', error.error);
-      }
+      console.log('Error here →', error);
     }
 
     addStock(stock: Stock) {
       return this.http.post<Stock>(this.apiUrl, stock, httpOptions)
         .pipe(
-          catchError((error) => {
-            this.handleStockError(error);
-            return throwError(() => 'Failed to add new stock!');
+          catchError((err) => {
+            this.handleStockError(err);
+            return throwError(() => `${err.statusText}: Failed to add new stock!`);
           })
         );
     }
@@ -41,23 +37,35 @@
       if (this.searchQuery) {
         params = params.set('search', this.searchQuery)
       }
-      return this.http.get<Stock[]>(this.apiUrl, { params: params});
+      return this.http.get<Stock[]>(this.apiUrl, { params: params})
+        .pipe(
+          catchError((err) => {
+            this.handleStockError(err);
+            return throwError(() => `${err.statusText}: Failed to display stocks!`);
+          })
+        );
     }
 
     editStock(stock: Stock) {
       const url = this.apiUrl + `${stock.id}/`;
       return this.http.put<Stock>(url, stock, httpOptions)
       .pipe(
-        catchError((error) => {
-          this.handleStockError(error);
-          return throwError(() => "Failed to edit stock!");
+        catchError((err) => {
+          this.handleStockError(err);
+          return throwError(() => `${err.statusText}: Failed to update stock!`);
         })
       );
     }
 
     deleteStock(stock: Stock) {
       const url = this.apiUrl + `${stock.id}`;
-      return this.http.delete<Stock>(url);
+      return this.http.delete<Stock>(url)
+        .pipe(
+          catchError((err) => {
+            this.handleStockError(err);
+            return throwError(() => `${err.statusText}: Failed to delete stock!`);
+          })
+        );
     }
 
   }

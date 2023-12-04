@@ -19,6 +19,8 @@ export class PosComponent implements OnInit {
   deletingSaleBill?: SaleBill | null = null;
   deletingSaleItem?: SaleItem | null = null;
 
+  isLoading = false;
+
   proceedEditBill: boolean = false;
   proceedEditItem: boolean = false;
   proceedPayment: boolean = false;
@@ -193,18 +195,26 @@ export class PosComponent implements OnInit {
   }  
 
   loadBills() {
+    this.isLoading = true;
     this.salesService
       .getSaleBills()
-      .subscribe(salesBills => {
-        this.activeBills = salesBills.filter(item => !item.status);
-        this.allBills = salesBills;
+      .subscribe({
+        next: (salesBills) => {
+          this.activeBills = salesBills.filter(item => !item.status);
+          this.allBills = salesBills;
+        },
+        error: (err) => {
+          window.alert(err);
+        }
       });
   }
 
   loadItems() {
+    this.isLoading = true;
     this.salesService
       .getSaleItems()
       .subscribe((saleItems) => {
+        this.isLoading = false;
         if (this.updatingOrder) {
           this.saleItems = saleItems.filter(item => item.billno === this.saleBill.id);
           this.saleBill.grand_total = this.calculateGrandtotal(this.saleItems);
@@ -218,9 +228,16 @@ export class PosComponent implements OnInit {
   loadMenus() {
     this.productService
       .getMenus()
-      .subscribe(menus => {
-        const activeMenus = menus.filter(menu => menu.status === true);
-        this.menus = activeMenus;
+      .subscribe({
+        next: menus => {
+          const activeMenus = menus.filter(menu => menu.status === true);
+          this.menus = activeMenus;
+        },
+        error: (err) => {
+          this.isLoading = false;
+          console.log(err);
+          window.alert(`${err.statusText}! Please try again later.`)
+        }
       })
   }
 
@@ -281,25 +298,31 @@ export class PosComponent implements OnInit {
     }
 
     this.salesService.addSaleBill(newBill)
-      .subscribe(async (bill) => {
-        this.activeBills.push(bill);
-        
-        this.saleItems.map(item => {
-          if (!item.billno) {
-            item.billno = bill.id;
-          }
-          this.salesService.editSaleItem(item).subscribe(item => {
-            const index = this.saleItems.findIndex(i => i.id === item.id);
-            this.saleItems[index] = item;
-            this.loadItems();
+      .subscribe({
+        next: async (bill) => {
+          this.activeBills.push(bill);
+          
+          this.saleItems.map(item => {
+            if (!item.billno) {
+              item.billno = bill.id;
+            }
+            this.salesService.editSaleItem(item).subscribe(item => {
+              const index = this.saleItems.findIndex(i => i.id === item.id);
+              this.saleItems[index] = item;
+              this.loadItems();
+            })
           })
-        })
-        this.resetBillForm();
-        await this.uiService.wait(100);
-        if (!bill.grand_total || bill.grand_total < 1) {
-          window.alert("Warning: You have saved a transaction without a total bill amount. Make sure it is correct.");
+          this.resetBillForm();
+          await this.uiService.wait(100);
+          if (!bill.grand_total || bill.grand_total < 1) {
+            window.alert("Warning: You have saved a transaction without a total bill amount. Make sure it is correct.");
+          }
+          window.alert("New transaction has been added successfully!");
+        },
+        error: (err) => {
+          console.log(err);
+          window.alert(`${err.statusText}! Please try again later.`);
         }
-        window.alert("New transaction has been added successfully!");
       });
   }
 

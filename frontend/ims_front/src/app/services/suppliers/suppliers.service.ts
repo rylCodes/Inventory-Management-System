@@ -19,18 +19,15 @@ export class SuppliersService {
   searchQuery: string | null = null;
 
   handleSupplierError(error:any) {
-    if (error.error) {
-      console.log('Error here →', error.error);
-      window.alert("Unexpected error occur! Refresh the page and try again.")
-    }
+    console.log('Error here →', error);
   }
 
   addSupplier(supplier: Supplier) {
     return this.http.post<Supplier>(this.apiUrl, supplier, httpOptions)
       .pipe(
-        catchError((error) => {
-          this.handleSupplierError(error);
-          return throwError(() => 'Failed to add new supplier!');
+        catchError((err) => {
+          this.handleSupplierError(err);
+          return throwError(() => `${err.statusText}: Failed to add new supplier!`);
         })
       );
   }
@@ -40,22 +37,34 @@ export class SuppliersService {
     if (this.searchQuery) {
       params = params.set('search', this.searchQuery)
     }
-    return this.http.get<Supplier[]>(this.apiUrl, { params: params});
+    return this.http.get<Supplier[]>(this.apiUrl, { params: params})
+      .pipe(
+        catchError((err) => {
+          this.handleSupplierError(err);
+          return throwError(() => `${err.statusText}: Failed to display suppliers!`)
+        })
+      );
   }
 
   editSupplier(supplier: Supplier) {
     const url = this.apiUrl + `${supplier.id}/`;
     return this.http.put<Supplier>(url, supplier, httpOptions)
     .pipe(
-      catchError((error) => {
-        this.handleSupplierError(error);
-        return throwError(() => "Failed to edit supplier!");
+      catchError((err) => {
+        this.handleSupplierError(err);
+        return throwError(() => `${err.statusText}: Failed to update supplier!`);
       })
     );
   }
 
   deleteSupplier(supplier: Supplier) {
     const url = this.apiUrl + `${supplier.id}`;
-    return this.http.delete<Supplier>(url);
+    return this.http.delete<Supplier>(url)
+      .pipe(
+        catchError((err) => {
+          this.handleSupplierError(err);
+          return throwError(() => `${err.statusText}: Failed to delete supplier!`)
+        })
+      );
   }
 }

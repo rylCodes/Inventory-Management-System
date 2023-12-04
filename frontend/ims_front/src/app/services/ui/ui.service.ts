@@ -48,4 +48,9 @@ export class UiService {
       })
     }
   }
+
+  handleError(err: any): void {
+    console.log("Error here →", err);
+    window.alert(err);
+  } 
 }

@@ -16,6 +16,7 @@ import { DecimalPipe } from '@angular/common';
 export class ProductsComponent implements OnInit {
   deletingMenu?: Menu | null = null;
   deletingProduct?: Product | null = null;
+  isLoading: boolean = false;
 
   proceedEditMenu: boolean = false;
   proceedEditProduct: boolean = false;
@@ -171,19 +172,25 @@ export class ProductsComponent implements OnInit {
   loadMenus() {
     this.productService
       .getMenus()
-      .subscribe(menus => {
-        this.menus = menus;
+      .subscribe({
+        next: menus => this.menus = menus,
+        error: err => this.uiService.handleError(err),
       });
   }
 
   loadProducts() {
     this.productService
       .getProducts()
-      .subscribe((products) => {
-        if (this.updatingMenuItems) {
-          this.products = products.filter(product => product.menu === this.menu.id);
-        } else {
-          this.products = products.filter(product => product.menu === null);
+      .subscribe({
+        next: (products) => {
+          if (this.updatingMenuItems) {
+            this.products = products.filter(product => product.menu === this.menu.id);
+          } else {
+            this.products = products.filter(product => product.menu === null);
+          }
+        },
+        error: (err) => {
+          this.uiService.handleError(err);
         }
       });
   }
@@ -238,26 +245,34 @@ export class ProductsComponent implements OnInit {
       window.alert("Failed: Please add at least one item to the product.");
       return;
     } else {
+      this.isLoading = true;
       this.productService.addMenu(newMenu)
-      .subscribe(async (menu) => {
-        this.menus.push(menu);
-        
-        const lastMenuId = this.menus.length - 1;
-        this.products.map(product => {
-          if (!product.menu) {
-            product.menu = this.menus[lastMenuId].id;
-          }
-          this.productService.updateProduct(product).subscribe(product => {
-            const index = this.products.findIndex(i => i.id === product.id);
-            this.products[index] = product;
-            this.loadProducts();
+      .subscribe({
+        next: async (menu) => {
+          this.isLoading = false;
+          this.menus.push(menu);
+          
+          const lastMenuId = this.menus.length - 1;
+          this.products.map(product => {
+            if (!product.menu) {
+              product.menu = this.menus[lastMenuId].id;
+            }
+            this.productService.updateProduct(product).subscribe(product => {
+              const index = this.products.findIndex(i => i.id === product.id);
+              this.products[index] = product;
+              this.loadProducts();
+            })
           })
-        })
-        this.resetMenuForm();
-        this.resetProductForm();
-        this.toggleFormContainer();
-        await this.uiService.wait(100);
-        window.alert("Success: New product has been added to the menu.");
+          this.resetMenuForm();
+          this.resetProductForm();
+          this.toggleFormContainer();
+          await this.uiService.wait(100);
+          window.alert("Success: New product has been added to the menu.");
+        },
+        error: (err) => {
+          this.isLoading = false;
+          this.uiService.handleError(err);
+        }
       });
     }
   }
@@ -278,12 +293,20 @@ export class ProductsComponent implements OnInit {
       ...this.product,
     }
 
+    this.isLoading = true;
     this.productService.addProduct(newProduct)
-      .subscribe(async (product) => {
-        this.products.push(product);
-        this.loadProducts();
-        this.resetProductForm();
-        await this.uiService.wait(100);
+      .subscribe({
+        next: async (product) => {
+          this.isLoading = false;
+          this.products.push(product);
+          this.loadProducts();
+          this.resetProductForm();
+          await this.uiService.wait(100);
+        },
+        error: (err) => {
+          this.isLoading = false;
+          this.uiService.handleError(err);
+        }
       });
   }
 
@@ -329,15 +352,23 @@ export class ProductsComponent implements OnInit {
       window.alert("Menu with this name already exists!");
       return;
     } else {
+      this.isLoading = true;
       this.productService
       .updateMenu(editingMenu)
-      .subscribe(async (menuData) => {
-        const index = this.menus.findIndex(menu => menu.id === menuData.id);
-        this.menus[index] = menuData;
-        this.toggleMenuForm();
-
-        await this.uiService.wait(100);
-        window.alert("Successfully saved changes to the menu details.");
+      .subscribe({
+        next: async (menuData) => {
+          this.isLoading = false;
+          const index = this.menus.findIndex(menu => menu.id === menuData.id);
+          this.menus[index] = menuData;
+          this.toggleMenuForm();
+  
+          await this.uiService.wait(100);
+          window.alert("Successfully saved changes to the menu details.");
+        },
+        error: (err) => {
+          this.isLoading = false;
+          this.uiService.handleError(err);
+        }
       });
     }
   }
@@ -353,14 +384,22 @@ export class ProductsComponent implements OnInit {
       return;
     }
 
+    this.isLoading = true;
     this.productService
       .deleteMenu(this.deletingMenu)
-      .subscribe(async () => {
-        this.menus = this.menus.filter(s => s.id !== this.deletingMenu?.id);
-        this.deletingMenu = null;
-        this.toggleMenuActionModal()
-        await this.uiService.wait(100);
-        window.alert("Menu has been deleted successfully!");
+      .subscribe({
+        next: async () => {
+          this.isLoading = false;
+          this.menus = this.menus.filter(s => s.id !== this.deletingMenu?.id);
+          this.deletingMenu = null;
+          this.toggleMenuActionModal()
+          await this.uiService.wait(100);
+          window.alert("Menu has been deleted successfully!");
+        },
+        error: (err) => {
+          this.isLoading = false;
+          this.uiService.handleError(err);
+        }
       });
   }
 
@@ -405,15 +444,23 @@ export class ProductsComponent implements OnInit {
       ...this.product
     }
 
+    this.isLoading = true;
     this.productService
       .updateProduct(editingProduct)
-      .subscribe(async (productData) => {
-        const index = this.products.findIndex(product => product.id === productData.id);
-
-        await this.uiService.wait(100);
-        window.alert("Successfully saved changes to the item.");
-
-        this.products[index] = productData;
+      .subscribe({
+        next: async (productData) => {
+          this.isLoading = false;
+          const index = this.products.findIndex(product => product.id === productData.id);
+  
+          await this.uiService.wait(100);
+          window.alert("Successfully saved changes to the item.");
+  
+          this.products[index] = productData;
+        },
+        error: (err) => {
+          this.isLoading = false;
+          this.uiService.handleError(err);
+        }
       });
   }
 
@@ -428,15 +475,23 @@ export class ProductsComponent implements OnInit {
       return;
     }
 
+    this.isLoading = true;
     this.productService
       .deleteProduct(this.deletingProduct)
-      .subscribe(async () => {
-        this.menus = this.menus.filter(s => s.id !== this.deletingProduct?.id);
-        this.deletingProduct = null;
-        this.toggleProductActionModal()
-        this.loadProducts();
-        await this.uiService.wait(100);
-        window.alert("Product has been deleted successfully!");
+      .subscribe({
+        next: async () => {
+          this.isLoading = false;
+          this.menus = this.menus.filter(s => s.id !== this.deletingProduct?.id);
+          this.deletingProduct = null;
+          this.toggleProductActionModal()
+          this.loadProducts();
+          await this.uiService.wait(100);
+          window.alert("Product has been deleted successfully!");
+        },
+        error: (err) => {
+          this.isLoading = false;
+          this.uiService.handleError(err);
+        }
       });
   }
 }

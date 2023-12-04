@@ -8,35 +8,6 @@
     </div>
     <hr class="border-b-1 border-neutral-900 mt-4">
 
-    <!-- PRODUCT MODAL: Confirm to Delete Product -->
-    <div *ngIf="showProductActionModal"
-        class="flex justify-center top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] fixed">
-        <div class="relative flex flex-col items-center bg-white rounded-lg w-96 h-fit p-4 mt-32">
-            <fa-icon class="place-self-end scale-125 hover:scale-110" [icon]="faXmark"
-                [ngStyle]="{color: 'rgb(64 64 64 )'}" (click)="toggleProductActionModal()">
-            </fa-icon>
-            <p class="mb-8 mt-6 text-center">Do you want to remove this item??<br>This action cannot be
-                undone.</p>
-            <app-button (btnClick)="onConfirmDeleteProduct()" bgColor="red" txtColor="bg-white"
-                txtContent="Delete"></app-button>
-        </div>
-    </div>
-
-    <!-- MENU MODAL: Confirm to Delete Menu -->
-    <div *ngIf="showMenuActionModal" class="flex justify-center top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] fixed">
-        <div class="relative flex flex-col items-center bg-white rounded-lg w-96 h-fit p-4 mt-32">
-            <fa-icon class="place-self-end scale-125 hover:scale-110" [icon]="faXmark"
-                [ngStyle]="{color: 'rgb(64 64 64 )'}" (click)="toggleMenuActionModal()">
-            </fa-icon>
-            <p class="mb-8 mt-6 text-center">
-                Do you want to remove this product from the menu?
-                <br>This action cannot be undone.
-            </p>
-            <app-button (btnClick)="onConfirmDeleteMenu()" bgColor="red" txtColor="bg-white"
-                txtContent="Delete"></app-button>
-        </div>
-    </div>
-
     <!-- MENU FORM: Edit -->
     <div *ngIf="showMenuForm" class="flex justify-center top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] fixed">
         <div class="relative flex flex-col items-center bg-white rounded-lg w-96 h-fit p-4 mt-32">
@@ -278,5 +249,39 @@
                 </tr>
             </tbody>
         </table>
+    </div>
+
+    <!-- PRODUCT MODAL: Confirm to Delete Product -->
+    <div *ngIf="showProductActionModal"
+        class="flex justify-center top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] fixed">
+        <div class="relative flex flex-col items-center bg-white rounded-lg w-96 h-fit p-4 mt-32">
+            <fa-icon class="place-self-end scale-125 hover:scale-110" [icon]="faXmark"
+                [ngStyle]="{color: 'rgb(64 64 64 )'}" (click)="toggleProductActionModal()">
+            </fa-icon>
+            <p class="mb-8 mt-6 text-center">Do you want to remove this item??<br>This action cannot be
+                undone.</p>
+            <app-button (btnClick)="onConfirmDeleteProduct()" bgColor="red" txtColor="bg-white"
+                txtContent="Delete"></app-button>
+        </div>
+    </div>
+
+    <!-- MENU MODAL: Confirm to Delete Menu -->
+    <div *ngIf="showMenuActionModal" class="flex justify-center top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] fixed">
+        <div class="relative flex flex-col items-center bg-white rounded-lg w-96 h-fit p-4 mt-32">
+            <fa-icon class="place-self-end scale-125 hover:scale-110" [icon]="faXmark"
+                [ngStyle]="{color: 'rgb(64 64 64 )'}" (click)="toggleMenuActionModal()">
+            </fa-icon>
+            <p class="mb-8 mt-6 text-center">
+                Do you want to remove this product from the menu?
+                <br>This action cannot be undone.
+            </p>
+            <app-button (btnClick)="onConfirmDeleteMenu()" bgColor="red" txtColor="bg-white"
+                txtContent="Delete"></app-button>
+        </div>
+    </div>
+
+    <!-- CSS Loader -->
+    <div *ngIf="isLoading" class="top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.3)] fixed">
+        <app-loader></app-loader>
     </div>
 </div>

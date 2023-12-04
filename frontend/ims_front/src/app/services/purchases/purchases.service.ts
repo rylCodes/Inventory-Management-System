@@ -17,70 +17,94 @@ export class PurchasesService {
 
   constructor(private http: HttpClient) { }
   
-  handlePurchaseBillError(error:any) {
-    console.log('See error here:', error.error);
+  handlePurchaseError(error:any) {
+    console.log('Error here →', error);
   }
 
   // SALE BILL
   addPurchaseBill(purchaseBill: PurchaseBill) {
     return this.http.post<PurchaseBill>(`${this.apiUrl}purchase-bill/`, purchaseBill, httpOptions)
       .pipe(
-        catchError((error) => {
-          this.handlePurchaseBillError(error);
-          return throwError(() => 'Failed to add new product!');
+        catchError((err) => {
+          this.handlePurchaseError(err);
+          return throwError(() => `${err.statusText}: Failed to add new purchase transaction!`);
         })
       );
   }
 
   getPurchaseBills(): Observable<PurchaseBill[]> {
-    return this.http.get<PurchaseBill[]>(`${this.apiUrl}purchase-bill/`);
+    return this.http.get<PurchaseBill[]>(`${this.apiUrl}purchase-bill/`)
+      .pipe(
+        catchError(err => {
+          this.handlePurchaseError(err);
+          return throwError(() => `${err.statusText}: Failed to display purchase transactions!`);
+        })
+      );
   }
 
   editPurchaseBill(purchaseBill: PurchaseBill) {
     const url = `${this.apiUrl}purchase-bill/` + `${purchaseBill.id}/`;
     return this.http.put<PurchaseBill>(url, purchaseBill, httpOptions)
     .pipe(
-      catchError((error) => { 
-        this.handlePurchaseBillError(error);
-        return throwError(() => "Failed to edit bill!");
+      catchError((err) => { 
+        this.handlePurchaseError(err);
+        return throwError(() => `${err.statusText}: Failed to update purchase transaction!`);
       })
     );
   }
 
   deletePurchaseBill(purchaseBill: PurchaseBill) {
     const url = `${this.apiUrl}purchase-bill/` + `${purchaseBill.id}`;
-    return this.http.delete<PurchaseBill>(url);
+    return this.http.delete<PurchaseBill>(url)
+    .pipe(
+      catchError((err) => {
+        this.handlePurchaseError(err);
+        return throwError(() => `${err.statusText}: Failed to delete purchase transaction!`)
+      })
+    );
   }
 
   // SALE ITEM
   addPurchaseItem(purchaseItem: PurchaseItem) {
     return this.http.post<PurchaseItem>(`${this.apiUrl}purchase-item/`, purchaseItem, httpOptions)
       .pipe(
-        catchError((error) => {
-          console.log("Error here:", error);
-          return throwError(() => 'Failed to add new saleItem!');
+        catchError((err) => {
+          this.handlePurchaseError(err);
+          return throwError(() => `${err.statusText}: Failed to add new purchase item!`);
         })
       );
   }
 
   getPurchaseItems(): Observable<PurchaseItem[]> {
-    return this.http.get<PurchaseItem[]>(`${this.apiUrl}purchase-item/`);
+    return this.http.get<PurchaseItem[]>(`${this.apiUrl}purchase-item/`)
+      .pipe(
+        catchError((err) => {
+          this.handlePurchaseError(err);
+          return throwError(() => `${err.statusText}: Failed to display purchase items!`)
+        })
+      );
   }
 
   editPurchaseItem(purchaseItem: PurchaseItem) {
     const url = `${this.apiUrl}purchase-item/` + `${purchaseItem.id}/`;
     return this.http.put<PurchaseItem>(url, purchaseItem, httpOptions)
     .pipe(
-      catchError((error) => {
-        console.log("Error here:", error)
-        return throwError(() => "Failed to edit item!");
+      catchError((err) => {
+        this.handlePurchaseError(err);
+        return throwError(() => `${err.statusText}: Failed to update purchase item!`);
       })
     );
   }
 
   deletePurchaseItem(purchaseItem: PurchaseItem) {
     const url = `${this.apiUrl}purchase-item/` + `${purchaseItem.id}`;
-    return this.http.delete<PurchaseItem>(url);
+    return this.http.delete<PurchaseItem>(url)
+      .pipe(
+        catchError((err) => {
+          this.handlePurchaseError(err);
+          return throwError(() => `${err.statusText}: Failed to delete purchase item!`)
+        })
+      );
   }
 
 }

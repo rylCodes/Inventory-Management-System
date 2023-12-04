@@ -1,4 +1,4 @@
-<div class="bg-neutral-300 w-full h-screen text-neutral-300 pt-32">
+<div class="relative bg-neutral-300 w-full h-screen text-neutral-300 pt-32">
     <div class="bg-neutral-900 w-[400px] h-auto mx-auto px-8 py-10 rounded-lg">
         <h2 class="text-center">
             Log in to<br>
@@ -16,5 +16,8 @@
             <button class="mt-12 bg-white text-neutral-900 font-bold p-2 rounded hover:bg-neutral-100"
                 type="submit">Log in</button>
         </form>
+    </div>
+    <div *ngIf="isLoading" class="w-full h-full top-0 left-0 absolute bg-[rgba(0,0,0,0.3)]">
+        <app-loader></app-loader>
     </div>
 </div>

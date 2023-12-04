@@ -17,6 +17,7 @@ import { StocksService } from 'src/app/services/stocks/stocks';
 export class PurchasesComponent implements OnInit {
   deletingBill?: PurchaseBill | null = null;
   deletingItem?: PurchaseItem | null = null;
+  isLoading: boolean = false;
 
   proceedEditBill: boolean = false;
   proceedEditItem: boolean = false;
@@ -201,19 +202,27 @@ export class PurchasesComponent implements OnInit {
   loadBills() {
     this.purchaseService
       .getPurchaseBills()
-      .subscribe(bills => this.bills = bills);
+      .subscribe({
+        next: bills => this.bills = bills,
+        error: error => this.uiService.handleError(error),
+      });
   }
 
   loadFilteredItems() {
     this.purchaseService
       .getPurchaseItems()
-      .subscribe((items) => {
-        if (this.showEachPurchaseOrder) {
-          this.items = items.filter(item => item.purchaseBill_id === this.bill.id);
-          this.bill.grand_total = this.calculateGrandtotal(this.items);
-        } else {
-          this.items = items.filter(item => item.purchaseBill_id === null);
-          this.bill.grand_total = this.calculateGrandtotal(this.items);
+      .subscribe({
+        next: (items) => {
+          if (this.showEachPurchaseOrder) {
+            this.items = items.filter(item => item.purchaseBill_id === this.bill.id);
+            this.bill.grand_total = this.calculateGrandtotal(this.items);
+          } else {
+            this.items = items.filter(item => item.purchaseBill_id === null);
+            this.bill.grand_total = this.calculateGrandtotal(this.items);
+          }
+        },
+        error: (error) => {
+          this.uiService.handleError(error);
         }
       });
   }
@@ -221,7 +230,10 @@ export class PurchasesComponent implements OnInit {
   loadAllItems() {
     this.purchaseService
       .getPurchaseItems()
-      .subscribe((items) => this.allItems = items);
+      .subscribe({
+        next: items => this.allItems = items,
+        error: err => this.uiService.handleError(err),
+      });
   }
 
   loadSuppliers() {
@@ -318,36 +330,45 @@ export class PurchasesComponent implements OnInit {
     if (isBillnoExist) {
       window.alert("Billno with this name already exists!");
     } else {
+      this.isLoading = true;
       this.purchaseService.addPurchaseBill(newBill)
-      .subscribe(async (bill) => {
-        this.bills.push(bill);
-        this.items.map(item => {
-          if (!item.purchaseBill_id) {
-            item.purchaseBill_id = bill.id;
-          }
-          this.purchaseService.editPurchaseItem(item).subscribe(item => {
-            const index = this.items.findIndex(i => i.id === item.id);
-            this.items[index] = item;
-            this.loadBills();
-            this.loadAllItems();
-            this.loadFilteredItems();
+      .subscribe({
+        next: async (bill) => {
+          this.isLoading = false;
+          this.bills.push(bill);
+          this.items.map(item => {
+            if (!item.purchaseBill_id) {
+              item.purchaseBill_id = bill.id;
+            }
+            this.purchaseService.editPurchaseItem(item).subscribe(item => {
+              const index = this.items.findIndex(i => i.id === item.id);
+              this.items[index] = item;
+              this.loadBills();
+              this.loadAllItems();
+              this.loadFilteredItems();
+            });
+          })
+  
+          // Adjusted inventories upon saving the purchase.
+          stocks.map(stock => {
+            this.stockService.editStock(stock).subscribe();
           });
-        })
+  
+          this.resetBillForm();
+          this.toggleSaveBillModal();
+          this.toggleFormContainer();
+  
+          await this.uiService.wait(100);
+          if (!bill.grand_total || bill.grand_total < 1) {
+            window.alert("Warning: You have saved a purchase without a total amount. Make sure it is correct.");
+          }
+          window.alert("Success: New purchase has been added.");
+        },
 
-        // Adjusted inventories upon saving the purchase.
-        stocks.map(stock => {
-          this.stockService.editStock(stock).subscribe();
-        });
-
-        this.resetBillForm();
-        this.toggleSaveBillModal();
-        this.toggleFormContainer();
-
-        await this.uiService.wait(100);
-        if (!bill.grand_total || bill.grand_total < 1) {
-          window.alert("Warning: You have saved a purchase without a total amount. Make sure it is correct.");
-        }
-        window.alert("Success: New purchase has been added.");
+        error: (err) => {
+          this.isLoading = false;
+          this.uiService.handleError(err)
+        },
       });
     }
   }
@@ -369,16 +390,24 @@ export class PurchasesComponent implements OnInit {
       ...this.item,
     }
 
+    this.isLoading = true;
     this.purchaseService.addPurchaseItem(newSaleItem)
-      .subscribe(async (item) => {
-        this.items.push(item);
-        this.loadFilteredItems();
-        this.resetItemForm();
-
-        await this.uiService.wait(100);
-        if (!item || item.item_price < 1) {
-          window.alert("Warning: You have added an item without a price. Make sure it is correct.");
-        }
+      .subscribe({
+        next: async (item) => {
+          this.isLoading = false
+          this.items.push(item);
+          this.loadFilteredItems();
+          this.resetItemForm();
+  
+          await this.uiService.wait(100);
+          if (!item || item.item_price < 1) {
+            window.alert("Warning: You have added an item without a price. Make sure it is correct.");
+          }
+        },
+        error: (err) => {
+          this.isLoading = false;
+          this.uiService.handleError(err)
+        },
       });
   }
 
@@ -408,15 +437,23 @@ export class PurchasesComponent implements OnInit {
       window.alert("Purchase with this billno already exists!");
       return;
     } else {
+      this.isLoading = true;
       this.purchaseService
       .editPurchaseBill(editingPurchaseBill)
-      .subscribe(async (billData) => {
-        const index = this.bills.findIndex(bill => bill.id === billData.id);
-        this.bills[index] = billData;
-        this.toggleBillForm();
-
-        await this.uiService.wait(100);
-        window.alert("Successfully saved changes to the bill details.");
+      .subscribe({
+        next: async (billData) => {
+          this.isLoading = false;
+          const index = this.bills.findIndex(bill => bill.id === billData.id);
+          this.bills[index] = billData;
+          this.toggleBillForm();
+  
+          await this.uiService.wait(100);
+          window.alert("Successfully saved changes to the bill details.");
+        },
+        error: (err) => {
+          this.isLoading = false;
+          this.uiService.handleError(err)
+        },
       });
     }
   }
@@ -434,15 +471,23 @@ export class PurchasesComponent implements OnInit {
       ...this.item
     }
 
+    this.isLoading = true;
     this.purchaseService
       .editPurchaseItem(editingSaleItem)
-      .subscribe(async (itemData) => {
-        const index = this.items.findIndex(saleItem => saleItem.id === itemData.id);
-
-        await this.uiService.wait(100);
-        window.alert("Successfully saved changes to the item.");
-
-        this.items[index] = itemData;
+      .subscribe({
+        next: async (itemData) => {
+          this.isLoading = false;
+          const index = this.items.findIndex(saleItem => saleItem.id === itemData.id);
+  
+          await this.uiService.wait(100);
+          window.alert("Successfully saved changes to the item.");
+  
+          this.items[index] = itemData;
+        },
+        error: (err) => {
+          this.isLoading = false;
+          this.uiService.handleError(err)
+        },
       });
   }
   
@@ -458,14 +503,22 @@ export class PurchasesComponent implements OnInit {
       return;
     }
 
+    this.isLoading = true;
     this.purchaseService
       .deletePurchaseBill(this.deletingBill)
-      .subscribe(async () => {
-        this.bills = this.bills.filter(s => s.id !== this.deletingBill?.id);
-        this.deletingBill = null;
-        this.toggleBillActionModal()
-        await this.uiService.wait(100);
-        window.alert("Transaction has been deleted successfully!");
+      .subscribe({
+        next: async () => {
+          this.isLoading = false;
+          this.bills = this.bills.filter(s => s.id !== this.deletingBill?.id);
+          this.deletingBill = null;
+          this.toggleBillActionModal()
+          await this.uiService.wait(100);
+          window.alert("Transaction has been deleted successfully!");
+        },
+        error: (err) => {
+          this.isLoading = false;
+          this.uiService.handleError(err);
+        },
       });
   }
 
@@ -502,15 +555,23 @@ export class PurchasesComponent implements OnInit {
       return;
     }
 
+    this.isLoading = true;
     this.purchaseService
       .deletePurchaseItem(this.deletingItem)
-      .subscribe(async () => {
-        this.bills = this.bills.filter(s => s.id !== this.deletingItem?.id);
-        this.deletingItem = null;
-        this.toggleItemActionModal()
-        this.loadFilteredItems();
-        await this.uiService.wait(100);
-        window.alert("Item has been deleted successfully!");
+      .subscribe({
+        next: async () => {
+          this.isLoading = false;
+          this.bills = this.bills.filter(s => s.id !== this.deletingItem?.id);
+          this.deletingItem = null;
+          this.toggleItemActionModal()
+          this.loadFilteredItems();
+          await this.uiService.wait(100);
+          window.alert("Item has been deleted successfully!");
+        },
+        error: (err) => {
+          this.isLoading = false;
+          this.uiService.handleError(err);
+        }
       });
   }
 }

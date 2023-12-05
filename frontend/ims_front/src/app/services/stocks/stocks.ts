@@ -27,7 +27,7 @@
         .pipe(
           catchError((err) => {
             this.handleStockError(err);
-            return throwError(() => `${err.statusText}: Failed to add new stock!`);
+            return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to add new stock!`);
           })
         );
     }
@@ -41,7 +41,7 @@
         .pipe(
           catchError((err) => {
             this.handleStockError(err);
-            return throwError(() => `${err.statusText}: Failed to display stocks!`);
+            return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to display stocks!`);
           })
         );
     }
@@ -52,7 +52,7 @@
       .pipe(
         catchError((err) => {
           this.handleStockError(err);
-          return throwError(() => `${err.statusText}: Failed to update stock!`);
+          return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to update stock!`);
         })
       );
     }
@@ -63,7 +63,7 @@
         .pipe(
           catchError((err) => {
             this.handleStockError(err);
-            return throwError(() => `${err.statusText}: Failed to delete stock!`);
+            return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to delete stock!`);
           })
         );
     }

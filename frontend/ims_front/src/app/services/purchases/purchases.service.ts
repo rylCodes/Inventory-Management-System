@@ -27,7 +27,7 @@ export class PurchasesService {
       .pipe(
         catchError((err) => {
           this.handlePurchaseError(err);
-          return throwError(() => `${err.statusText}: Failed to add new purchase transaction!`);
+          return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to add new purchase transaction!`);
         })
       );
   }
@@ -37,7 +37,7 @@ export class PurchasesService {
       .pipe(
         catchError(err => {
           this.handlePurchaseError(err);
-          return throwError(() => `${err.statusText}: Failed to display purchase transactions!`);
+          return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to display purchase transactions!`);
         })
       );
   }
@@ -48,7 +48,7 @@ export class PurchasesService {
     .pipe(
       catchError((err) => { 
         this.handlePurchaseError(err);
-        return throwError(() => `${err.statusText}: Failed to update purchase transaction!`);
+        return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to update purchase transaction!`);
       })
     );
   }
@@ -59,7 +59,7 @@ export class PurchasesService {
     .pipe(
       catchError((err) => {
         this.handlePurchaseError(err);
-        return throwError(() => `${err.statusText}: Failed to delete purchase transaction!`)
+        return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to delete purchase transaction!`)
       })
     );
   }
@@ -70,7 +70,7 @@ export class PurchasesService {
       .pipe(
         catchError((err) => {
           this.handlePurchaseError(err);
-          return throwError(() => `${err.statusText}: Failed to add new purchase item!`);
+          return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to add new purchase item!`);
         })
       );
   }
@@ -80,7 +80,7 @@ export class PurchasesService {
       .pipe(
         catchError((err) => {
           this.handlePurchaseError(err);
-          return throwError(() => `${err.statusText}: Failed to display purchase items!`)
+          return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to display purchase items!`)
         })
       );
   }
@@ -91,7 +91,7 @@ export class PurchasesService {
     .pipe(
       catchError((err) => {
         this.handlePurchaseError(err);
-        return throwError(() => `${err.statusText}: Failed to update purchase item!`);
+        return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to update purchase item!`);
       })
     );
   }
@@ -102,7 +102,7 @@ export class PurchasesService {
       .pipe(
         catchError((err) => {
           this.handlePurchaseError(err);
-          return throwError(() => `${err.statusText}: Failed to delete purchase item!`)
+          return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to delete purchase item!`)
         })
       );
   }

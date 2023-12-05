@@ -14,6 +14,7 @@ import { EmailValidator } from '@angular/forms';
 export class SuppliersComponent implements OnInit {
   deletingSupplier?: Supplier | null = null;
   proceedEdit: boolean = false;
+  isLoading = false;
 
   faXmark = faXmark;
   faPen = faPen;
@@ -74,8 +75,13 @@ export class SuppliersComponent implements OnInit {
   loadSuppliers() {
     this.supplierService
     .getSuppliers()
-    .subscribe((suppliers) => {
-      this.suppliers = suppliers;
+    .subscribe({
+      next: (suppliers) => {
+        this.suppliers = suppliers;
+      },
+      error: (err) => {
+        this.uiService.displayErrorMessage(err);
+      }
     });
   }
 
@@ -119,12 +125,20 @@ export class SuppliersComponent implements OnInit {
     } else if (newSupplier.email && !this.validateEmail(newSupplier.email)) {
       window.alert("Enter valid email!");
     } else {
+      this.isLoading = true;
       this.supplierService.addSupplier(newSupplier)
-      .subscribe(async (Supplier) => {
-        this.suppliers.push(Supplier);
-        this.toggleForm();
-        await this.uiService.wait(100);
-        window.alert("New supplier has been created successfully!");
+      .subscribe({
+        next: async (Supplier) => {
+          this.isLoading = false;
+          this.suppliers.push(Supplier);
+          this.toggleForm();
+          await this.uiService.wait(100);
+          window.alert("New supplier has been created successfully!");
+        },
+        error: (err) => {
+          this.isLoading = false;
+          this.uiService.displayErrorMessage(err);
+        }
       });
     }
   }
@@ -140,14 +154,22 @@ export class SuppliersComponent implements OnInit {
       return;
     }
 
+    this.isLoading = true;
     this.supplierService
       .deleteSupplier(this.deletingSupplier)
-      .subscribe(async () => {
-        this.suppliers = this.suppliers.filter(s => s.id !== this.deletingSupplier?.id);
-        this.deletingSupplier = null;
-        this.toggleActionModal()
-        await this.uiService.wait(100);
-        window.alert("Supplier has been deleted successfully!");
+      .subscribe({
+        next: async () => {
+          this.isLoading = false;
+          this.suppliers = this.suppliers.filter(s => s.id !== this.deletingSupplier?.id);
+          this.deletingSupplier = null;
+          this.toggleActionModal()
+          await this.uiService.wait(100);
+          window.alert("Supplier has been deleted successfully!");
+        },
+        error: (err) => {
+          this.isLoading = false;
+          this.uiService.displayErrorMessage(err);
+        }
       });
   }
 
@@ -190,14 +212,21 @@ saveUpdate() {
   } else if (editingSupplier.email && !this.validateEmail(editingSupplier.email)) {
     window.alert("Enter valid email!");
   } else {
+      this.isLoading = true;
       this.supplierService
       .editSupplier(editingSupplier)
-      .subscribe(async (supplierData) => {
-        const index = this.suppliers.findIndex(supplier => supplier.id === supplierData.id);
-        this.suppliers[index] = supplierData;
-        this.toggleForm();
-        await this.uiService.wait(100);
-        window.alert("Successfully saved changes to the supplier.");
+      .subscribe({
+        next: async (supplierData) => {
+          const index = this.suppliers.findIndex(supplier => supplier.id === supplierData.id);
+          this.suppliers[index] = supplierData;
+          this.toggleForm();
+          await this.uiService.wait(100);
+          window.alert("Successfully saved changes to the supplier.");
+        },
+        error: (err) => {
+          this.isLoading = false;
+          this.uiService.displayErrorMessage(err);
+        }
       });
     }
   }

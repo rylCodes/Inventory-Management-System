@@ -27,7 +27,7 @@ export class SuppliersService {
       .pipe(
         catchError((err) => {
           this.handleSupplierError(err);
-          return throwError(() => `${err.statusText}: Failed to add new supplier!`);
+          return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to add new supplier!`);
         })
       );
   }
@@ -41,7 +41,7 @@ export class SuppliersService {
       .pipe(
         catchError((err) => {
           this.handleSupplierError(err);
-          return throwError(() => `${err.statusText}: Failed to display suppliers!`)
+          return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to display suppliers!`)
         })
       );
   }
@@ -52,7 +52,7 @@ export class SuppliersService {
     .pipe(
       catchError((err) => {
         this.handleSupplierError(err);
-        return throwError(() => `${err.statusText}: Failed to update supplier!`);
+        return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to update supplier!`);
       })
     );
   }
@@ -63,7 +63,7 @@ export class SuppliersService {
       .pipe(
         catchError((err) => {
           this.handleSupplierError(err);
-          return throwError(() => `${err.statusText}: Failed to delete supplier!`)
+          return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to delete supplier!`)
         })
       );
   }

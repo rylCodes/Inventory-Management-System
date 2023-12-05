@@ -204,7 +204,7 @@ export class PurchasesComponent implements OnInit {
       .getPurchaseBills()
       .subscribe({
         next: bills => this.bills = bills,
-        error: error => this.uiService.handleError(error),
+        error: error => this.uiService.displayErrorMessage(error),
       });
   }
 
@@ -222,7 +222,7 @@ export class PurchasesComponent implements OnInit {
           }
         },
         error: (error) => {
-          this.uiService.handleError(error);
+          this.uiService.displayErrorMessage(error);
         }
       });
   }
@@ -232,7 +232,7 @@ export class PurchasesComponent implements OnInit {
       .getPurchaseItems()
       .subscribe({
         next: items => this.allItems = items,
-        error: err => this.uiService.handleError(err),
+        error: err => this.uiService.displayErrorMessage(err),
       });
   }
 
@@ -367,7 +367,7 @@ export class PurchasesComponent implements OnInit {
 
         error: (err) => {
           this.isLoading = false;
-          this.uiService.handleError(err)
+          this.uiService.displayErrorMessage(err);
         },
       });
     }
@@ -406,7 +406,7 @@ export class PurchasesComponent implements OnInit {
         },
         error: (err) => {
           this.isLoading = false;
-          this.uiService.handleError(err)
+          this.uiService.displayErrorMessage(err)
         },
       });
   }
@@ -452,7 +452,7 @@ export class PurchasesComponent implements OnInit {
         },
         error: (err) => {
           this.isLoading = false;
-          this.uiService.handleError(err)
+          this.uiService.displayErrorMessage(err)
         },
       });
     }
@@ -486,7 +486,7 @@ export class PurchasesComponent implements OnInit {
         },
         error: (err) => {
           this.isLoading = false;
-          this.uiService.handleError(err)
+          this.uiService.displayErrorMessage(err)
         },
       });
   }
@@ -517,7 +517,7 @@ export class PurchasesComponent implements OnInit {
         },
         error: (err) => {
           this.isLoading = false;
-          this.uiService.handleError(err);
+          this.uiService.displayErrorMessage(err);
         },
       });
   }
@@ -570,7 +570,7 @@ export class PurchasesComponent implements OnInit {
         },
         error: (err) => {
           this.isLoading = false;
-          this.uiService.handleError(err);
+          this.uiService.displayErrorMessage(err);
         }
       });
   }

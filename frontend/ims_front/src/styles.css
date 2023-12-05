@@ -3,10 +3,41 @@
 @tailwind components;
 @tailwind utilities;
 
-/* @media print {
-    @page {
-        size: 80mm;
-        width: 80mm;
-        height: auto;
+.text-xxs {
+    font-size: 10px;
+    line-height: 12px;
+}
+
+table {
+    border-radius: 10px;
+}
+
+table tbody tr {
+    background-color: #fff;
+}
+
+table tbody tr:nth-child(even) {
+    background-color: #ebebeb;
+}
+
+table th {
+    padding: 10px;
+}
+
+.active {
+    border-left: 5px solid #008000;
+    margin: 0;
+    padding: 0;
+}
+
+.inactive {
+    border-left: 5px solid #ffa500;
+    margin: 0;
+    padding: 0;
+}
+
+@media (max-width: 768px) {
+    table td, table tr {
+        word-wrap: break-word;
     }
-} */
+}

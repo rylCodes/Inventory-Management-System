@@ -1,7 +1,7 @@
 <div class="relative w-full px-8">
     <!-- HEADING: POS PAGE -->
     <div class="flex justify-between mt-8">
-        <h1 class="font-bold text-3xl">PURCHASES</h1>
+        <h1 class="font-bold text-2xl md:text-3xl">PURCHASES</h1>
         <!-- ADD BUTTON -->
         <app-button *ngIf="!showEachPurchaseOrder" txtContent="{{showFormContainer? 'Cancel': 'Add'}}"
             bgColor="{{showFormContainer? 'red': 'green'}}" (btnClick)="toggleFormContainer()"></app-button>
@@ -44,9 +44,13 @@
         </div>
     </div>
 
+    <!-- HEADING: ITEM LIST -->
+    <div *ngIf="showFormContainer && !showEachPurchaseOrder" class="flex justify-between mt-4">
+        <h1 class="font-bold text-xl lg:text-2xl">Add items:</h1>
+    </div>
     <!-- ITEM FORM -->
     <form *ngIf="showFormContainer && !showEachPurchaseOrder"
-        class="flex items-end text-start justify-between w-3/4 bg-[#fff] h-fit mt-4 px-4 py-2 rounded-lg shadow-xl text-neutral-900"
+        class="flex items-end text-start justify-between w-full bg-[#fff] h-fit mt-2 px-4 py-2 rounded-lg shadow-xl text-neutral-900 md:w-3/4"
         (ngSubmit)="onSubmitItem()">
         <div class="flex flex-col w-1/4">
             <label for="name">Item:</label>
@@ -86,9 +90,9 @@
     </form>
 
     <!-- FORM CONTAINER: Add items and add new purchase -->
-    <div *ngIf="showFormContainer" class="flex justify-center space-x-2 w-full">
-        <div class="table-container w-3/4 text-center shadow-xl mt-4">
-            <!-- ITEM TABLE -->
+    <div *ngIf="showFormContainer" class="flex flex-col justify-center space-x-0 w-full md:flex-row md:space-x-2">
+        <!-- ITEM TABLE -->
+        <div class="table-container w-full text-center shadow-xl mt-4 md:w-3/4">
             <table class="w-full table-fixed">
                 <thead class="text-neutral-300 bg-neutral-900">
                     <th>Datetime</th>
@@ -99,13 +103,15 @@
                 </thead>
                 <tbody>
                     <tr *ngFor="let item of items">
-                        <td class="p-2 {{showEachPurchaseOrder? '': 'flex items-center space-x-6'}}">
-                            <button *ngIf="!showEachPurchaseOrder" class="px-1.5 py-1 rounded-md bg-[#ff0000]"
-                                (click)="deleteItem(item)">
-                                <fa-icon class="scale-75" [icon]="faTrashCan" [ngStyle]="{color: 'rgb(212 212 212)'}">
-                                </fa-icon>
-                            </button>
-                            <p>{{item.purchase_date | date: "MMM dd 'at' hh:mm a"}}</p>
+                        <td class="p-2">
+                            <div [ngClass]="showEachPurchaseOrder? '': 'flex items-center justify-center space-x-2 md:space-x-4'">
+                                <button *ngIf="!showEachPurchaseOrder" class="px-1.5 py-1 rounded-md bg-[#ff0000]"
+                                    (click)="deleteItem(item)">
+                                    <fa-icon class="scale-75" [icon]="faTrashCan" [ngStyle]="{color: 'rgb(212 212 212)'}">
+                                    </fa-icon>
+                                </button>
+                                <p>{{item.purchase_date | date: "MMM dd 'at' hh:mm a"}}</p>
+                            </div>
                         </td>
                         <td class="p-2">{{getStockDetails(item.stock_id).stockName}}</td>
                         <td class="p-2">&#8369;{{item.item_price | number: '1.2-2'}}</td>
@@ -114,11 +120,14 @@
                     </tr>
                 </tbody>
             </table>
+            <div class="w-full" *ngIf="!items">
+                <p class="text-center my-4">No item.</p>
+            </div>
         </div>
 
         <!-- BILL DIV -->
         <div *ngIf="showEachPurchaseOrder"
-            class="bg-[#fff] self-start flex-1 h-auto mx-auto p-4 rounded-lg shadow-xl text-neutral-900 mt-4">
+            class="bg-[#fff] self-start w-full h-auto mx-auto p-4 rounded-lg shadow-xl text-neutral-900 mt-4 md:flex-1">
             <form class="flex flex-col">
                 <h3 for="bill.customer_name">OR No.:</h3>
                 <p class="uppercase border border-neutral-900 px-1 py-0.5 rounded-sm mt-1 text-center">
@@ -146,8 +155,8 @@
 
         <!-- PURCHASE FORM: Add -->
         <div *ngIf="!showEachPurchaseOrder"
-            class="bg-white self-start flex-1 h-auto mx-auto p-4 rounded-lg shadow-xl text-neutral-900 mt-4">
-            <h2 class="font-bold text-center text-xl">
+            class="bg-white self-start w-full h-auto mx-auto p-4 rounded-lg shadow-xl text-neutral-900 mt-4 md:flex-1">
+            <h2 class="font-bold text-center text-base lg:text-xl md:lg">
                 {{ proceedEditBill? "Update bill details" : "Add new purchase" }}
             </h2>
             <form class="flex flex-col" (ngSubmit)="onSubmitBill()">
@@ -178,45 +187,52 @@
     </div>
 
     <!-- BILL TABLE -->
-    <div *ngIf="showBillTable" class="w-full text-center shadow-xl rounded-xl mt-8">
+    <div *ngIf="showBillTable" class="w-full text-center shadow-xl rounded-xl mt-6 md:mt-8">
         <table class="w-full table-fixed rounded-xl">
             <thead class="text-neutral-300 bg-neutral-900">
                 <th>OR No.</th>
                 <th>Name</th>
                 <th>Items</th>
                 <th>Total</th>
-                <th>Remarks</th>
-                <th>Datetime</th>
+                <th class="hidden md:table-cell">Remarks</th>
+                <th class="hidden md:table-cell">Datetime</th>
                 <th>Action</th>
             </thead>
             <tbody>
                 <tr *ngFor="let bill of bills">
-                    <td class="flex items-center space-x-6">
-                        <!-- View Order List -->
-                        <button class="px-1.5 py-0.5 rounded-md bg-neutral-800 ml-2" (click)="viewOrder(bill)">
-                            <fa-icon [icon]="faRectangleList" [ngStyle]="{color: 'rgb(212 212 212)'}">
-                            </fa-icon>
-                        </button>
-                        <p>{{bill.billno}}</p>
+                    <td class="p-2">
+                        <div class="flex justify-center items-center space-x-1 md:space-x-3">
+                            <!-- View Order List -->
+                            <button class="px-1.5 py-0.5 rounded-md bg-neutral-800 ml-2" (click)="viewOrder(bill)">
+                                <fa-icon [icon]="faRectangleList" [ngStyle]="{color: 'rgb(212 212 212)'}">
+                                </fa-icon>
+                            </button>
+                            <p>{{bill.billno}}</p>
+                        </div>
                     </td>
                     <td class="p-2">{{getSupplierDetails(bill.supplier_id).supplierName}}</td>
                     <td class="p-2">{{getItemLength(bill)}}</td>
                     <td class="p-2">&#8369;{{bill.grand_total | number: '1.2-2'}}</td>
-                    <td class="p-2">{{bill.remarks}}</td>
-                    <td class="p-2">{{bill.time | date: "MMM dd 'at' hh:mm a"}}</td>
-                    <td class="flex justify-center p-2 space-x-6">
-                        <!-- Edit bill -->
-                        <fa-icon class="hover:scale-110" [ngStyle]="{color: 'green'}" [icon]="faPen"
-                            (click)="updateBill(bill)">
-                        </fa-icon>
-                        <!-- Delete bill -->
-                        <fa-icon class="hover:scale-110" [ngStyle]="{color: 'red'}" [icon]="faTrashCan"
-                            (click)="deleteBill(bill)">
-                        </fa-icon>
+                    <td class="p-2 hidden md:table-cell">{{bill.remarks}}</td>
+                    <td class="p-2 hidden md:table-cell">{{bill.time | date: "MMM dd 'at' hh:mm a"}}</td>
+                    <td class="p-2">
+                        <div class="flex justify-center items-start-center space-x-2 md:space-x-4">
+                            <!-- Edit bill -->
+                            <fa-icon class="hover:scale-110" [ngStyle]="{color: 'green'}" [icon]="faPen"
+                                (click)="updateBill(bill)">
+                            </fa-icon>
+                            <!-- Delete bill -->
+                            <fa-icon class="hover:scale-110" [ngStyle]="{color: 'red'}" [icon]="faTrashCan"
+                                (click)="deleteBill(bill)">
+                            </fa-icon>
+                        </div>
                     </td>
                 </tr>
             </tbody>
         </table>
+        <div class="w-full" *ngIf="!bills.length">
+            <p class="text-center my-4">No purchases to show.</p>
+        </div>
     </div>
 
     <!-- PRODUCT MODAL: Confirm to Delete Product -->

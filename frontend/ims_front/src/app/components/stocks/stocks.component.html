@@ -1,7 +1,7 @@
 <div class="relative w-full h-full px-8">
     <!-- HEADING -->
     <div class="flex justify-between mt-8">
-        <h1 class="font-bold text-3xl">INVENTORY</h1>
+        <h1 class="font-bold text-2xl lg:text-3xl">INVENTORY</h1>
         <!-- ADD BUTTON -->
         <app-button txtContent="{{showForm? 'Cancel': 'Add'}}" bgColor="{{showForm? 'red': 'green'}}"
             (btnClick)="toggleForm()"></app-button>
@@ -23,7 +23,7 @@
                 id="stock.description" [(ngModel)]="stock.description">
 
             <label class="mt-4" for="stock.quantity">Quantity:</label>
-            <input appSelectAllText class="border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="number"
+            <input appSelectAllText class="border border-neutral-900 px-2 py-1 rounded-sm mt-1 text-center" type="number"
                 name="stock.quantity" id="stock.quantity" [(ngModel)]="stock.quantity">
 
             <label class="mt-4" for="stock.unit">Unit:</label>
@@ -59,7 +59,7 @@
     </div>
 
     <!-- TABLE -->
-    <div class="w-full text-center shadow-xl rounded-xl mt-8 {{showForm? 'hidden': 'block'}}">
+    <div class="w-full text-center shadow-xl rounded-xl mt-6 md:mt-8" [ngClass]="showForm? 'hidden': 'block'">
         <table class="w-full table-fixed rounded-xl">
             <thead class="text-neutral-300 bg-neutral-900">
                 <th>Code</th>
@@ -67,8 +67,8 @@
                 <th>Description</th>
                 <th>Quantity</th>
                 <th>Unit</th>
-                <th>Date Updated</th>
-                <th>Status</th>
+                <th class="hidden md:table-cell">Date Updated</th>
+                <th class="hidden md:table-cell">Status</th>
                 <th>Action</th>
             </thead>
             <tbody class="relative">
@@ -78,21 +78,30 @@
                     <td class="p-2">{{stock.description}}</td>
                     <td class="p-2">{{stock.quantity | number: '1.0-3'}}</td>
                     <td class="p-2">{{stock.unit}}</td>
-                    <td class="p-2">{{stock.date_updated | date: 'dd/MM/yyyy'}}</td>
-                    <td class="p-2">{{stock.status? "active": "inactive"}}</td>
-                    <td class="flex justify-center p-2 space-x-6">
-                        <!-- Edit Stock -->
-                        <fa-icon class="hover:scale-110" [ngStyle]="{color: 'green'}" [icon]="faPen"
-                            (click)="updateStock(stock)">
-                        </fa-icon>
-                        <!-- Delete Stock -->
-                        <fa-icon class="hover:scale-110" [ngStyle]="{color: 'red'}" [icon]="faTrashCan"
-                            (click)="deleteStock(stock)">
-                        </fa-icon>
+                    <td class="p-2 hidden md:table-cell">{{stock.date_updated | date: 'dd/MM/yyyy'}}</td>
+                    <td class="p-2 hidden md:table-cell">
+                        <span class="text-white text-xs px-2 py-1 rounded-md" [ngClass]="stock.status? 'bg-[#008000]' : 'bg-[#ffa500]'">
+                            {{stock.status? 'active' : 'inactive'}}
+                        </span>
+                    </td>
+                    <td class="p-2">
+                        <div class="flex justify-center items-center space-x-2 md:space-x-4">
+                            <!-- Edit Stock -->
+                            <fa-icon class="hover:scale-110" [ngStyle]="{color: 'green'}" [icon]="faPen"
+                                (click)="updateStock(stock)">
+                            </fa-icon>
+                            <!-- Delete Stock -->
+                            <fa-icon class="hover:scale-110" [ngStyle]="{color: 'red'}" [icon]="faTrashCan"
+                                (click)="deleteStock(stock)">
+                            </fa-icon>
+                        </div>
                     </td>
                 </tr>
             </tbody>
         </table>
+        <div class="w-full" *ngIf="!stocks.length">
+            <p class="text-center my-4">No item.</p>
+        </div>
     </div>
 
     <!-- Confirm to Delete Stock Modal -->

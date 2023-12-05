@@ -4,7 +4,7 @@ import { Menu } from 'src/app/interface/Product';
 import { Stock } from 'src/app/interface/Stock';
 import { ProductsService } from 'src/app/services/products/products.service';
 import { UiService } from 'src/app/services/ui/ui.service';
-import { faPen, faTrashCan, faXmark, faRectangleList, faPlus, faMinus, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faPen, faTrashCan, faXmark, faRectangleList, faPlus, faMinus, faTimes, faPrint, faLocationDot, faPhone, faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import { Router } from '@angular/router';
 import { SalesService } from 'src/app/services/sales/sales.service';
 import { StocksService } from 'src/app/services/stocks/stocks';
@@ -30,6 +30,10 @@ export class SalesComponent implements OnInit {
   faPlus = faPlus;
   faMinus = faMinus;
   faTimes = faTimes;
+  faPrint = faPrint;
+  faLocationDot = faLocationDot;
+  faPhone = faPhone;
+  faEnvelope = faEnvelope;
 
   bills: SaleBill[] = [];
   allItems: SaleItem[] = [];
@@ -109,6 +113,8 @@ export class SalesComponent implements OnInit {
         this.toggleItemActionModal();
       } else if (this.showBillActionModal) {
         this.toggleBillActionModal();
+      } else if (this.showInvoice) {
+        this.toggleInvoice(this.bill); 
       }
     }
   }
@@ -129,7 +135,7 @@ export class SalesComponent implements OnInit {
           this.bills = bills.filter(bill => bill.status)
         },
         error: (error) => {
-          this.uiService.handleError(error);
+          this.uiService.displayErrorMessage(error);
         }
       });
   }
@@ -142,7 +148,7 @@ export class SalesComponent implements OnInit {
           this.eachBillItems = items.filter(item => item.billno === this.bill.id);
         },
         error: (error) => {
-          this.uiService.handleError(error);
+          this.uiService.displayErrorMessage(error);
         }
       });
   }
@@ -155,7 +161,7 @@ export class SalesComponent implements OnInit {
           this.allItems = items;
         },
         error: (error) => {
-          this.uiService.handleError(error);
+          this.uiService.displayErrorMessage(error);
         }
       });
   }

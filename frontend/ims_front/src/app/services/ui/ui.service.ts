@@ -49,7 +49,7 @@ export class UiService {
     }
   }
 
-  handleError(err: any): void {
+  displayErrorMessage(err: any): void {
     console.log("Error here →", err);
     window.alert(err);
   } 

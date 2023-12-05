@@ -122,6 +122,9 @@
                     </tr>
                 </tbody>
             </table>
+            <div class="w-full h-[5vh]" *ngIf="!products.length">
+                <p class="text-center my-4">No items to show.</p>
+            </div>
         </div>
 
         <!-- MENU DIV -->
@@ -214,41 +217,52 @@
                 <th>Code</th>
                 <th>Name</th>
                 <th>Category</th>
-                <th>Description</th>
+                <th class="hidden md:table-cell">Description</th>
                 <th>Price</th>
-                <th>Status</th>
-                <th>Date Added</th>
+                <th class="hidden md:table-cell">Status</th>
+                <th class="hidden md:table-cell">Date Added</th>
                 <th>Action</th>
             </thead>
             <tbody>
                 <tr class="{{menu.status? 'active' : 'inactive'}}" *ngFor="let menu of menus">
-                    <td class="flex items-center space-x-3">
-                        <!-- View Order List -->
-                        <button class="px-1.5 py-0.5 rounded-md bg-neutral-800 ml-2" (click)="viewMenuProducts(menu)">
-                            <fa-icon [icon]="faRectangleList" [ngStyle]="{color: 'rgb(212 212 212)'}">
-                            </fa-icon>
-                        </button>
-                        <p>{{menu.code}}</p>
+                    <td class="p-2">
+                        <div class="flex justify-center items-center space-x-1 md:space-x-3">
+                            <!-- View Order List -->
+                            <button class="px-1.5 py-0.5 rounded-md bg-neutral-800 ml-2" (click)="viewMenuProducts(menu)">
+                                <fa-icon [icon]="faRectangleList" [ngStyle]="{color: 'rgb(212 212 212)'}">
+                                </fa-icon>
+                            </button>
+                            <p>{{menu.code}}</p>
+                        </div>
                     </td>
                     <td class="p-2">{{menu.name}}</td>
                     <td class="p-2">{{menu.category}}</td>
-                    <td class="p-2">{{menu.description}}</td>
+                    <td class="p-2 hidden md:table-cell">{{menu.description}}</td>
                     <td class="p-2">&#8369;{{menu.price | number: '1.2-2'}}</td>
-                    <td class="p-2">{{menu.status? 'active' : 'inactive'}}</td>
-                    <td class="p-2">{{menu.date_added | date: 'MM-dd-yyyy'}}</td>
-                    <td class="flex justify-center p-2 space-x-6">
-                        <!-- Edit Menu -->
-                        <fa-icon class="hover:scale-110" [ngStyle]="{color: 'green'}" [icon]="faPen"
-                            (click)="updateMenu(menu)">
-                        </fa-icon>
-                        <!-- Delete Menu -->
-                        <fa-icon class="hover:scale-110" [ngStyle]="{color: 'red'}" [icon]="faTrashCan"
-                            (click)="deleteMenu(menu)">
-                        </fa-icon>
+                    <td class="p-2 hidden md:table-cell">
+                        <span class="text-white text-xs px-2 py-1 rounded-md" [ngClass]="menu.status? 'bg-[#008000]' : 'bg-[#ffa500]'">
+                            {{menu.status? 'active' : 'inactive'}}
+                        </span>
+                    </td>
+                    <td class="p-2 hidden md:table-cell">{{menu.date_added | date: 'MM-dd-yyyy'}}</td>
+                    <td class="p-2">
+                        <div class="flex justify-center space-x-2 md:space-x-4">
+                            <!-- Edit Menu -->
+                            <fa-icon class="hover:scale-110" [ngStyle]="{color: 'green'}" [icon]="faPen"
+                                (click)="updateMenu(menu)">
+                            </fa-icon>
+                            <!-- Delete Menu -->
+                            <fa-icon class="hover:scale-110" [ngStyle]="{color: 'red'}" [icon]="faTrashCan"
+                                (click)="deleteMenu(menu)">
+                            </fa-icon>
+                        </div>
                     </td>
                 </tr>
             </tbody>
         </table>
+        <div class="w-full h-[5vh]" *ngIf="!menus.length">
+            <p class="text-center my-4">No purchases to show.</p>
+        </div>
     </div>
 
     <!-- PRODUCT MODAL: Confirm to Delete Product -->

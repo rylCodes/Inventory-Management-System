@@ -93,7 +93,7 @@ export class StocksComponent implements OnInit {
         },
         error: (err) => {
           console.log(err);
-          this.uiService.handleError(err);
+          this.uiService.displayErrorMessage(err);
         }
       });
   }
@@ -149,7 +149,7 @@ export class StocksComponent implements OnInit {
         },
         error: (err) => {
           this.isLoading = false;
-          this.uiService.handleError(err);
+          this.uiService.displayErrorMessage(err);
         }
       });
     }
@@ -207,7 +207,7 @@ export class StocksComponent implements OnInit {
           },
           error: (err) => {
             this.isLoading = false;
-            this.uiService.handleError(err);
+            this.uiService.displayErrorMessage(err);
           }
         });
     }
@@ -239,7 +239,7 @@ export class StocksComponent implements OnInit {
         error: (err) => {
           if (err) {
             this.isLoading = false;
-            this.uiService.handleError(err);
+            this.uiService.displayErrorMessage(err);
             this.toggleActionModal();
           }
         }

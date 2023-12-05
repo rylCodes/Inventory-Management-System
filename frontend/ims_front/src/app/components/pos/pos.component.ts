@@ -5,7 +5,7 @@ import { Stock } from 'src/app/interface/Stock';
 import { Product } from 'src/app/interface/Product';
 import { ProductsService } from 'src/app/services/products/products.service';
 import { UiService } from 'src/app/services/ui/ui.service';
-import { faPen, faTrashCan, faXmark, faRectangleList, faPlus, faMinus, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faPen, faTrashCan, faXmark, faRectangleList, faPlus, faMinus, faTimes, faPrint, faEnvelope, faPhone, faLocationDot } from '@fortawesome/free-solid-svg-icons';
 import { Router } from '@angular/router';
 import { SalesService } from 'src/app/services/sales/sales.service';
 import { StocksService } from 'src/app/services/stocks/stocks';
@@ -40,6 +40,10 @@ export class PosComponent implements OnInit {
   faPlus = faPlus;
   faMinus = faMinus;
   faTimes = faTimes;
+  faPrint = faPrint;
+  faPhone = faPhone;
+  faLocationDot = faLocationDot;
+  faEnvelope = faEnvelope;
 
   activeBills: SaleBill[] = [];
   allBills: SaleBill[] = [];
@@ -195,7 +199,6 @@ export class PosComponent implements OnInit {
   }  
 
   loadBills() {
-    this.isLoading = true;
     this.salesService
       .getSaleBills()
       .subscribe({
@@ -204,23 +207,26 @@ export class PosComponent implements OnInit {
           this.allBills = salesBills;
         },
         error: (err) => {
-          window.alert(err);
+          this.uiService.displayErrorMessage(err);
         }
       });
   }
 
   loadItems() {
-    this.isLoading = true;
     this.salesService
       .getSaleItems()
-      .subscribe((saleItems) => {
-        this.isLoading = false;
-        if (this.updatingOrder) {
-          this.saleItems = saleItems.filter(item => item.billno === this.saleBill.id);
-          this.saleBill.grand_total = this.calculateGrandtotal(this.saleItems);
-        } else {
-          this.saleItems = saleItems.filter(item => item.billno === null);
-          this.saleBill.grand_total = this.calculateGrandtotal(this.saleItems);
+      .subscribe({
+        next: (saleItems) => {
+          if (this.updatingOrder) {
+            this.saleItems = saleItems.filter(item => item.billno === this.saleBill.id);
+            this.saleBill.grand_total = this.calculateGrandtotal(this.saleItems);
+          } else {
+            this.saleItems = saleItems.filter(item => item.billno === null);
+            this.saleBill.grand_total = this.calculateGrandtotal(this.saleItems);
+          }
+        },
+        error: (err) => {
+          this.uiService.displayErrorMessage(err);
         }
       });
   }
@@ -234,9 +240,7 @@ export class PosComponent implements OnInit {
           this.menus = activeMenus;
         },
         error: (err) => {
-          this.isLoading = false;
-          console.log(err);
-          window.alert(`${err.statusText}! Please try again later.`)
+          this.uiService.displayErrorMessage(err);
         }
       })
   }
@@ -297,9 +301,11 @@ export class PosComponent implements OnInit {
       remarks: this.saleBill.remarks.toUpperCase(),
     }
 
+    this.isLoading = true;
     this.salesService.addSaleBill(newBill)
       .subscribe({
         next: async (bill) => {
+          this.isLoading = false;
           this.activeBills.push(bill);
           
           this.saleItems.map(item => {
@@ -320,8 +326,8 @@ export class PosComponent implements OnInit {
           window.alert("New transaction has been added successfully!");
         },
         error: (err) => {
-          console.log(err);
-          window.alert(`${err.statusText}! Please try again later.`);
+          this.isLoading = false;
+          this.uiService.displayErrorMessage(err);
         }
       });
   }
@@ -343,13 +349,21 @@ export class PosComponent implements OnInit {
     const newSaleItem = {
       ...this.saleItem,
     }
-
+    
+    this.isLoading = true;
     this.salesService.addSaleItem(newSaleItem)
-      .subscribe(async (saleItem) => {
-        this.saleItems.push(saleItem);
-        this.loadItems();
-        this.resetItemForm();
-        await this.uiService.wait(100);
+      .subscribe({
+        next: async (saleItem) => {
+          this.isLoading = false;
+          this.saleItems.push(saleItem);
+          this.loadItems();
+          this.resetItemForm();
+          await this.uiService.wait(100);
+        },
+        error: (err) => {
+          this.isLoading = false;
+          this.uiService.displayErrorMessage(err);
+        }
       });
   }
 
@@ -372,15 +386,23 @@ export class PosComponent implements OnInit {
       remarks: this.saleBill.remarks.toUpperCase(),
     }
 
+    this.isLoading = true;
     this.salesService
       .editSaleBill(editingSaleBill)
-      .subscribe(async (saleBillData) => {
-        const index = this.activeBills.findIndex(saleBill => saleBill.id === saleBillData.id);
-        this.activeBills[index] = saleBillData;
-        this.toggleBillForm();
-
-        await this.uiService.wait(100);
-        window.alert("Successfully saved changes to the customer details.");
+      .subscribe({
+        next: async (saleBillData) => {
+          this.isLoading = false;
+          const index = this.activeBills.findIndex(saleBill => saleBill.id === saleBillData.id);
+          this.activeBills[index] = saleBillData;
+          this.toggleBillForm();
+  
+          await this.uiService.wait(100);
+          window.alert("Successfully saved changes to the customer details.");
+        },
+        error: (err) => {
+          this.isLoading = false;
+          this.uiService.displayErrorMessage(err);
+        }
       });
   }
   
@@ -395,14 +417,22 @@ export class PosComponent implements OnInit {
       return;
     }
 
+    this.isLoading = true;
     this.salesService
       .deleteSaleBill(this.deletingSaleBill)
-      .subscribe(async () => {
-        this.activeBills = this.activeBills.filter(s => s.id !== this.deletingSaleBill?.id);
-        this.deletingSaleBill = null;
-        this.toggleBillActionModal()
-        await this.uiService.wait(100);
-        window.alert("Transaction has been deleted successfully!");
+      .subscribe({
+        next: async () => {
+          this.isLoading =false;
+          this.activeBills = this.activeBills.filter(s => s.id !== this.deletingSaleBill?.id);
+          this.deletingSaleBill = null;
+          this.toggleBillActionModal()
+          await this.uiService.wait(100);
+          window.alert("Transaction has been deleted successfully!");
+        },
+        error: (err) => {
+          this.isLoading = false;
+          this.uiService.displayErrorMessage(err);
+        }
       });
   }
 
@@ -451,15 +481,23 @@ export class PosComponent implements OnInit {
       ...this.saleItem
     }
 
+    this.isLoading = true;
     this.salesService
       .editSaleItem(editingSaleItem)
-      .subscribe(async (saleItemData) => {
-        const index = this.saleItems.findIndex(saleItem => saleItem.id === saleItemData.id);
-
-        await this.uiService.wait(100);
-        window.alert("Successfully saved changes to the item.");
-
-        this.saleItems[index] = saleItemData;
+      .subscribe({
+        next: async (saleItemData) => {
+          this.isLoading = false;
+          const index = this.saleItems.findIndex(saleItem => saleItem.id === saleItemData.id);
+  
+          await this.uiService.wait(100);
+          window.alert("Successfully saved changes to the item.");
+  
+          this.saleItems[index] = saleItemData;
+        },
+        error: (err) => {
+          this.isLoading = false;
+          this.uiService.displayErrorMessage(err);
+        }
       });
   }
 
@@ -474,15 +512,23 @@ export class PosComponent implements OnInit {
       return;
     }
 
+    this.isLoading = true;
     this.salesService
       .deleteSaleItem(this.deletingSaleItem)
-      .subscribe(async () => {
-        this.activeBills = this.activeBills.filter(s => s.id !== this.deletingSaleItem?.id);
-        this.deletingSaleItem = null;
-        this.toggleItemActionModal()
-        this.loadItems();
-        await this.uiService.wait(100);
-        window.alert("Item has been deleted successfully!");
+      .subscribe({
+        next: async () => {
+          this.isLoading = false;
+          this.activeBills = this.activeBills.filter(s => s.id !== this.deletingSaleItem?.id);
+          this.deletingSaleItem = null;
+          this.toggleItemActionModal()
+          this.loadItems();
+          await this.uiService.wait(100);
+          window.alert("Item has been deleted successfully!");
+        },
+        error: (err) => {
+          this.isLoading = false;
+          this.uiService.displayErrorMessage(err);
+        }
       });
   }
 
@@ -494,11 +540,19 @@ export class PosComponent implements OnInit {
       this.renderer.setStyle(document.body, 'overflow', 'auto');
     }
 
+    this.isLoading = true;
     this.salesService.editSaleBill(this.saleBill)
-      .subscribe(data => {
-        const index = this.activeBills.findIndex(saleBill => saleBill.id === data.id);
-        this.activeBills[index] = data;
-        this.loadBills();
+      .subscribe({
+        next: data => {
+          this.isLoading = false;
+          const index = this.activeBills.findIndex(saleBill => saleBill.id === data.id);
+          this.activeBills[index] = data;
+          this.loadBills();
+        },
+        error: (err) => {
+          this.isLoading = false;
+          this.uiService.displayErrorMessage(err);
+        }
       });
   }
 
@@ -552,19 +606,28 @@ export class PosComponent implements OnInit {
       }
     })
 
-    this.salesService.editSaleBill(this.saleBill).subscribe((bill) => {
-      if (bill.grand_total) {
-        stocks.map(stock => {
-          this.stockService.editStock(stock).subscribe();
-        });
-        
-        this.toggleInvoice();
-        this.toggleProceedPayment();
-      } else {
-        window.alert("No payable amount!");
-        return;
-      }
-    });
+    this.isLoading = true;
+    this.salesService.editSaleBill(this.saleBill)
+      .subscribe({
+        next: (bill) => {
+          this.isLoading = false;
+          if (bill.grand_total) {
+            stocks.map(stock => {
+              this.stockService.editStock(stock).subscribe();
+            });
+            this.loadBills();
+            this.toggleInvoice();
+            this.toggleProceedPayment();
+          } else {
+            window.alert("No payable amount!");
+            return;
+          }
+        },
+        error: (err) => {
+          this.isLoading = false;
+          this.uiService.displayErrorMessage(err);
+        }
+      });
   }
 
   printReceipt(): void {

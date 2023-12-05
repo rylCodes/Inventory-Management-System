@@ -28,7 +28,7 @@ export class ProductsService {
       .pipe(
         catchError((err) => {
           this.handleError(err);
-          return throwError(() => `${err.statusText}: Failed to add new product!`);
+          return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to add new product!`);
         })
       );
   }
@@ -38,7 +38,7 @@ export class ProductsService {
       .pipe(
         catchError((err) => {
           this.handleError(err);
-          return throwError(() => `${err.statusText}: Failed to display menu!`)
+          return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to display menu!`)
         })
       );
   }
@@ -49,7 +49,7 @@ export class ProductsService {
     .pipe(
       catchError((err) => { 
         this.handleError(err);
-        return throwError(() => `${err.statusText}: Failed to update product!`);
+        return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to update product!`);
       })
     );
   }
@@ -60,7 +60,7 @@ export class ProductsService {
       .pipe(
         catchError((err) => {
           this.handleError(err);
-          return throwError(() => `${err.statusText}: Failed to delete product!`);
+          return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to delete product!`);
         })
       );
   }
@@ -71,7 +71,7 @@ export class ProductsService {
       .pipe(
         catchError((err) => {
           this.handleError(err);
-          return throwError(() => `${err.statusText}: Failed to add new item!`);
+          return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to add new item!`);
         })
       );
   }
@@ -81,7 +81,7 @@ export class ProductsService {
       .pipe(
         catchError((err) => {
           this.handleError(err);
-          return throwError(() => `${err.statusText}: Failed to display items!`);
+          return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to display items!`);
         })
       );
   }
@@ -92,7 +92,7 @@ export class ProductsService {
     .pipe(
       catchError((err) => {
         this.handleError(err);
-        return throwError(() => `${err.statusText}: Failed to update item!`);
+        return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to update item!`);
       })
     );
   }
@@ -103,7 +103,7 @@ export class ProductsService {
       .pipe(
         catchError((err) => {
           this.handleError(err);
-          return throwError(() => `${err.statusText}: Failed to delete item!`);
+          return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to delete item!`);
         })
       );
   }

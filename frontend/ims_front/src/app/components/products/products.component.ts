@@ -174,7 +174,7 @@ export class ProductsComponent implements OnInit {
       .getMenus()
       .subscribe({
         next: menus => this.menus = menus,
-        error: err => this.uiService.handleError(err),
+        error: err => this.uiService.displayErrorMessage(err),
       });
   }
 
@@ -190,7 +190,7 @@ export class ProductsComponent implements OnInit {
           }
         },
         error: (err) => {
-          this.uiService.handleError(err);
+          this.uiService.displayErrorMessage(err);
         }
       });
   }
@@ -271,7 +271,7 @@ export class ProductsComponent implements OnInit {
         },
         error: (err) => {
           this.isLoading = false;
-          this.uiService.handleError(err);
+          this.uiService.displayErrorMessage(err);
         }
       });
     }
@@ -305,7 +305,7 @@ export class ProductsComponent implements OnInit {
         },
         error: (err) => {
           this.isLoading = false;
-          this.uiService.handleError(err);
+          this.uiService.displayErrorMessage(err);
         }
       });
   }
@@ -367,7 +367,7 @@ export class ProductsComponent implements OnInit {
         },
         error: (err) => {
           this.isLoading = false;
-          this.uiService.handleError(err);
+          this.uiService.displayErrorMessage(err);
         }
       });
     }
@@ -398,7 +398,7 @@ export class ProductsComponent implements OnInit {
         },
         error: (err) => {
           this.isLoading = false;
-          this.uiService.handleError(err);
+          this.uiService.displayErrorMessage(err);
         }
       });
   }
@@ -459,7 +459,7 @@ export class ProductsComponent implements OnInit {
         },
         error: (err) => {
           this.isLoading = false;
-          this.uiService.handleError(err);
+          this.uiService.displayErrorMessage(err);
         }
       });
   }
@@ -490,7 +490,7 @@ export class ProductsComponent implements OnInit {
         },
         error: (err) => {
           this.isLoading = false;
-          this.uiService.handleError(err);
+          this.uiService.displayErrorMessage(err);
         }
       });
   }

@@ -1,11 +1,11 @@
 <div class="relative w-full px-8">
     <!-- HEADING: POS PAGE -->
     <div class="flex justify-between mt-8">
-        <h1 class="font-bold text-3xl">POINT OF SALES</h1>
+        <h1 class="font-bold text-2xl lg:text-3xl">POINT OF SALES</h1>
     </div>
     <hr class="border-b-1 border-neutral-900 mt-4">
 
-    <div class="relative w-full px-8">
+    <div class="relative w-full px-2 lg:px-4">
         <!-- BILL FORM: Edit -->
         <div *ngIf="showBillForm" class="flex justify-center top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] fixed">
             <div class="relative flex flex-col items-center bg-white rounded-lg w-96 h-fit p-4 mt-32">
@@ -37,9 +37,13 @@
             </div>
         </div>
 
+        <!-- HEADING: ORDER LIST -->
+        <div class="flex justify-between mt-4">
+            <h1 class="font-bold text-xl lg:text-2xl">Add orders:</h1>
+        </div>
         <!-- ITEM FORM -->
         <form
-            class="flex items-end text-start justify-between w-3/4 bg-[#fff] h-fit mt-4 px-4 py-2 rounded-lg shadow-xl text-neutral-900"
+            class="flex items-end text-start justify-between w-full bg-[#fff] h-fit mt-2 px-4 py-2 rounded-lg shadow-xl text-neutral-900 md:w-3/4"
             (ngSubmit)="onSubmitItem()">
             <div class="flex flex-col w-2/5">
                 <label for="name">Menu:</label>
@@ -71,8 +75,8 @@
         </form>
 
         <!-- FLEX CONTAINER: ORDER LIST -->
-        <div class="flex justify-center space-x-2 w-full">
-            <div class="table-container w-3/4 text-center shadow-xl mt-4">
+        <div class="flex flex-col justify-center space-x-0 w-full md:flex-row md:space-x-2">
+            <div class="table-container w-full text-center shadow-xl mt-4 md:w-3/4">
                 <!-- ITEM TABLE -->
                 <table class="w-full table-fixed">
                     <thead class="text-neutral-300 bg-neutral-900">
@@ -101,14 +105,39 @@
                         </tr>
                     </tbody>
                 </table>
-                <div *ngIf="isLoading && updatingOrder" class="h-[25vh]">
-                    <app-loader></app-loader>
+                <div class="w-full" *ngIf="!saleItems">
+                    <p class="text-center my-4">No items to show.</p>
                 </div>
+            </div>
+
+            <!-- BILL FORM: Add -->
+            <div *ngIf="!updatingOrder"
+                class="bg-white self-start mx-auto p-4 rounded-lg shadow-xl text-neutral-900 mt-4 w-full md:flex-1">
+                <form class="flex flex-col" (ngSubmit)="onSubmitBill()">
+                    <label for="saleBill.customer_name">Customer:</label>
+                    <input class="text-center uppercase border border-neutral-900 px-1 py-0.5 rounded-sm mt-1"
+                        type="text" name="saleBill.customer_name" id="saleBill.customer_name"
+                        [(ngModel)]="saleBill.customer_name">
+
+                    <label class="mt-2" for="remarks">Remarks:</label>
+                    <input class="text-center uppercase border border-neutral-900 px-1 py-0.5 rounded-sm mt-1"
+                        type="text" name="remarks" id="remarks" [(ngModel)]="saleBill.remarks">
+
+                    <h3 class="mt-2" for="remarks">Total Bill:</h3>
+                    <p class="text-center uppercase bg-blue-50 border border-neutral-900 px-1 py-0.5 rounded-sm mt-1">
+                        &#8369;{{saleBill.grand_total | number: '1.2-2'}}
+                    </p>
+
+                    <!-- Submit Button -->
+                    <button class="mt-6 bg-[#008000] text-white font-bold p-2 rounded hover:bg-[#009000]" type="submit">
+                        Place Order
+                    </button>
+                </form>
             </div>
 
             <!-- BILL DIV -->
             <div *ngIf="updatingOrder"
-                class="bg-[#fff] self-start flex-1 h-auto mx-auto p-4 rounded-lg shadow-xl text-neutral-900 mt-4">
+                class="bg-[#fff] self-start h-auto mx-auto p-4 rounded-lg shadow-xl text-neutral-900 mt-4 w-full md:flex-1">
                 <form class="flex flex-col">
                     <h3 for="saleBill.customer_name">Transaction Code:</h3>
                     <p class="uppercase border border-neutral-900 px-1 py-0.5 rounded-sm mt-1 text-center">
@@ -144,37 +173,11 @@
                     </div>
                 </form>
             </div>
-
-            <!-- BILL FORM: Add -->
-            <div *ngIf="!updatingOrder"
-                class="bg-white self-start flex-1 h-auto mx-auto p-4 rounded-lg shadow-xl text-neutral-900 mt-4">
-                <form class="flex flex-col" (ngSubmit)="onSubmitBill()">
-                    <label for="saleBill.customer_name">Customer:</label>
-                    <input class="text-center uppercase border border-neutral-900 px-1 py-0.5 rounded-sm mt-1"
-                        type="text" name="saleBill.customer_name" id="saleBill.customer_name"
-                        [(ngModel)]="saleBill.customer_name">
-
-                    <label class="mt-2" for="remarks">Remarks:</label>
-                    <input class="text-center uppercase border border-neutral-900 px-1 py-0.5 rounded-sm mt-1"
-                        type="text" name="remarks" id="remarks" [(ngModel)]="saleBill.remarks">
-
-                    <h3 class="mt-2" for="remarks">Total Bill:</h3>
-                    <p class="text-center uppercase bg-blue-50 border border-neutral-900 px-1 py-0.5 rounded-sm mt-1">
-                        &#8369;{{saleBill.grand_total | number: '1.2-2'}}
-                    </p>
-
-                    <!-- Submit Button -->
-                    <button class="mt-6 bg-[#008000] text-white font-bold p-2 rounded hover:bg-[#009000]" type="submit">
-                        Place Order
-                    </button>
-                </form>
-            </div>
-
         </div>
 
         <!-- HEADING: TRANSACTION TABLE -->
         <div *ngIf="showBillTable" class="flex justify-between mt-8">
-            <h1 class="font-bold text-2xl">Ongoing Transactions:</h1>
+            <h1 class="font-bold text-xl lg:text-2xl">Ongoing Transactions:</h1>
         </div>
 
         <!-- BILL TABLE -->
@@ -184,14 +187,14 @@
                     <th>Time</th>
                     <th>Transaction Code</th>
                     <th>Customer Name</th>
-                    <th>Remarks</th>
+                    <th class="hidden md:table-cell"><span>Remarks</span></th>
                     <th>Items</th>
                     <th>Total</th>
                     <th>Action</th>
                 </thead>
                 <tbody>
                     <tr *ngFor="let bill of activeBills">
-                        <td class="flex items-center space-x-6">
+                        <td class="flex justify-center items-center space-x-2 p-2 md:space-x-4">
                             <!-- View Order List -->
                             <button class="px-1.5 py-0.5 rounded-md bg-neutral-800 ml-2" (click)="viewOrder(bill)">
                                 <fa-icon [icon]="faRectangleList" [ngStyle]="{color: 'rgb(212 212 212)'}">
@@ -201,10 +204,10 @@
                         </td>
                         <td class="p-2">{{bill.billno}}</td>
                         <td class="p-2">{{bill.customer_name}}</td>
-                        <td class="p-2">{{bill.remarks}}</td>
+                        <td class="p-2 hidden md:table-cell">{{bill.remarks}}</td>
                         <td class="p-2">{{1}}</td>
                         <td class="p-2">&#8369;{{bill.grand_total | number: '1.2-2'}}</td>
-                        <td class="flex justify-center p-2 space-x-6">
+                        <td class="flex justify-center p-2 space-x-2 md:space-x-4">
                             <!-- Edit Sale Bill -->
                             <fa-icon class="hover:scale-110" [ngStyle]="{color: 'green'}" [icon]="faPen"
                                 (click)="updateSaleBill(bill)">
@@ -217,8 +220,8 @@
                     </tr>
                 </tbody>
             </table>
-            <div *ngIf="isLoading" class="h-[25vh]">
-                <app-loader></app-loader>
+            <div class="w-full" *ngIf="!activeBills.length">
+                <p class="text-center my-4">No ongoing transactions to show.</p>
             </div>
         </div>
 
@@ -250,25 +253,25 @@
         </div>
 
         <!-- INVOICE -->
-        <div id="invoice-section" *ngIf="showInvoice" class="top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] fixed overflow-y-auto">
-            <div class="bg-white rounded-lg w-2/5 h-fit mt-10 mx-auto">
-                <div class="flex flex-col justify-center p-8">
+        <div *ngIf="showInvoice" class="top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] fixed overflow-y-auto">
+            <div class="bg-white rounded-lg w-4/5 h-fit mt-8 mx-auto lg:w-1/2">
+                <div id="invoice-section" class="flex flex-col justify-center p-4 w-full md:p-8">
                     <h3
-                        class="self-center text-center w-1/3 rounded-2xl text-white bg-orange-600 font-bold py-1 text-xl">
-                        INVOICE</h3>
+                        class="self-center text-center w-1/3 rounded-2xl text-white bg-orange-600 font-bold py-1 text-base mx-auto lg:text-xl">
+                        INVOICE
+                    </h3>
                     <div class="flex justify-between mt-8">
                         <div class="w-1/2">
-                            <h4 class="font-bold text-2xl text-orange-600">ALADIN'S FOOD HUB</h4>
+                            <h4 class="font-bold text-xl text-orange-600 lg:text-2xl">ALADIN'S FOOD HUB</h4>
                             <p>Valleygolf, Brgy. San Juan, Cainta, Rizal</p>
                         </div>
                         <div class="w-2/5">
-                            <h4 class="font-bold text-lg text-orange-600">BILL TO</h4>
+                            <h4 class="font-bold text-base text-orange-600 lg:text-lg">BILL TO</h4>
                             <p>Transaction Code: {{saleBill.billno}}</p>
                             <p>Name: {{saleBill.customer_name}}</p>
-                            <p>Bank Detail: 123123</p>
                         </div>
                     </div>
-                    <table class="mt-8">
+                    <table class="mt-8 w-full">
                         <thead class="bg-orange-600 text-white p-2">
                             <th>DESCRIPTIONS</th>
                             <th>PRICE</th>
@@ -279,16 +282,16 @@
                             <tr class="text-center bg-inherit border-b border-neutral-900"
                                 *ngFor="let item of saleItems">
                                 <td class="p-1">{{getMenuDetails(item.menu).name}}</td>
-                                <td class="p-1">{{item.price}}</td>
+                                <td class="p-1">{{item.price | number: '1.2-2'}}</td>
                                 <td class="p-1">{{item.quantity}}</td>
-                                <td class="p-1">{{item.sub_total}}</td>
+                                <td class="p-1">&#8369;{{item.sub_total | number: '1.2-2'}}</td>
                             </tr>
                         </tbody>
                     </table>
                     <div class="flex justify-between mt-6">
                         <div class="w-1/2">
-                            <div class="w-2/3">
-                                <p class="flex justify-between">sss
+                            <div class="w-4/5">
+                                <p class="flex justify-between">
                                     <span>Invoice:</span>
                                     <span>{{saleBill.billno}}</span>
                                 </p>
@@ -297,12 +300,12 @@
                                     <span>{{saleBill.time | date: 'MM-dd-yyyy hh:mm a'}}</span>
                                 </p>
                             </div>
-                            <p class="text-base font-bold mt-6 text-orange-600">THANK YOU FOR YOUR BUSINESS</p>
+                            <p class="text-sm font-bold mt-6 text-orange-600 lg:text-base">THANK YOU FOR YOUR BUSINESS</p>
                         </div>
                         <div class="w-2/5">
                             <p class="flex justify-between px-1">
                                 <span>SUBTOTAL:</span>
-                                <span class="font-bold">{{saleBill.grand_total}}</span>
+                                <span class="font-bold">&#8369;{{saleBill.grand_total | number: '1.2-2'}}</span>
                             </p>
                             <p class="flex justify-between px-1">
                                 <span>SERVICE FEE:</span>
@@ -314,19 +317,36 @@
                             </p>
                             <p class="bg-orange-600 text-white font-bold flex justify-between mt-4 px-2 py-1">
                                 <span>TOTAL:</span>
-                                <span>{{saleBill.grand_total}}</span>
+                                <span>&#8369;{{saleBill.grand_total | number: '1.2-2'}}</span>
                             </p>
                         </div>
                     </div>
-                    <div class="flex justify-between mt-8">
-                        <div>09123456789</div>
-                        <div>Valleygolf, Cainta, Rizal</div>
-                        <div>cityconbuilders.gmail.com</div>
+                    <div class="flex justify-between mt-8 text-xxs lg:text-xs">
+                        <div class="flex items-center space-x-1">
+                            <fa-icon [icon]="faPhone"></fa-icon>
+                            <span>09123456789</span>
+                        </div>
+                        <div class="flex items-center  space-x-1">
+                            <fa-icon [icon]="faLocationDot"></fa-icon>
+                            <span>Valleygolf, Cainta, Rizal</span>
+                        </div>
+                        <div class="flex items-center space-x-1">
+                            <fa-icon [icon]="faEnvelope"></fa-icon>
+                            <span>cityconbuilders@.gmail.com</span>
+                        </div>
                     </div>
                 </div>
                 <div class="flex justify-end space-x-1 p-2 border-t border-neutral-300">
-                    <app-button printSectionId="invoice-section" ngxPrint bgColor="blue" txtContent="Print"></app-button>
-                    <app-button (btnClick)="toggleInvoice()" bgColor="red" txtContent="Close"></app-button>
+                    <button class="flex bg-blue-600 space-x-1 hover:bg-blue-700 font-bold text-white px-3 py-2 rounded-md"
+                        [useExistingCss]="true" printSectionId="invoice-section" ngxPrint>
+                        <fa-icon [icon]="faPrint"></fa-icon>
+                        <span>Print</span>
+                    </button>
+                    <button class="flex bg-red-600 space-x-1 hover:bg-red-700 font-bold text-white px-3 py-2 rounded-md"
+                        (click)="toggleInvoice()">
+                        <fa-icon [icon]="faTimes"></fa-icon>
+                        <span>Close</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -357,6 +377,11 @@
                 <app-button (btnClick)="onConfirmDelete()" bgColor="red" txtColor="bg-white"
                     txtContent="Delete"></app-button>
             </div>
+        </div>
+
+        <!-- CSS Loader -->
+        <div *ngIf="isLoading" class="top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.3)] fixed">
+            <app-loader></app-loader>
         </div>
     </div>
 </div>

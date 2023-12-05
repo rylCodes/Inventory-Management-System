@@ -11,24 +11,23 @@
     <!-- FORM -->
     <div *ngIf="showForm"
         class="bg-[#fff] max-w-xl h-auto mx-auto px-8 py-10 rounded-lg shadow-xl text-neutral-900 mt-4">
-        <h2 class="font-bold text-center text-2xl"> {{ proceedEdit? 'Edit stock' : 'Create new stock' }}</h2>
-        <form class="flex flex-col mt-2" (ngSubmit)="onSubmit()">
+        <h2 class="font-bold text-center text-xl lg:text-2xl"> {{ proceedEdit? 'Edit item' : 'Add new item' }}</h2>
+        <form class="flex flex-col lg:mt-2" (ngSubmit)="onSubmit()">
+            <label class="mt-2 lg:mt-4" for="name">Name:</label>
+            <input class="uppercase border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text"
+                name="stock.stock_name" id="stock.stock_name" [(ngModel)]="stock.stock_name">
 
-            <label class="mt-4" for="name">Name:</label>
-            <input class="uppercase border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text" name="stock.stock_name"
-                id="stock.stock_name" [(ngModel)]="stock.stock_name">
+            <label class="mt-2 lg:mt-4" for="stock.description">Description:</label>
+            <input class="uppercase border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text"
+                name="stock.description" id="stock.description" [(ngModel)]="stock.description">
 
-            <label class="mt-4" for="stock.description">Description:</label>
-            <input class="uppercase border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text" name="stock.description"
-                id="stock.description" [(ngModel)]="stock.description">
+            <label class="mt-2 lg:mt-4" for="stock.quantity">Quantity:</label>
+            <input appSelectAllText class="border border-neutral-900 px-2 py-1 rounded-sm mt-1 text-center"
+                type="number" name="stock.quantity" id="stock.quantity" [(ngModel)]="stock.quantity">
 
-            <label class="mt-4" for="stock.quantity">Quantity:</label>
-            <input appSelectAllText class="border border-neutral-900 px-2 py-1 rounded-sm mt-1 text-center" type="number"
-                name="stock.quantity" id="stock.quantity" [(ngModel)]="stock.quantity">
-
-            <label class="mt-4" for="stock.unit">Unit:</label>
-            <select class="lowercase border border-neutral-900 px-2 py-1 rounded-sm mt-1" name="stock.unit" id="stock.unit"
-                [(ngModel)]="stock.unit">
+            <label class="mt-2 lg:mt-4" for="stock.unit">Unit:</label>
+            <select class="lowercase border border-neutral-900 px-2 py-1 rounded-sm mt-1" name="stock.unit"
+                id="stock.unit" [(ngModel)]="stock.unit">
                 <option selected value="piece">piece</option>
                 <option value="bottle">bottle</option>
                 <option value="liter">liter</option>
@@ -37,21 +36,22 @@
                 <option class="text-neutral-500" value="otherUnit">other unit...</option>
             </select>
             <!-- Input field for custom unit when "other unit..." is selected -->
-            <input class="lowercase" *ngIf="stock.unit === 'otherUnit'" class="border border-neutral-900 px-2 py-1 rounded-sm mt-1"
-                type="text" name="customUnit" id="customUnit" [(ngModel)]="customUnit" placeholder="Please specify.">
+            <input class="lowercase" *ngIf="stock.unit === 'otherUnit'"
+                class="border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text" name="customUnit"
+                id="customUnit" [(ngModel)]="customUnit" placeholder="Please specify.">
 
-            <div class="flex items-center mt-4">
+            <div class="flex items-center mt-3 lg:mt-4">
                 <label class="" for="stock.status">Status:</label>
                 <div class="flex items-center ml-10">
-                    <input class="border border-neutral-900 px-2 py-1 rounded-sm w-4 h-4" type="checkbox" name="stock.status"
-                        id="active" [(ngModel)]="stock.status" checked>
+                    <input class="border border-neutral-900 px-2 py-1 rounded-sm w-4 h-4" type="checkbox"
+                        name="stock.status" id="active" [(ngModel)]="stock.status" checked>
                     <label class="ml-1" for="active">Active</label>
 
                 </div>
             </div>
 
             <!-- Submit Button -->
-            <button class="mt-10 bg-neutral-800 text-neutral-300 font-bold p-2 rounded hover:bg-[rgb(48,48,48)]"
+            <button class="mt-8 bg-neutral-800 text-neutral-300 font-bold p-2 rounded hover:bg-[rgb(48,48,48)] lg:mt-10"
                 type="submit">
                 {{ proceedEdit? 'Update': 'Add' }}
             </button>
@@ -80,7 +80,8 @@
                     <td class="p-2">{{stock.unit}}</td>
                     <td class="p-2 hidden md:table-cell">{{stock.date_updated | date: 'dd/MM/yyyy'}}</td>
                     <td class="p-2 hidden md:table-cell">
-                        <span class="text-white text-xs px-2 py-1 rounded-md" [ngClass]="stock.status? 'bg-[#008000]' : 'bg-[#ffa500]'">
+                        <span class="text-white text-xs px-2 py-1 rounded-md"
+                            [ngClass]="stock.status? 'bg-[#008000]' : 'bg-[#ffa500]'">
                             {{stock.status? 'active' : 'inactive'}}
                         </span>
                     </td>
@@ -99,14 +100,11 @@
                 </tr>
             </tbody>
         </table>
-        <div class="w-full" *ngIf="!stocks.length">
-            <p class="text-center my-4">No item.</p>
-        </div>
     </div>
 
     <!-- Confirm to Delete Stock Modal -->
     <div *ngIf="showActionModal" class="flex justify-center top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] fixed">
-        <div class="relative flex flex-col items-center bg-white rounded-lg w-96 h-fit p-4 mt-32">
+        <div class="relative flex flex-col items-center bg-white rounded-lg h-fit p-4 mt-32 w-1/2 lg:w-1/4 md:w-1/3">
             <fa-icon class="place-self-end scale-125 hover:scale-110" [icon]="faXmark"
                 [ngStyle]="{color: 'rgb(64 64 64 )'}" (click)="toggleActionModal()">
             </fa-icon>

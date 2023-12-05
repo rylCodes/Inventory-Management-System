@@ -24,20 +24,22 @@ table th {
     padding: 10px;
 }
 
-.active {
-    border-left: 5px solid #008000;
-    margin: 0;
-    padding: 0;
-}
-
-.inactive {
-    border-left: 5px solid #ffa500;
-    margin: 0;
-    padding: 0;
-}
-
 @media (max-width: 768px) {
-    table td, table tr {
+
+    table tbody td,
+    table thead tr {
         word-wrap: break-word;
+    }
+
+    .active {
+        border-left: 5px solid #008000;
+        margin: 0;
+        padding: 0;
+    }
+
+    .inactive {
+        border-left: 5px solid #ffa500;
+        margin: 0;
+        padding: 0;
     }
 }

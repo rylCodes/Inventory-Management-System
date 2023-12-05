@@ -267,6 +267,9 @@ export class ProductsComponent implements OnInit {
           this.resetProductForm();
           this.toggleFormContainer();
           await this.uiService.wait(100);
+          if (!menu.price || menu.price < 1) {
+            window.alert("Warning: You have saved a product without a price amount. Make sure it is correct.");
+          }
           window.alert("Success: New product has been added to the menu.");
         },
         error: (err) => {

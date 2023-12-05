@@ -8,19 +8,6 @@
     </div>
     <hr class="border-b-1 border-neutral-900 mt-4">
 
-    <!-- Confirm to Delete Supplier Modal -->
-    <div *ngIf="showActionModal" class="flex justify-center top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] fixed">
-        <div class="relative flex flex-col items-center bg-white rounded-lg w-96 h-fit p-4 mt-32">
-            <fa-icon class="place-self-end scale-125 hover:scale-110" [icon]="faXmark"
-                [ngStyle]="{color: 'rgb(64 64 64 )'}" (click)="toggleActionModal()">
-            </fa-icon>
-            <p class="mb-8 mt-6 text-center">Are you sure you want to delete this supplier?<br>This action cannot be
-                undone.</p>
-            <app-button (btnClick)="onConfirmDelete()" bgColor="red" txtColor="bg-white"
-                txtContent="Delete"></app-button>
-        </div>
-    </div>
-
     <!-- FORM -->
     <div *ngIf="showForm"
         class="bg-[#fff] max-w-xl h-auto mx-auto px-8 py-10 rounded-lg shadow-xl text-neutral-900 mt-4">
@@ -69,7 +56,7 @@
                 <th>Phone</th>
                 <th>Email</th>
                 <th class="hidden md:table-cell">Status</th>
-                <th>Action</th>
+                <th class="w-[15%] md:auto">Action</th>
             </thead>
             <tbody>
                 <tr [ngClass]="supplier.status ? 'active' : 'inactive'" *ngFor="let supplier of suppliers">
@@ -79,7 +66,8 @@
                     <td class="p-2">{{supplier.phone }}</td>
                     <td class="p-2">{{supplier.email }}</td>
                     <td class="p-2 hidden md:table-cell">
-                        <span class="text-white text-xs px-2 py-1 rounded-md" [ngClass]="supplier.status? 'bg-[#008000]' : 'bg-[#ffa500]'">
+                        <span class="text-white text-xs px-2 py-1 rounded-md"
+                            [ngClass]="supplier.status? 'bg-[#008000]' : 'bg-[#ffa500]'">
                             {{supplier.status? 'active' : 'inactive'}}
                         </span>
                     </td>
@@ -98,8 +86,18 @@
                 </tr>
             </tbody>
         </table>
-        <div class="w-full" *ngIf="!suppliers.length">
-            <p class="text-center my-4">No item.</p>
+    </div>
+
+    <!-- Confirm to Delete Supplier Modal -->
+    <div *ngIf="showActionModal" class="flex justify-center top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] fixed">
+        <div class="relative flex flex-col items-center bg-white rounded-lg h-fit p-4 mt-32 w-1/2 lg:w-1/4 md:w-1/3">
+            <fa-icon class="place-self-end scale-125 hover:scale-110" [icon]="faXmark"
+                [ngStyle]="{color: 'rgb(64 64 64 )'}" (click)="toggleActionModal()">
+            </fa-icon>
+            <p class="mb-8 mt-6 text-center">Are you sure you want to delete this supplier?<br>This action cannot be
+                undone.</p>
+            <app-button (btnClick)="onConfirmDelete()" bgColor="red" txtColor="bg-white"
+                txtContent="Delete"></app-button>
         </div>
-    </div>    
+    </div>
 </div>

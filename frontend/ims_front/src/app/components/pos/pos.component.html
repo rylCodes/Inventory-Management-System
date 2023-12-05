@@ -6,38 +6,6 @@
     <hr class="border-b-1 border-neutral-900 mt-4">
 
     <div class="relative w-full px-2 lg:px-4">
-        <!-- BILL FORM: Edit -->
-        <div *ngIf="showBillForm" class="flex justify-center top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] fixed">
-            <div
-                class="relative flex flex-col items-center bg-white rounded-lg h-fit p-4 mt-32 w-1/2 lg:w-1/4 md:w-1/3">
-                <fa-icon class="place-self-end scale-125 hover:scale-110" [icon]="faXmark"
-                    [ngStyle]="{color: 'rgb(64 64 64 )'}" (click)="toggleBillForm()">
-                </fa-icon>
-                <h2 class="font-bold text-center text-2xl">
-                    {{ proceedEditBill? "Edit transaction details" : "Add new transaction" }}
-                </h2>
-                <form class="flex flex-col mt-2 w-full" (ngSubmit)="onSubmitBill()">
-                    <h4 class="mt-4" for="saleBill.customer_name">Bill No:</h4>
-                    <p class="uppercase bg-blue-50 border border-neutral-900 px-2 py-1 rounded-sm mt-1">
-                        {{saleBill.billno}}
-                    </p>
-                    <label class="mt-4" for="saleBill.customer_name">Customer:</label>
-                    <input class="uppercase border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text"
-                        name="saleBill.customer_name" id="saleBill.customer_name" [(ngModel)]="saleBill.customer_name">
-
-                    <label class="mt-4" for="remarks">Remarks:</label>
-                    <input class="uppercase border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text"
-                        name="remarks" id="remarks" [(ngModel)]="saleBill.remarks">
-
-                    <!-- Submit Button -->
-                    <button class="mt-10 bg-neutral-800 text-neutral-300 font-bold p-2 rounded hover:bg-[rgb(48,48,48)]"
-                        type="submit">
-                        Update
-                    </button>
-                </form>
-            </div>
-        </div>
-
         <!-- HEADING: ORDER LIST -->
         <div class="flex justify-between mt-4">
             <h1 class="font-bold text-xl lg:text-2xl">Add orders:</h1>
@@ -89,7 +57,7 @@
                     </thead>
                     <tbody class="relative">
                         <tr *ngFor="let item of saleItems">
-                            <td class="flex items-center p-2 space-x-6">
+                            <td class="flex items-center p-2 space-x-2 lg:space-x-4">
                                 <button class="px-1.5 py-1 rounded-md bg-[#ff0000]" (click)="deleteSaleItem(item)">
                                     <fa-icon class="scale-75" [icon]="faTrashCan"
                                         [ngStyle]="{color: 'rgb(212 212 212)'}">
@@ -116,9 +84,9 @@
                 class="bg-white self-start mx-auto p-4 rounded-lg shadow-xl text-neutral-900 mt-4 w-full md:flex-1">
                 <form class="flex flex-col" (ngSubmit)="onSubmitBill()">
                     <h2 class="font-bold text-center text-base lg:text-xl md:lg md:flex-1">
-                        {{ proceedEditBill? "Update bill details" : "Add new transaction" }}
+                        {{ proceedEditBill? "Updating..." : "New transaction" }}
                     </h2>
-                    <label for="saleBill.customer_name">Customer:</label>
+                    <label class="mt-2" for="saleBill.customer_name">Customer:</label>
                     <input class="text-center uppercase border border-neutral-900 px-1 py-0.5 rounded-sm mt-1"
                         type="text" name="saleBill.customer_name" id="saleBill.customer_name"
                         [(ngModel)]="saleBill.customer_name">
@@ -134,7 +102,7 @@
 
                     <!-- Submit Button -->
                     <button class="mt-6 bg-[#008000] text-white font-bold p-2 rounded hover:bg-[#009000]" type="submit">
-                        Save
+                        Add
                     </button>
                 </form>
             </div>
@@ -210,7 +178,7 @@
                         <td class="p-2">{{bill.billno}}</td>
                         <td class="p-2">{{bill.customer_name}}</td>
                         <td class="p-2 hidden md:table-cell">{{bill.remarks}}</td>
-                        <td class="p-2">{{1}}</td>
+                        <td class="p-2">{{getItemLength(bill)}}</td>
                         <td class="p-2">&#8369;{{bill.grand_total | number: '1.2-2'}}</td>
                         <td class="flex justify-center p-2 space-x-2 md:space-x-4">
                             <!-- Edit Sale Bill -->
@@ -227,15 +195,47 @@
             </table>
         </div>
 
-        <!-- BILL OUT MODAL: Amount Tendered and Change -->
+        <!-- BILL FORM: Edit -->
+        <div *ngIf="showBillForm" class="flex justify-center top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] fixed">
+            <div
+                class="relative flex flex-col items-center bg-white rounded-lg h-fit p-4 mt-32 w-1/2 lg:w-1/4 md:w-1/3">
+                <fa-icon class="place-self-end scale-125 hover:scale-110" [icon]="faXmark"
+                    [ngStyle]="{color: 'rgb(64 64 64 )'}" (click)="toggleBillForm()">
+                </fa-icon>
+                <h2 class="font-bold text-center text-lg lg:text-2xl md:text-xl">
+                    {{ proceedEditBill? "Edit transaction details" : "Add new transaction" }}
+                </h2>
+                <form class="flex flex-col mt-2 w-full" (ngSubmit)="onSubmitBill()">
+                    <h4 class="mt-4" for="saleBill.customer_name">Bill No:</h4>
+                    <p class="uppercase bg-blue-50 border border-neutral-900 px-2 py-1 rounded-sm mt-1">
+                        {{saleBill.billno}}
+                    </p>
+                    <label class="mt-4" for="saleBill.customer_name">Customer:</label>
+                    <input class="uppercase border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text"
+                        name="saleBill.customer_name" id="saleBill.customer_name" [(ngModel)]="saleBill.customer_name">
+
+                    <label class="mt-4" for="remarks">Remarks:</label>
+                    <input class="uppercase border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text"
+                        name="remarks" id="remarks" [(ngModel)]="saleBill.remarks">
+
+                    <!-- Submit Button -->
+                    <button class="mt-10 bg-neutral-800 text-neutral-300 font-bold p-2 rounded hover:bg-[rgb(48,48,48)]"
+                        type="submit">
+                        Update
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- CHECKOUT MODAL: Amount Tendered and Change -->
         <div *ngIf="proceedPayment" class="flex justify-center top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] fixed">
             <form class="relative flex flex-col bg-white rounded-lg h-fit p-4 mt-32 w-1/2 lg:w-1/4 md:w-1/3"
                 (ngSubmit)="onPayment()">
                 <fa-icon class="place-self-end scale-125 hover:scale-110" [icon]="faXmark"
                     [ngStyle]="{color: 'rgb(64 64 64 )'}" (click)="toggleProceedPayment()">
                 </fa-icon>
-                <h2 class="font-bold text-center text-2xl">
-                    Bill Out
+                <h2 class="font-bold text-center text-lg lg:text-2xl md:text-xl">
+                    Checkout
                 </h2>
                 <h4 class="mt-4">Payable Amount:</h4>
                 <p class="text-end uppercase bg-blue-50 border border-neutral-900 px-2 py-1 rounded-sm mt-1">

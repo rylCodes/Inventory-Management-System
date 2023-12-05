@@ -108,7 +108,7 @@
         </div>
 
         <!-- TRANSACTION HISTORY TABLE -->
-        <div class="w-full text-center shadow-xl rounded-xl mt-8">
+        <div class="w-full text-center shadow-xl rounded-xl mt-6 md:mt-8">
             <table class="w-full table-fixed rounded-xl">
                 <thead class="text-neutral-300 bg-neutral-900">
                     <th>Date Time</th>
@@ -128,7 +128,7 @@
                         <td class="p-2">{{getItemLength(bill)}}</td>
                         <td class="p-2">&#8369;{{bill.grand_total | number: '1.2-2'}}</td>
                         <td class="p-2">
-                            <div class="flex justify-center space-x-2 md:space-x-4">
+                            <div class="flex justify-center space-x-3 md:space-x-4">
                                 <fa-icon class="hover:scale-110" [icon]="faRectangleList" (click)="toggleInvoice(bill)">
                                 </fa-icon>
                                 <!-- Delete SaleBill -->

@@ -202,8 +202,8 @@
             </thead>
             <tbody>
                 <tr *ngFor="let bill of bills">
-                    <td class="p-2">
-                        <div class="flex justify-center items-center space-x-1 md:space-x-3">
+                    <td class="p-2 text-clip overflow-hidden">
+                        <div class="flex items-center space-x-2 md:space-x-4">
                             <!-- View Order List -->
                             <button class="px-1.5 py-0.5 rounded-md bg-neutral-800 ml-2" (click)="viewOrder(bill)">
                                 <fa-icon [icon]="faRectangleList" [ngStyle]="{color: 'rgb(212 212 212)'}">
@@ -218,7 +218,7 @@
                     <td class="p-2 hidden md:table-cell">{{bill.remarks}}</td>
                     <td class="p-2 hidden md:table-cell">{{bill.time | date: "MMM dd 'at' hh:mm a"}}</td>
                     <td class="p-2">
-                        <div class="flex justify-center items-start-center space-x-2 md:space-x-4">
+                        <div class="flex justify-center items-start-center space-x-3 md:space-x-4">
                             <!-- Edit bill -->
                             <fa-icon class="hover:scale-110" [ngStyle]="{color: 'green'}" [icon]="faPen"
                                 (click)="updateBill(bill)">

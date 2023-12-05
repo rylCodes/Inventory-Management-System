@@ -48,6 +48,7 @@ export class PosComponent implements OnInit {
   activeBills: SaleBill[] = [];
   allBills: SaleBill[] = [];
   saleItems: SaleItem[] = [];
+  allItems: SaleItem[] = [];
   menus: Menu[] = [];
   stocks: Stock[] = [];
   products: Product[] = [];
@@ -217,6 +218,8 @@ export class PosComponent implements OnInit {
       .getSaleItems()
       .subscribe({
         next: (saleItems) => {
+          this.allItems = saleItems;
+
           if (this.updatingOrder) {
             this.saleItems = saleItems.filter(item => item.billno === this.saleBill.id);
             this.saleBill.grand_total = this.calculateGrandtotal(this.saleItems);
@@ -260,6 +263,11 @@ export class PosComponent implements OnInit {
       .subscribe(products => {
         this.products = products;
       })
+  }
+
+  getItemLength(bill: SaleBill) {
+    const items = this.allItems.filter(item => item.billno === bill.id);
+    return items.length;
   }
 
   onSubmitBill() {

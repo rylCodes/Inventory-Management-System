@@ -1,4 +1,4 @@
-<div class="relative w-full px-8">
+<div class="relative w-full  px-4 md:px-8">
     <!-- HEADING -->
     <div class="flex justify-between mt-8">
         <h1 class="font-bold text-2xl lg:text-3xl">DASHBOARD</h1>
@@ -6,7 +6,7 @@
     <hr class="border-b-1 border-neutral-900 mt-4">
 
     <!-- Flex container: Dashboard Items -->
-    <div class="bg-white p-4 rounded-md flex flex-col w-full space-y-2 space-x-0 md:space-y-0 md:space-x-2 mt-8 md:flex-row">
+    <div class="bg-white p-2 rounded-md flex flex-col w-full space-y-2 space-x-0 md:space-y-0 md:space-x-2 mt-6 lg:mt-8 md:p-4 md:flex-row">
         <div class="flex w-full space-x-2 md:flex-row md:w-1/2">
             <div class="bg-green-600 text-neutral-50 h-auto w-1/2 rounded-sm md:rounded-md bg-gradient-to-r from-green-700 to-green-500">
                 <div class="flex justify-around items-center py-6 lg:py-8">
@@ -59,7 +59,7 @@
             <div class="text-neutral-50 h-auto w-1/2 rounded-sm md:rounded-md bg-gradient-to-r from-yellow-700 to-yellow-500">
                 <div class="flex justify-around items-center py-6 lg:py-8">
                     <div>
-                        <h3 class="font-semibold text-lg lg:text-xl">Today Sales</h3>
+                        <h3 class="font-semibold text-lg lg:text-xl">Today's Sales</h3>
                         <p class="text-base lg:text-lg">&#8369;{{getTodaySales() | number: '1.2-2'}}</p>
                     </div>
                     <div class="text-5xl lg:text-7xl">

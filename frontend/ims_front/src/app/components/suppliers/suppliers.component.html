@@ -1,4 +1,4 @@
-<div class="relative w-full px-8">
+<div class="relative w-full px-4 md:px-8">
     <!-- HEADING -->
     <div class="flex justify-between mt-8">
         <h1 class="font-bold text-2xl lg:text-3xl">SUPPLIERS</h1>
@@ -47,7 +47,7 @@
     </div>
 
     <!-- TABLE -->
-    <div class="w-full text-center shadow-xl rounded-xl mt-6 md:mt-8" [ngClass]="showForm ? 'hidden' : 'block'">
+    <div class="w-full text-center shadow-xl rounded-xl mt-6 lg:mt-8" [ngClass]="showForm ? 'hidden' : 'block'">
         <table class="w-full table-fixed rounded-xl">
             <thead class="text-neutral-300 bg-neutral-900">
                 <th>Code</th>
@@ -63,8 +63,8 @@
                     <td class="p-2">{{supplier.code}}</td>
                     <td class="p-2">{{supplier.name}}</td>
                     <td class="p-2">{{supplier.address}}</td>
-                    <td class="p-2">{{supplier.phone }}</td>
-                    <td class="p-2">{{supplier.email }}</td>
+                    <td class="p-2 break-words">{{supplier.phone }}</td>
+                    <td class="p-2 break-words">{{supplier.email }}</td>
                     <td class="p-2 hidden md:table-cell">
                         <span class="text-white text-xs px-2 py-1 rounded-md"
                             [ngClass]="supplier.status? 'bg-[#008000]' : 'bg-[#ffa500]'">

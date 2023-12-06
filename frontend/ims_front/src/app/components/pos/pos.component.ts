@@ -219,10 +219,10 @@ export class PosComponent implements OnInit {
       .subscribe({
         next: (saleItems) => {
           this.allItems = saleItems;
+          console.log(this.updatingOrder);
 
           if (this.updatingOrder) {
             this.saleItems = saleItems.filter(item => item.billno === this.saleBill.id);
-            this.saleBill.grand_total = this.calculateGrandtotal(this.saleItems);
           } else {
             this.saleItems = saleItems.filter(item => item.billno === null);
             this.saleBill.grand_total = this.calculateGrandtotal(this.saleItems);
@@ -357,11 +357,27 @@ export class PosComponent implements OnInit {
     const newSaleItem = {
       ...this.saleItem,
     }
+
+    const activeBill = this.saleBill;
+    if (this.updatingOrder) {
+      if (activeBill?.grand_total && newSaleItem?.sub_total) {
+        activeBill.grand_total += newSaleItem.sub_total;
+      }
+    }
     
     this.isLoading = true;
     this.salesService.addSaleItem(newSaleItem)
       .subscribe({
         next: async (saleItem) => {
+          if (this.updatingOrder) {
+            this.salesService.editSaleBill(activeBill)
+            .subscribe(data => {
+              const index = this.activeBills.findIndex(bill => bill.id === data.id);
+              this.activeBills[index] = data;
+              this.loadBills();
+            });
+          }
+
           this.isLoading = false;
           this.saleItems.push(saleItem);
           this.loadItems();
@@ -520,11 +536,25 @@ export class PosComponent implements OnInit {
       return;
     }
 
+    const activeBill = this.saleBill;
+    if (activeBill?.grand_total && this.deletingSaleItem?.sub_total) {
+      activeBill.grand_total -= this.deletingSaleItem.sub_total;
+    }
+
     this.isLoading = true;
     this.salesService
       .deleteSaleItem(this.deletingSaleItem)
       .subscribe({
         next: async () => {
+          if (this.updatingOrder) {
+            this.salesService.editSaleBill(activeBill)
+            .subscribe(data => {
+              const index = this.activeBills.findIndex(bill => bill.id === data.id);
+              this.activeBills[index] = data;
+              this.loadBills();
+            });
+          }
+
           this.isLoading = false;
           this.activeBills = this.activeBills.filter(s => s.id !== this.deletingSaleItem?.id);
           this.deletingSaleItem = null;
@@ -551,7 +581,7 @@ export class PosComponent implements OnInit {
     this.isLoading = true;
     this.salesService.editSaleBill(this.saleBill)
       .subscribe({
-        next: data => {
+        next: (data) => {
           this.isLoading = false;
           const index = this.activeBills.findIndex(saleBill => saleBill.id === data.id);
           this.activeBills[index] = data;

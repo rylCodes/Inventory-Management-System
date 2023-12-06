@@ -1,4 +1,4 @@
-<div class="relative w-full px-8">
+<div class="relative w-full px-4 md:px-8">
     <!-- HEADING: POS PAGE -->
     <div class="flex justify-between mt-8">
         <h1 class="font-bold text-2xl lg:text-3xl">POINT OF SALES</h1>
@@ -149,7 +149,7 @@
         </div>
 
         <!-- HEADING: TRANSACTION TABLE -->
-        <div *ngIf="showBillTable" class="flex justify-between mt-8">
+        <div *ngIf="showBillTable" class="flex justify-between mt-6 lg:mt-8">
             <h1 class="font-bold text-xl lg:text-2xl">Ongoing Transactions:</h1>
         </div>
 
@@ -161,7 +161,7 @@
                     <th class="w-[20%] md:w-auto">Transaction Code</th>
                     <th>Customer Name</th>
                     <th class="hidden md:table-cell"><span>Remarks</span></th>
-                    <th>Items</th>
+                    <th class="w-[10%] md:w-auto">Items</th>
                     <th>Total</th>
                     <th class="w-[15%] md:w-auto">Action</th>
                 </thead>

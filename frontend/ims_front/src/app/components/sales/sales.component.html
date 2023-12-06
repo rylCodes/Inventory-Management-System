@@ -1,4 +1,4 @@
-<div id="sales-component" class="relative w-full px-8">
+<div id="sales-component" class="relative w-full px-4 md:px-8">
     <!-- HEADING: POS PAGE -->
     <div class="flex justify-between mt-8">
         <h1 class="font-bold text-2xl lg:text-3xl">SALES HISTORY</h1>
@@ -108,7 +108,7 @@
         </div>
 
         <!-- TRANSACTION HISTORY TABLE -->
-        <div class="w-full text-center shadow-xl rounded-xl mt-6 md:mt-8">
+        <div class="w-full text-center shadow-xl rounded-xl mt-6 lg:mt-8">
             <table class="w-full table-fixed rounded-xl">
                 <thead class="text-neutral-300 bg-neutral-900">
                     <th>Date Time</th>
@@ -121,7 +121,7 @@
                 </thead>
                 <tbody>
                     <tr *ngFor="let bill of bills">
-                        <td class="p-2">{{bill.time | date: "dd MMM 'at' hh:mm a"}}</td>
+                        <td class="p-2">{{bill.time | date: "MM/dd/yyyy hh:mm a"}}</td>
                         <td class="p-2">{{bill.billno}}</td>
                         <td class="p-2">{{bill.customer_name}}</td>
                         <td class="p-2 hidden md:table-cell">{{bill.remarks}}</td>

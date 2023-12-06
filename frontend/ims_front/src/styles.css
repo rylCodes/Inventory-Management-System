@@ -8,6 +8,11 @@
     line-height: 12px;
 }
 
+.text-mb {
+    font-size: 13px;
+    line-height: 18px;
+}
+
 table {
     border-radius: 10px;
 }
@@ -34,14 +39,12 @@ table th {
     }
 
     .active {
-        color: #ffffff;
         border-left: 5px solid #008000;
         margin: 0;
         padding: 0;
     }
 
     .inactive {
-        color: #ffffff;
         border-left: 5px solid darkorange;
         margin: 0;
         padding: 0;

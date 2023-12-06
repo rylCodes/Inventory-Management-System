@@ -3,21 +3,29 @@
         <!-- Hamburger Menu -->
         <div class="justify-self-start xl:hidden hover:scale-105">
             <fa-icon [ngClass]="{'border': !isHidden}"
-                class="menu-icon text-neutral-300 text-lg cursor-pointer rounded-md py-2 px-3" [icon]="faBars"
-                (click)="toggleNavigation()"></fa-icon>
+                class="menu-icon text-neutral-300 text-lg cursor-pointer rounded-md py-1.5 px-2" [icon]="faBars"
+                (click)="toggleNavigation()">
+            </fa-icon>
         </div>
 
         <!-- User Icon -->
-        <div class="relative flex px-2 flex-col justify-self-end">
-            <div class="relative hover:scale-105">
-                <fa-icon class="user-icon cursor-pointer" [ngStyle]="{color: 'rgb(212 212 212)', 'font-size': '24px'}"
+        <div class="relative flex px-2 justify-self-end space-x-3">
+            <div class="hover:scale-105">
+                <div class="flex justify-center items-center rounded-full bg-neutral-300 w-7 h-7">
+                    <fa-icon class="user-icon cursor-pointer" [ngStyle]="{'font-size': '20px'}" [ngClass]="'text-neutral-900'"
+                        [icon]="faBell" (click)="toggleUserDetails()">
+                    </fa-icon>
+                </div>
+            </div>
+
+            <div class="hover:scale-105">
+                <fa-icon class="user-icon cursor-pointer" [ngStyle]="{color: 'rgb(212 212 212)', 'font-size': '28px'}"
                     [icon]="faUserCircle" (click)="toggleUserDetails()">
                 </fa-icon>
-                <fa-icon></fa-icon>
             </div>
 
             <div *ngIf="showUserDetails"
-                class="flex flex-col space-y-2 rounded-md p-3 absolute top-[125%] right-0 w-40 bg-neutral-100 shadow-lg z-20">
+                class="flex flex-col space-y-2 rounded-md p-3 absolute top-[125%] right-0 w-72 bg-neutral-100 shadow-lg z-20">
                 <!-- Current User -->
                 <div class="flex space-x-1">
                     <fa-icon class="" [ngStyle]="{color: 'rgb(82 82 82)', 'font-size': '15px'}" [icon]="faUserCircle">
@@ -37,7 +45,7 @@
     </div>
 
     <!-- Navigation: Smaller Screens -->
-    <div class="bg-neutral-50 absolute top-full left-0 w-full h-auto text-neutral-900 xl:hidden transition-all duration-500 z-10"
+    <div class="bg-neutral-50 absolute top-full left-0 w-full h-auto text-neutral-900 xl:hidden transition-all duration-500 shadow-lg z-10"
         [ngClass]="{'-translate-y-[125%] opacity-0': isHidden, 'translate-y-0 opacity-100': !isHidden}">
         <a class="flex items-center px-4 py-2 hover:bg-neutral-200 duration-500" routerLink="/"
             routerLinkActive="bg-neutral-700 text-neutral-200 font-semibold hover:bg-neutral-700"

@@ -12,14 +12,17 @@ import { Supplier } from 'src/app/interface/Supplier';
 import { PurchaseBill, PurchaseItem } from 'src/app/interface/Purchase';
 import { SaleBill, SaleItem } from 'src/app/interface/Sale';
 import { DatePipe } from '@angular/common';
+import { faCircleArrowRight, faBoxesPacking, faRectangleList, faBoxesStacked, faMoneyBillTrendUp } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
+
 export class DashboardComponent implements OnInit {
-  dashboardItems: [] = [];
+
+  dashboardItems: any = [];
   stocks: Stock[] = [];
   products: Menu[] = [];
   saleBills: SaleBill[] = [];
@@ -30,6 +33,12 @@ export class DashboardComponent implements OnInit {
   suppliers: Supplier[] = [];
 
   today: Date = new Date;
+
+  faBoxesStacked = faBoxesStacked;
+  faCircleArrowRight = faCircleArrowRight;
+  faBoxesPacking = faBoxesPacking;
+  faRectangleList = faRectangleList;
+  faMoneyBillTrendUp = faMoneyBillTrendUp;
 
   constructor(
     private uiService: UiService,
@@ -42,6 +51,26 @@ export class DashboardComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.saleService.getSaleBills()
+    .subscribe(saleBills => {
+      this.saleBills = saleBills;
+      this.todaySaleBills = saleBills.filter(bill => {
+        const dateToday = this.datePipe.transform(this.today, 'MM-dd-yyyy');
+        const billToday = this.datePipe.transform(bill.time, 'MM-dd-yyyy');
+        return billToday === dateToday && bill.status ;
+      })
+    })
+
+    this.saleService.getSaleItems()
+    .subscribe(saleItems => {
+      this.saleItems = saleItems; 
+    })
+
+    this.supplierService.getSuppliers()
+    .subscribe(suppliers => {
+      this.suppliers = suppliers;
+    })
+
     this.stockServices.getStocks()
     .subscribe(stocks => {
       this.stocks = stocks;
@@ -62,38 +91,26 @@ export class DashboardComponent implements OnInit {
       this.purchaseItems = purchaseItems;
     })
 
-    this.saleService.getSaleBills()
-    .subscribe(saleBills => {
-      this.saleBills = saleBills;
-      this.todaySaleBills = saleBills.filter(bill => {
-        const dateToday = this.datePipe.transform(this.today, 'MM-dd-yyyy');
-        const billToday = this.datePipe.transform(bill.time, 'MM-dd-yyyy');
-        console.log(billToday);
-        return billToday === dateToday ;
-      })
-      console.log(this.todaySaleBills);
-    })
-
-    this.saleService.getSaleItems()
-    .subscribe(saleItems => {
-      this.saleItems = saleItems;
-    })
-
-    this.supplierService.getSuppliers()
-    .subscribe(suppliers => {
-      this.suppliers = suppliers;
-    })
-
     const dashboardItems: any = [
       { title: "stocks", length: this.stocks.length },
       { title: "menu", length: this.products.length },
-      { title: "purchaseBills", length: this.purchaseBills },
-      { title: "purchaseItems", length: this.purchaseItems },
-      { title: "saleBills", length: this.saleBills },
-      { title: "saleItems", length: this.saleItems },
-      { title: "suppliers", length: this.suppliers },
+      { title: "purchaseBills", length: this.purchaseBills.length },
+      { title: "purchaseItems", length: this.purchaseItems.length },
+      { title: "saleBills", length: this.saleBills.length },
+      { title: "saleItems", length: this.saleItems.length },
+      { title: "suppliers", length: this.suppliers.length },
     ]
 
     this.dashboardItems = dashboardItems;
+  }
+
+  getTodaySales():number | null {
+    let total = 0;
+    this.todaySaleBills.map(bill => {
+      if (bill && bill.grand_total) {
+        total += bill.grand_total;
+      } 
+    })
+    return total;
   }
 }

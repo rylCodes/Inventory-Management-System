@@ -26,7 +26,7 @@ export class PurchasesComponent implements OnInit {
   showFormContainer: boolean = false; 
   showBillForm: boolean = false;
   showBillTable: boolean = true;  
-  showEachPurchaseOrder: boolean = false;
+  showPurchaseBill: boolean = false;
 
   showSaveBillModal: boolean = false;
   showBillActionModal: boolean = false;
@@ -52,7 +52,7 @@ export class PurchasesComponent implements OnInit {
     billno: "",
     time: undefined,
     supplier_id: undefined,
-    grand_total: undefined,
+    grand_total: 0,
     remarks: "",
   };
 
@@ -63,7 +63,7 @@ export class PurchasesComponent implements OnInit {
     purchase_date: "",
     quantity_purchased: 0,
     item_price: 0,
-    sub_total: undefined,
+    sub_total: 0,
   }
 
   constructor(
@@ -82,7 +82,7 @@ export class PurchasesComponent implements OnInit {
       billno: "",
       time: undefined,
       supplier_id: undefined,
-      grand_total: undefined,
+      grand_total: 0,
       remarks: "",
     };
   }
@@ -95,7 +95,7 @@ export class PurchasesComponent implements OnInit {
       purchase_date: "",
       quantity_purchased: 0,
       item_price: 0,
-      sub_total: undefined,
+      sub_total: 0,
     }
   }
 
@@ -148,8 +148,8 @@ export class PurchasesComponent implements OnInit {
     this.loadFilteredItems();
     this.toggleFormContainer();
 
-    this.showEachPurchaseOrder = !this.showEachPurchaseOrder;
-    if (!this.showEachPurchaseOrder) {
+    this.showPurchaseBill = !this.showPurchaseBill;
+    if (!this.showPurchaseBill) {
       this.resetBillForm();
       this.loadFilteredItems();
     }
@@ -213,9 +213,8 @@ export class PurchasesComponent implements OnInit {
       .getPurchaseItems()
       .subscribe({
         next: (items) => {
-          if (this.showEachPurchaseOrder) {
+          if (this.showPurchaseBill) {
             this.items = items.filter(item => item.purchaseBill_id === this.bill.id);
-            this.bill.grand_total = this.calculateGrandtotal(this.items);
           } else {
             this.items = items.filter(item => item.purchaseBill_id === null);
             this.bill.grand_total = this.calculateGrandtotal(this.items);
@@ -398,6 +397,20 @@ export class PurchasesComponent implements OnInit {
           this.items.push(item);
           this.loadFilteredItems();
           this.resetItemForm();
+
+          // Update total bill upon adding an item
+          if (this.showPurchaseBill) {
+            this.bill.grand_total += item.sub_total;
+          }
+      
+          this.purchaseService.editPurchaseBill(this.bill)
+          .subscribe({
+            next: bill => {
+              this.bill = bill;
+              this.loadBills();
+            },
+            error: err => console.log(err) 
+          });
   
           await this.uiService.wait(100);
           if (!item || item.item_price < 1) {
@@ -554,6 +567,19 @@ export class PurchasesComponent implements OnInit {
     if (!this.deletingItem) {
       return;
     }
+
+    // Reduce bill total upon deleting an item
+    this.bill.grand_total -= this.deletingItem.sub_total;
+
+    this.purchaseService.editPurchaseBill(this.bill)
+    .subscribe({
+      next: data => {
+        this.bill = data;
+      },
+      error: (err) => {
+        console.log(err);
+      }
+    });
 
     this.isLoading = true;
     this.purchaseService

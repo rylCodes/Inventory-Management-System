@@ -81,6 +81,7 @@ export class SalesComponent implements OnInit {
       remarks: "",
       amount_tendered: 0,
       grand_total: 0,
+      status: false,
     };
   }
 

@@ -5,8 +5,8 @@ export interface SaleBill {
     customer_name: string,
     remarks: string,
     amount_tendered: number,
-    grand_total?: number,
-    status?: boolean;
+    grand_total: number,
+    status: boolean;
 }
 
 export interface SaleItem {
@@ -14,7 +14,7 @@ export interface SaleItem {
     billno?: number | null,
     menu?: number,
     quantity: number,
-    price?: number,
+    price: number,
     sale_date?: string,
-    sub_total?: number,
+    sub_total: number,
 }

@@ -93,6 +93,7 @@ export class PosComponent implements OnInit {
       remarks: "",
       amount_tendered: 0,
       grand_total: 0,
+      status: false,
     };
   }
   
@@ -201,68 +202,67 @@ export class PosComponent implements OnInit {
 
   loadBills() {
     this.salesService
-      .getSaleBills()
-      .subscribe({
-        next: (salesBills) => {
-          this.activeBills = salesBills.filter(item => !item.status);
-          this.allBills = salesBills;
-        },
-        error: (err) => {
-          this.uiService.displayErrorMessage(err);
-        }
-      });
+    .getSaleBills()
+    .subscribe({
+      next: (salesBills) => {
+        this.activeBills = salesBills.filter(item => !item.status);
+        this.allBills = salesBills;
+      },
+      error: (err) => {
+        this.uiService.displayErrorMessage(err);
+      }
+    });
   }
 
   loadItems() {
     this.salesService
-      .getSaleItems()
-      .subscribe({
-        next: (saleItems) => {
-          this.allItems = saleItems;
-          console.log(this.updatingOrder);
+    .getSaleItems()
+    .subscribe({
+      next: (saleItems) => {
+        this.allItems = saleItems;
 
-          if (this.updatingOrder) {
-            this.saleItems = saleItems.filter(item => item.billno === this.saleBill.id);
-          } else {
-            this.saleItems = saleItems.filter(item => item.billno === null);
-            this.saleBill.grand_total = this.calculateGrandtotal(this.saleItems);
-          }
-        },
-        error: (err) => {
-          this.uiService.displayErrorMessage(err);
+        if (this.updatingOrder) {
+          this.saleItems = saleItems.filter(item => item.billno === this.saleBill.id);
+        } else {
+          this.saleItems = saleItems.filter(item => item.billno === null);
+          this.saleBill.grand_total = this.calculateGrandtotal(this.saleItems);
         }
-      });
+      },
+      error: (err) => {
+        this.uiService.displayErrorMessage(err);
+      }
+    });
   }
 
   loadMenus() {
     this.productService
-      .getMenus()
-      .subscribe({
-        next: menus => {
-          const activeMenus = menus.filter(menu => menu.status === true);
-          this.menus = activeMenus;
-        },
-        error: (err) => {
-          this.uiService.displayErrorMessage(err);
-        }
-      })
+    .getMenus()
+    .subscribe({
+      next: menus => {
+        const activeMenus = menus.filter(menu => menu.status === true);
+        this.menus = activeMenus;
+      },
+      error: (err) => {
+        this.uiService.displayErrorMessage(err);
+      }
+    })
   }
 
   loadStocks() {
     this.stockService
-      .getStocks()
-      .subscribe(stocks => {
-        const activeStocks = stocks.filter(stock => stock.status === true);
-        this.stocks = activeStocks;
-      })
+    .getStocks()
+    .subscribe(stocks => {
+      const activeStocks = stocks.filter(stock => stock.status === true);
+      this.stocks = activeStocks;
+    })
   }
 
   loadProducts() {
     this.productService
-      .getProducts()
-      .subscribe(products => {
-        this.products = products;
-      })
+    .getProducts()
+    .subscribe(products => {
+      this.products = products;
+    })
   }
 
   getItemLength(bill: SaleBill) {
@@ -357,38 +357,36 @@ export class PosComponent implements OnInit {
     const newSaleItem = {
       ...this.saleItem,
     }
-
-    const activeBill = this.saleBill;
-    if (this.updatingOrder) {
-      if (activeBill?.grand_total && newSaleItem?.sub_total) {
-        activeBill.grand_total += newSaleItem.sub_total;
-      }
-    }
     
     this.isLoading = true;
     this.salesService.addSaleItem(newSaleItem)
-      .subscribe({
-        next: async (saleItem) => {
-          if (this.updatingOrder) {
-            this.salesService.editSaleBill(activeBill)
-            .subscribe(data => {
-              const index = this.activeBills.findIndex(bill => bill.id === data.id);
-              this.activeBills[index] = data;
-              this.loadBills();
-            });
-          }
+    .subscribe({
+      next: async (saleItem) => {
+        this.isLoading = false;
+        this.saleItems.push(saleItem);
+        this.loadItems();
 
-          this.isLoading = false;
-          this.saleItems.push(saleItem);
-          this.loadItems();
-          this.resetItemForm();
-          await this.uiService.wait(100);
-        },
-        error: (err) => {
-          this.isLoading = false;
-          this.uiService.displayErrorMessage(err);
+        if (this.updatingOrder) {
+          this.saleBill.grand_total += saleItem.sub_total;
         }
-      });
+    
+        this.salesService.editSaleBill(this.saleBill)
+        .subscribe({
+          next: bill => {
+            this.saleBill = bill;
+            this.loadBills();
+          },
+          error: err => console.log(err) 
+        });
+
+        this.resetItemForm();
+        await this.uiService.wait(100);
+      },
+      error: (err) => {
+        this.isLoading = false;
+        this.uiService.displayErrorMessage(err);
+      }
+    });
   }
 
   // UPDATE SALE BILL
@@ -536,27 +534,26 @@ export class PosComponent implements OnInit {
       return;
     }
 
-    const activeBill = this.saleBill;
-    if (activeBill?.grand_total && this.deletingSaleItem?.sub_total) {
-      activeBill.grand_total -= this.deletingSaleItem.sub_total;
-    }
+    // Reduce total bill upon deleting an item
+    this.saleBill.grand_total -= this.deletingSaleItem.sub_total;
+
+    this.salesService.editSaleBill(this.saleBill)
+    .subscribe({
+      next: data => {
+        this.saleBill = data;
+      },
+      error: (err) => {
+        console.log(err);
+      }
+    });
 
     this.isLoading = true;
     this.salesService
       .deleteSaleItem(this.deletingSaleItem)
       .subscribe({
         next: async () => {
-          if (this.updatingOrder) {
-            this.salesService.editSaleBill(activeBill)
-            .subscribe(data => {
-              const index = this.activeBills.findIndex(bill => bill.id === data.id);
-              this.activeBills[index] = data;
-              this.loadBills();
-            });
-          }
-
           this.isLoading = false;
-          this.activeBills = this.activeBills.filter(s => s.id !== this.deletingSaleItem?.id);
+          this.activeBills = this.activeBills.filter(bill => bill.id !== this.deletingSaleItem?.id);
           this.deletingSaleItem = null;
           this.toggleItemActionModal()
           this.loadItems();

@@ -3,7 +3,7 @@
     <div class="flex justify-between mt-8">
         <h1 class="font-bold text-2xl md:text-3xl">PURCHASES</h1>
         <!-- ADD BUTTON -->
-        <app-button *ngIf="!showEachPurchaseOrder" txtContent="{{showFormContainer? 'Cancel': 'Add'}}"
+        <app-button *ngIf="!showPurchaseBill" txtContent="{{showFormContainer? 'Cancel': 'Add'}}"
             bgColor="{{showFormContainer? 'red': 'green'}}" (btnClick)="toggleFormContainer()"></app-button>
     </div>
     <hr class="border-b-1 border-neutral-900 mt-4">
@@ -45,11 +45,11 @@
     </div>
 
     <!-- HEADING: ITEM LIST -->
-    <div *ngIf="showFormContainer && !showEachPurchaseOrder" class="flex justify-between mt-4">
+    <div *ngIf="showFormContainer && !showPurchaseBill" class="flex justify-between mt-4">
         <h1 class="font-bold text-xl lg:text-2xl">Add items:</h1>
     </div>
     <!-- ITEM FORM -->
-    <form *ngIf="showFormContainer && !showEachPurchaseOrder"
+    <form *ngIf="showFormContainer"
         class="flex items-end text-start justify-between w-full bg-[#fff] h-fit mt-2 px-4 py-2 rounded-lg shadow-xl text-neutral-900 md:w-3/4"
         (ngSubmit)="onSubmitItem()">
         <div class="flex flex-col w-1/4">
@@ -95,7 +95,7 @@
         <div class="table-container w-full text-center shadow-xl mt-4 md:w-3/4">
             <table class="w-full table-fixed">
                 <thead class="text-neutral-300 bg-neutral-900">
-                    <th>Time</th>
+                    <th>Date Time</th>
                     <th>Item</th>
                     <th>Price</th>
                     <th>Quantity</th>
@@ -104,15 +104,14 @@
                 <tbody>
                     <tr *ngFor="let item of items">
                         <td class="p-2">
-                            <div
-                                [ngClass]="showEachPurchaseOrder? '': 'flex items-center justify-center space-x-2 md:space-x-4'">
-                                <button *ngIf="!showEachPurchaseOrder" class="px-1.5 py-1 rounded-md bg-[#ff0000]"
+                            <div class="flex items-center justify-center space-x-2 md:space-x-4">
+                                <button class="px-1.5 py-1 rounded-md bg-[#ff0000]"
                                     (click)="deleteItem(item)">
                                     <fa-icon class="scale-75" [icon]="faTrashCan"
                                         [ngStyle]="{color: 'rgb(212 212 212)'}">
                                     </fa-icon>
                                 </button>
-                                <p>{{item.purchase_date | date: "hh:mm a"}}</p>
+                                <p>{{item.purchase_date | date: "MMM dd, hh:mm a"}}</p>
                             </div>
                         </td>
                         <td class="p-2">{{getStockDetails(item.stock_id).stockName}}</td>
@@ -128,7 +127,7 @@
         </div>
 
         <!-- BILL DIV -->
-        <div *ngIf="showEachPurchaseOrder"
+        <div *ngIf="showPurchaseBill"
             class="bg-[#fff] self-start w-full h-auto mx-auto p-4 rounded-lg shadow-xl text-neutral-900 mt-4 md:flex-1">
             <form class="flex flex-col">
                 <h3 for="bill.customer_name">OR No.:</h3>
@@ -147,7 +146,7 @@
                 </p>
 
                 <!-- Back Button -->
-                <button *ngIf="showEachPurchaseOrder"
+                <button *ngIf="showPurchaseBill"
                     class="bg-neutral-800 mt-6 text-neutral-300 font-bold px-4 py-2 rounded hover:bg-[rgb(48,48,48)]"
                     type="button" (click)="viewOrder(bill)">
                     Back
@@ -156,7 +155,7 @@
         </div>
 
         <!-- PURCHASE FORM: Add -->
-        <div *ngIf="!showEachPurchaseOrder"
+        <div *ngIf="!showPurchaseBill"
             class="bg-white self-start w-full h-auto mx-auto p-4 rounded-lg shadow-xl text-neutral-900 mt-4 md:flex-1">
             <h2 class="font-bold text-center text-base lg:text-xl md:lg">
                 {{ proceedEditBill? "Update bill details" : "Add new purchase" }}

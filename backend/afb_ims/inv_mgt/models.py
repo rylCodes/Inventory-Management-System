@@ -154,3 +154,15 @@ class SalesItem(models.Model):
     
     class Meta:
         ordering = ['-sale_date']
+
+# NOTIFICATION
+class Notification(models.Model):
+    content = models.TextField
+    timestamp = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.timestamp
+
+    class Meta:
+        ordering = ['-timestamp']

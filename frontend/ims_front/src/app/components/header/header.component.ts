@@ -1,14 +1,18 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { faRightFromBracket, faXmark, faUserCircle, faBell, faBars, faMagnifyingGlass, faTimes, faHouse, faBoxesStacked, faList, faDesktop, faWallet, faCreditCard, faCircleInfo, faHandshake } from '@fortawesome/free-solid-svg-icons';
+import { StocksService } from 'src/app/services/stocks/stocks';
+import { NotificationsService } from 'src/app/services/notifications/notifications.service';
+import { Stock } from 'src/app/interface/Stock';
+import { Notification } from 'src/app/interface/Notification';
 
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.css']
 })
-export class HeaderComponent {
+export class HeaderComponent implements OnInit {
   @HostListener('document:keyup.escape', ['$event'])
   onKeyUp(event: KeyboardEvent) {
     if (event.key === 'Escape') {
@@ -22,6 +26,10 @@ export class HeaderComponent {
   onClick(event: MouseEvent) {
     if(!(event.target as HTMLElement).closest('.user-icon')) {
       this.showUserDetails = false;
+    };
+
+    if(!(event.target as HTMLElement).closest('.notif-icon')) {
+      this.showNotifications = false;
     };
 
     if(!(event.target as HTMLElement).closest('.menu-icon')) {
@@ -49,12 +57,48 @@ export class HeaderComponent {
 
   showLogOutActionModal: boolean = false;
   showUserDetails: boolean = false;
+  showNotifications: boolean = false;
+  showUserDropDown: boolean = false;
 
   isHidden: boolean = true;
 
   user: string | null = null;
+  notifCount: number | null = null;
+  notifMessage: string = "";
 
-  constructor(private authService: AuthService, private router: Router) {}
+  stocks: Stock[] = [];
+  lowQtyStocks: Stock[] = [];
+  notifications: Notification[] = [];
+
+  notification: Notification = {
+    id: undefined,
+    content: "",
+    timestamp: "",
+    is_read: false,
+  }
+
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private stocksService: StocksService,
+    ) {}
+  
+  ngOnInit(): void {
+    this.stocksService.getStocks()
+    .subscribe((stocks) => {
+      this.stocks = stocks;
+      this.lowQtyStocks = stocks.filter(stock => stock.quantity < 10);
+    });
+  }
+
+  resetNotification() {
+    this.notification = {
+      id: undefined,
+      content: "",
+      timestamp: "",
+      is_read: false,
+    }
+  }
 
   logOut() {
     this.authService.clearToken();
@@ -65,12 +109,32 @@ export class HeaderComponent {
     this.showLogOutActionModal = !this.showLogOutActionModal;
   }
 
-  toggleUserDetails() {
-    this.showUserDetails = !this.showUserDetails;
-  }
-
   toggleNavigation() {
     this.isHidden = !this.isHidden;
+  }
+
+  toggleUserDropDown() {
+    this.showUserDropDown = !this.showUserDropDown;
+  }
+
+  toggleNotifications() {
+    this.showNotifications = !this.showNotifications;
+    if (this.showNotifications) {
+      this.showUserDropDown = true;
+      this.showUserDetails = false;
+    } else {
+      this.showUserDropDown = false;
+    }
+  }
+
+  toggleUserDetails() {
+    this.showUserDetails = !this.showUserDetails;
+    if (this.showUserDetails) {
+      this.showUserDropDown = true;
+      this.showNotifications = false;
+    } else {
+      this.showUserDropDown = false;
+    }
   }
 
   getUser(): string | null {

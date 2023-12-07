@@ -1,8 +1,8 @@
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser
-from .models import Menu, Product, Stock, Supplier, PurchaseBill, PurchaseItem, SalesBill, SalesItem, Stock
-from .serializers import MenuSerializer, ProductSerializer, SupplierSerializer, PurchaseBillSerializer, PurchaseItemSerializer , SalesBillSerializer, SalesItemSerializer, StockSerializer
+from .models import *
+from .serializers import *
 
 # Stock views
 class StockList(generics.ListCreateAPIView):
@@ -93,4 +93,14 @@ class SalesItemList(generics.ListCreateAPIView):
 class SalesItemDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = SalesItem.objects.all()
     serializer_class = SalesItemSerializer
+    permission_classes = [IsAdminUser]
+
+# Notification views
+class NotificationList(generics.ListCreateAPIView):
+    queryset = Notification.objects.all()
+    serializer_class = NotificationSerializer
+
+class NotificationDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Notification.objects.all()
+    serializer_class = NotificationSerializer
     permission_classes = [IsAdminUser]

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from inv_mgt.models import Menu, Product, Stock, Supplier, PurchaseBill, PurchaseItem, SalesBill, SalesItem
+from inv_mgt.models import *
 
 class StockSerializer(serializers.ModelSerializer):
     class Meta:
@@ -39,4 +39,9 @@ class SalesBillSerializer(serializers.ModelSerializer):
 class SalesItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = SalesItem
+        fields = '__all__'
+
+class NotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
         fields = '__all__'

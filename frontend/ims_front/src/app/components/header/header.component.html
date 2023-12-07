@@ -10,10 +10,10 @@
 
         <!-- User Icon -->
         <div class="relative flex px-2 justify-self-end space-x-3">
-            <div class="hover:scale-105">
+            <div class="notif-icon hover:scale-105" (click)="toggleNotifications()">
                 <div class="flex justify-center items-center rounded-full bg-neutral-300 w-7 h-7">
-                    <fa-icon class="user-icon cursor-pointer" [ngStyle]="{'font-size': '20px'}" [ngClass]="'text-neutral-900'"
-                        [icon]="faBell" (click)="toggleUserDetails()">
+                    <fa-icon class="cursor-pointer" [ngStyle]="{'font-size': '20px'}" [ngClass]="'text-neutral-900'"
+                        [icon]="faBell">
                     </fa-icon>
                 </div>
             </div>
@@ -24,22 +24,27 @@
                 </fa-icon>
             </div>
 
-            <div *ngIf="showUserDetails"
-                class="flex flex-col space-y-2 rounded-md p-3 absolute top-[125%] right-0 w-72 bg-neutral-100 shadow-lg z-20">
+            <div *ngIf="showUserDropDown"
+                class="flex flex-col rounded-md p-3 absolute top-[125%] right-0 w-72 bg-neutral-100 shadow-xl z-20"
+                [ngClass]="{'h-[80vh]': showNotifications}">
                 <!-- Current User -->
-                <div class="flex space-x-1">
+                <div *ngIf="showUserDetails" class="flex space-x-2 p-4 shadow-lg bg-neutral-50">
                     <fa-icon class="" [ngStyle]="{color: 'rgb(82 82 82)', 'font-size': '15px'}" [icon]="faUserCircle">
                     </fa-icon>
                     <p class="capitalize font-semibold">{{getUser()}}</p>
                 </div>
-                <hr class="border-b border-neutral-300">
 
                 <!-- Logout Button -->
-                <button class="flex hover:font-semibold mt-4" (click)="toggleLogOutActionModal()">
+                <button *ngIf="showUserDetails" class="flex hover:bg-neutral-200 p-3 mt-3 rounded-md" (click)="toggleLogOutActionModal()">
                     <fa-icon [ngStyle]="{color: 'rgb(82 82 82)'}" [icon]="logOutIcon"></fa-icon>
-                    <p class="text-neutral-900 ml-1">Logout</p>
+                    <p class="text-neutral-900 ml-2">Logout</p>
                     <hr>
                 </button>
+
+                <div *ngIf="showUserDetails" class="flex justify-between text-xxs text-neutral-500 mt-4">
+                    <p><span class="font-semibold">&copy;2023 {{title}}</span>. All rights reserved.</p>
+                    <p><span class="font-semibold">Version</span> 1.0.0</p>
+                </div>
             </div>
         </div>
     </div>

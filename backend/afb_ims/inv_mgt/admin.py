@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Menu, Product, Supplier, PurchaseItem, PurchaseBill, SalesBill, SalesItem, Stock
+from .models import *
 
 # Register your models here.
 admin.site.register(Product)
@@ -10,3 +10,4 @@ admin.site.register(SalesBill)
 admin.site.register(Stock)
 admin.site.register(Supplier)
 admin.site.register(Menu)
+admin.site.register(Notification)

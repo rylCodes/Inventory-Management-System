@@ -6,7 +6,6 @@ urlpatterns = [
     path('menus/', views.MenuList.as_view(), name='menu-list'),
     path('menus/<int:pk>/', views.MenuDetail.as_view(), name='menu-detail'),
 
-
     # Product URLs
     path('products/', views.ProductList.as_view(), name='product-list'),
     path('products/<int:pk>/', views.ProductDetail.as_view(), name='product-detail'),
@@ -34,4 +33,8 @@ urlpatterns = [
     # Stock URLs
     path('stocks/', views.StockList.as_view(), name='stock-list'),
     path('stocks/<int:pk>/', views.StockDetail.as_view(), name='stock-detail'),
+
+    # Notification URLs
+    path('notifications/', views.NotificationList.as_view(), name='notification-list'),
+    path('notifications/<int:pk>/', views.NotificationDetail.as_view(), name='notification-detail'),
 ]

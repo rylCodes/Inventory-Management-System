@@ -76,7 +76,10 @@
                     <td class="p-2">{{stock.code}}</td>
                     <td class="p-2">{{stock.stock_name}}</td>
                     <td class="p-2">{{stock.description}}</td>
-                    <td class="p-2">{{stock.quantity | number: '1.0-3'}}</td>
+                    <td class="p-2"
+                        [ngClass]="{'text-[#ff0000]' : stock.quantity <= 0, 'text-orange-500':stock.quantity <= 10}">
+                        {{stock.quantity | number: '1.0-3'}}
+                    </td>
                     <td class="p-2">{{stock.unit}}</td>
                     <td class="p-2 hidden md:table-cell">{{stock.date_updated | date: 'dd/MM/yyyy'}}</td>
                     <td class="p-2 hidden md:table-cell">

@@ -3,4 +3,5 @@ export interface Notification {
     content: string,
     timestamp: string,
     is_read: boolean,
+    warning_type: string
 }

@@ -14,4 +14,8 @@ export class AppComponent {
   hasRoute(route: string) {
     return this.router.url !== route;
   }
+
+  scrollToTop() {
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  }
 }

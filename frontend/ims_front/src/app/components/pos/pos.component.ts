@@ -8,7 +8,11 @@ import { UiService } from 'src/app/services/ui/ui.service';
 import { faPen, faTrashCan, faXmark, faRectangleList, faPlus, faMinus, faTimes, faPrint, faEnvelope, faPhone, faLocationDot } from '@fortawesome/free-solid-svg-icons';
 import { Router } from '@angular/router';
 import { SalesService } from 'src/app/services/sales/sales.service';
-import { StocksService } from 'src/app/services/stocks/stocks';
+import { StocksService } from 'src/app/services/stocks/stocks.service';
+import { OwnerService } from 'src/app/services/owner/owner.service';
+import { Owner } from 'src/app/interface/Owner';
+import { NotificationsService } from 'src/app/services/notifications/notifications.service';
+import { Notification } from 'src/app/interface/Notification';
 
 @Component({
   selector: 'app-pos',
@@ -51,7 +55,9 @@ export class PosComponent implements OnInit {
   allItems: SaleItem[] = [];
   menus: Menu[] = [];
   stocks: Stock[] = [];
+  stocksToCheck: Stock[] = [];
   products: Product[] = [];
+  owners: Owner[] = [];
   amountChange: number = 0;
 
   saleBill: SaleBill = {
@@ -62,17 +68,26 @@ export class PosComponent implements OnInit {
     remarks: "",
     amount_tendered: 0,
     grand_total: 0,
+    mode_of_payment: "Cash",
     status: false,
   };
 
   saleItem: SaleItem = {
     id: undefined,
-    billno: null,
+    billno: undefined,
     menu: undefined,
     quantity: 1,
     price: 0,
     sale_date: "",
     sub_total: 0,
+  }
+
+  notification: Notification = {
+    id: undefined,
+    content: "",
+    timestamp: "",
+    is_read: false,
+    warning_type: ""
   }
 
   constructor(
@@ -82,7 +97,19 @@ export class PosComponent implements OnInit {
       private uiService: UiService,
       private router: Router,
       private renderer: Renderer2,
+      private ownerService: OwnerService,
+      private notifService: NotificationsService,
     ) {}
+
+  resetNotification() {
+    this.notification = {
+      id: undefined,
+      content: "",
+      timestamp: "",
+      is_read: false,
+      warning_type: ""
+    }
+  }
 
   resetBillForm() {
     this.proceedEditBill = false;
@@ -93,6 +120,7 @@ export class PosComponent implements OnInit {
       remarks: "",
       amount_tendered: 0,
       grand_total: 0,
+      mode_of_payment: "Cash",
       status: false,
     };
   }
@@ -198,6 +226,7 @@ export class PosComponent implements OnInit {
     this.loadMenus();
     this.loadStocks();
     this.loadProducts();
+    this.loadOwners();
   }  
 
   loadBills() {
@@ -262,6 +291,14 @@ export class PosComponent implements OnInit {
     .getProducts()
     .subscribe(products => {
       this.products = products;
+    })
+  }
+
+  loadOwners() {
+    this.ownerService
+    .getOwners()
+    .subscribe(owners => {
+      this.owners = owners;
     })
   }
 
@@ -375,6 +412,7 @@ export class PosComponent implements OnInit {
           next: bill => {
             this.saleBill = bill;
             this.loadBills();
+            this.addNotification();
           },
           error: err => console.log(err) 
         });
@@ -541,6 +579,7 @@ export class PosComponent implements OnInit {
     .subscribe({
       next: data => {
         this.saleBill = data;
+        this.addNotification();
       },
       error: (err) => {
         console.log(err);
@@ -583,6 +622,7 @@ export class PosComponent implements OnInit {
           const index = this.activeBills.findIndex(saleBill => saleBill.id === data.id);
           this.activeBills[index] = data;
           this.loadBills();
+          this.addNotification();
         },
         error: (err) => {
           this.isLoading = false;
@@ -653,6 +693,7 @@ export class PosComponent implements OnInit {
             this.loadBills();
             this.toggleInvoice();
             this.toggleProceedPayment();
+            this.addNotification();
           } else {
             window.alert("No payable amount!");
             return;
@@ -667,6 +708,44 @@ export class PosComponent implements OnInit {
 
   printReceipt(): void {
     window.print();
+  }
+
+  addNotification() {
+    const critStocks = this.stocksToCheck.filter(stock => stock.quantity <= 5);
+    const lowStocks = this.stocksToCheck.filter(stock => stock.quantity <= 20 && stock.quantity > 5);
+    if (critStocks.length) {
+      critStocks.forEach(stock => {
+        this.notification.content = `${stock.quantity} ${stock.unit}/s of ${stock.stock_name} remaining.`;
+        this.notification.warning_type = "Critical stock level";
+        const newNotif = {
+          ...this.notification
+        }
+
+        this.notifService.addNotification(newNotif)
+        .subscribe(() => {
+          this.resetNotification();
+          this.notifService.setServiceStatus(true);
+          console.log("New notification has been added successfully!");
+        });
+      });
+    };
+    
+    if (lowStocks.length) {
+      lowStocks.forEach(stock => {
+        this.notification.content = `${stock.quantity} ${stock.unit}/s of ${stock.stock_name} remaining.`;
+        this.notification.warning_type = "Low stock level";
+        const newNotif = {
+          ...this.notification
+        }
+
+        this.notifService.addNotification(newNotif)
+        .subscribe(() => {
+          this.resetNotification();
+          this.notifService.setServiceStatus(true);
+          console.log("New notification has been added successfully!");
+        });
+      });
+    };
   }
 
 

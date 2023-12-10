@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, catchError, throwError } from 'rxjs';
+import { Observable, catchError, throwError, BehaviorSubject, Subject } from 'rxjs';
 import { Notification } from 'src/app/interface/Notification';
+import { Stock } from 'src/app/interface/Stock';
 
 const httpOptions = {
   headers: new HttpHeaders({
@@ -14,6 +15,12 @@ const httpOptions = {
 })
 export class NotificationsService {
   private apiUrl = 'http://localhost:8000/ims-api/notifications/'
+  private notifications = new BehaviorSubject<Notification[]>([]);
+  private notifServiceStatusSubject = new Subject<boolean>();
+
+  notifServiceStatus$ = this.notifServiceStatusSubject.asObservable();
+
+  stocks: Stock[] = [];
 
   constructor(private http: HttpClient) { }
 
@@ -41,8 +48,15 @@ export class NotificationsService {
     );
   }
 
+  fetchNotifications(): BehaviorSubject<Notification[]> {
+    this.http.get<Notification[]>(this.apiUrl).subscribe(
+      (notifications: Notification[]) => {this.notifications.next(notifications)}
+    )
+    return this.notifications;
+  }
+
   deleteNotification(notification: Notification) {
-    const url = `${this.apiUrl}` + `${notification.id}`;
+    const url = this.apiUrl + `${notification.id}`;
     return this.http.delete<Notification>(url)
     .pipe(
       catchError((err) => {
@@ -50,6 +64,15 @@ export class NotificationsService {
         return throwError(() => `${err.statusText? err.statusText: 'An error occured'}: Failed to delete notification`);
       })
     );
+  }
+
+  updateNotification(notif: Notification) {
+    const url = this.apiUrl + `${notif.id}/`;
+    return this.http.put<Notification>(url, notif, httpOptions);
+  }
+
+  setServiceStatus(status: boolean): void {
+    this.notifServiceStatusSubject.next(status);
   }
  
 }

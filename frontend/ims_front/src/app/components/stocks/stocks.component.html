@@ -30,8 +30,8 @@
                 id="stock.unit" [(ngModel)]="stock.unit">
                 <option selected value="piece">piece</option>
                 <option value="bottle">bottle</option>
-                <option value="liter">liter</option>
-                <option value="kilo">kilo</option>
+                <option value="ml">ml</option>
+                <option value="gram">gram</option>
                 <option value="pack">pack</option>
                 <option class="text-neutral-500" value="otherUnit">other unit...</option>
             </select>
@@ -40,13 +40,23 @@
                 class="border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text" name="customUnit"
                 id="customUnit" [(ngModel)]="customUnit" placeholder="Please specify.">
 
-            <div class="flex items-center mt-3 lg:mt-4">
-                <label class="" for="stock.status">Status:</label>
-                <div class="flex items-center ml-10">
-                    <input class="border border-neutral-900 px-2 py-1 rounded-sm w-4 h-4" type="checkbox"
-                        name="stock.status" id="active" [(ngModel)]="stock.status" checked>
-                    <label class="ml-1" for="active">Active</label>
-
+            <div class="flex justify-around mt-3">
+                <div class="flex items-center lg:mt-4">
+                    <label class="" for="stock.status">Status:</label>
+                    <div class="flex items-center ml-6">
+                        <input class="border border-neutral-900 px-2 py-1 rounded-sm w-[14px] h-[14px]" type="checkbox"
+                            name="stock.status" id="stock.status" [(ngModel)]="stock.status" checked>
+                        <label class="ml-1" for="stock.status">Active</label>
+                    </div>
+                </div>
+    
+                <div class="flex items-center lg:mt-4">
+                    <label class="" for="stock.status">Notification:</label>
+                    <div class="flex items-center ml-6">
+                        <input class="border border-neutral-900 px-2 py-1 rounded-sm w-[14px] h-[14px]" type="checkbox"
+                            name="stock.show_notification" id="stock.show_notification" [(ngModel)]="stock.show_notification" checked>
+                        <label class="ml-1" for="stock.show_notification">Enable</label>
+                    </div>
                 </div>
             </div>
 
@@ -65,10 +75,10 @@
                 <th>Code</th>
                 <th>Name</th>
                 <th>Description</th>
-                <th>Quantity</th>
-                <th>Unit</th>
+                <th class="w-[10%]">Qty</th>
+                <th class="w-[10%]">Unit</th>
                 <th class="hidden md:table-cell">Date Updated</th>
-                <th class="hidden md:table-cell">Status</th>
+                <th class="hidden md:table-cell w-[10%]">Status</th>
                 <th>Action</th>
             </thead>
             <tbody class="relative">
@@ -77,7 +87,11 @@
                     <td class="p-2">{{stock.stock_name}}</td>
                     <td class="p-2">{{stock.description}}</td>
                     <td class="p-2"
-                        [ngClass]="{'text-[#ff0000]' : stock.quantity <= 0, 'text-orange-500':stock.quantity <= 10}">
+                        [ngClass]="{
+                            'text-[#ff0000]' : stock.quantity <= 5,
+                            'text-[#ffa500]': stock.quantity <= 20 && stock.quantity > 5,
+                            'font-semibold': stock.quantity <= 20,
+                            }">
                         {{stock.quantity | number: '1.0-3'}}
                     </td>
                     <td class="p-2">{{stock.unit}}</td>
@@ -88,8 +102,8 @@
                             {{stock.status? 'active' : 'inactive'}}
                         </span>
                     </td>
-                    <td class="p-2">
-                        <div class="flex justify-center items-center space-x-3 md:space-x-4">
+                    <td class="relative p-2">
+                        <div class="flex justify-center items-center space-x-2 lg:space-x-3">
                             <!-- Edit Stock -->
                             <fa-icon class="hover:scale-110" [ngStyle]="{color: 'green'}" [icon]="faPen"
                                 (click)="updateStock(stock)">
@@ -97,6 +111,13 @@
                             <!-- Delete Stock -->
                             <fa-icon class="hover:scale-110" [ngStyle]="{color: 'red'}" [icon]="faTrashCan"
                                 (click)="deleteStock(stock)">
+                            </fa-icon>
+                        </div>
+                        <!-- Delete Stock -->
+                        <div class="absolute top-0 right-0 h-full w-3 flex items-center justify-center pr-1 sm:w-6">
+                            <fa-icon class="text-neutral-400 text-xxs sm:text-xs" *ngIf="stock.show_notification" [icon]="faBell">
+                            </fa-icon>
+                            <fa-icon class="text-neutral-400 text-xxs sm:text-xs" *ngIf="!stock.show_notification" [icon]="faBellSlash">
                             </fa-icon>
                         </div>
                     </td>

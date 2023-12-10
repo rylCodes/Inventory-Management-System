@@ -1,41 +1,47 @@
-<header class="relative flex bg-neutral-850 h-16 w-full items-center px-2">
+<header class="relative flex bg-neutral-800 h-16 w-full items-center px-2">
     <div class="flex w-full items-center justify-between flex-1 xl:justify-end">
         <!-- Hamburger Menu -->
-        <div class="justify-self-start xl:hidden hover:scale-105">
+        <div class="justify-self-start xl:hidden hover:scale-105 transition-all duration-500">
             <fa-icon [ngClass]="{'border': !isHidden}"
                 class="menu-icon text-neutral-300 text-lg cursor-pointer rounded-md py-1.5 px-2" [icon]="faBars"
                 (click)="toggleNavigation()">
             </fa-icon>
         </div>
 
-        <!-- User Icon -->
-        <div class="relative flex px-2 justify-self-end space-x-3">
-            <div class="notif-icon hover:scale-105" (click)="toggleNotifications()">
-                <div class="flex justify-center items-center rounded-full bg-neutral-300 w-7 h-7">
-                    <fa-icon class="cursor-pointer" [ngStyle]="{'font-size': '20px'}" [ngClass]="'text-neutral-900'"
-                        [icon]="faBell">
-                    </fa-icon>
+        <!-- NOTIFICATION CONTAINER -->
+        <div id="notifcontainer" class="relative flex px-2 justify-self-end space-x-3">
+            <!-- Bell Icon -->
+            <div id="notif-icon"
+                class="relative flex justify-center items-center rounded-full bg-neutral-300 w-7 h-7 hover:scale-105"
+                (click)="toggleNotifications()">
+                <fa-icon class="cursor-pointer" [ngStyle]="{'font-size': '20px'}" [ngClass]="'text-neutral-900'"
+                    [icon]="faBell">
+                </fa-icon>
+                <div *ngIf="unreadNotifications.length && !isNotificationClicked" class="flex justify-center items-center rounded-full h-4 w-4 text-[11px] bg-[#ff0000] text-white text-center absolute -top-1.5 -right-1.5">
+                    <p class="font-semibold">{{unreadNotifications.length}}</p>
                 </div>
             </div>
 
-            <div class="hover:scale-105">
-                <fa-icon class="user-icon cursor-pointer" [ngStyle]="{color: 'rgb(212 212 212)', 'font-size': '28px'}"
-                    [icon]="faUserCircle" (click)="toggleUserDetails()">
+            <!-- User Icon -->
+            <div id="user-icon" class="hover:scale-105">
+                <fa-icon class="cursor-pointer" [ngStyle]="{color: 'rgb(212 212 212)', 'font-size': '28px'}"
+                        [icon]="faUserCircle" (click)="toggleUserDetails()">
                 </fa-icon>
             </div>
 
-            <div *ngIf="showUserDropDown"
-                class="flex flex-col rounded-md p-3 absolute top-[125%] right-0 w-72 bg-neutral-100 shadow-xl z-20"
-                [ngClass]="{'h-[80vh]': showNotifications}">
+            <div *ngIf="showNotifications || showUserDetails"
+                class="flex flex-col rounded-md p-3 absolute top-[125%] right-0 bg-neutral-100 shadow-xl z-20 w-96 md:w-[450px]"
+                [ngClass]="{'max-h-[80vh] overflow-y-auto': showNotifications}">
                 <!-- Current User -->
-                <div *ngIf="showUserDetails" class="flex space-x-2 p-4 shadow-lg bg-neutral-50">
+                <div *ngIf="showUserDetails" class="flex items-center space-x-2 p-4 shadow-lg bg-neutral-50">
                     <fa-icon class="" [ngStyle]="{color: 'rgb(82 82 82)', 'font-size': '15px'}" [icon]="faUserCircle">
                     </fa-icon>
                     <p class="capitalize font-semibold">{{getUser()}}</p>
                 </div>
 
                 <!-- Logout Button -->
-                <button *ngIf="showUserDetails" class="flex hover:bg-neutral-200 p-3 mt-3 rounded-md" (click)="toggleLogOutActionModal()">
+                <button *ngIf="showUserDetails" class="flex hover:bg-[rgba(0,0,0,0.1)] p-3 mt-3 rounded-md transition-all duration-500"
+                        (click)="toggleLogOutActionModal()">
                     <fa-icon [ngStyle]="{color: 'rgb(82 82 82)'}" [icon]="logOutIcon"></fa-icon>
                     <p class="text-neutral-900 ml-2">Logout</p>
                     <hr>
@@ -45,6 +51,29 @@
                     <p><span class="font-semibold">&copy;2023 {{title}}</span>. All rights reserved.</p>
                     <p><span class="font-semibold">Version</span> 1.0.0</p>
                 </div>
+
+                <div *ngIf="!notifications.length && showNotifications" class="text-neutral-900 ml-2">No notification to show.</div>
+                <div *ngIf="notifications.length && showNotifications">
+                    <div class="cursor-pointer"
+                        [ngClass]="{'bg-blue-100': !notif.is_read, 'bg-inherit': notif.is_read}"
+                        *ngFor="let notif of notifications">
+                        <div (click)="markAsRead(notif)" (dblclick)="deleteNotification(notif)"
+                            class="hover:bg-[rgba(0,0,0,0.1)] p-2 whitespace-nowrap text-ellipsis overflow-hidden transition-all duration-500">
+                            <p>
+                                <span class="font-semibold"
+                                    [ngClass]="{
+                                        'text-[#ffa500]': notif.warning_type === 'Low stock level',
+                                        'text-[#ff0000]': notif.warning_type === 'Critical stock level',
+                                        }">
+                                    {{notif.warning_type}}: 
+                                </span> 
+                                {{notif.content}}
+                            </p>
+                            <p class="text-neutral-500 text-xxs mt-1 md:text-xs">{{notif.timestamp | date: "dd MMM 'at' hh:mm a"}}</p>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>

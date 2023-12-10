@@ -7,6 +7,17 @@ from .utils import get_padded_pk, year_last_digits
 
 STATUS_CHOICES = ((True, "Active"), (False, "Inactive"))
 
+class Owner(models.Model):
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    business_name = models.CharField(max_length=100)
+    business_address = models.CharField(max_length=100)
+    phone = models.CharField(max_length=100)
+    email = models.EmailField(max_length=100)
+
+    def __str__(self):
+        return self.business_name
+
 # STOCK
 class Stock(models.Model):
     code = models.CharField(max_length=100, unique=True, blank=True)
@@ -17,6 +28,7 @@ class Stock(models.Model):
     date_added = models.DateTimeField(default=timezone.now)
     date_updated = models.DateTimeField(auto_now=True)
     status = models.BooleanField(choices=STATUS_CHOICES, default=True)
+    show_notification = models.BooleanField(default=True)
 
     def __str__(self):
         return self.stock_name
@@ -126,6 +138,7 @@ class SalesBill(models.Model):
     remarks = models.CharField(max_length=100, blank=True, null=True)
     amount_tendered = models.FloatField(validators=[MinValueValidator(0)], default=0)
     grand_total = models.FloatField(validators=[MinValueValidator(0)], default=0)
+    mode_of_payment = models.CharField(max_length=100, default="Cash")
     status = models.BooleanField(default=False)
 
     def __str__(self):
@@ -157,9 +170,10 @@ class SalesItem(models.Model):
 
 # NOTIFICATION
 class Notification(models.Model):
-    content = models.TextField
+    content = models.CharField(max_length=200)
     timestamp = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)
+    warning_type = models.CharField(max_length=50)
 
     def __str__(self):
         return self.timestamp

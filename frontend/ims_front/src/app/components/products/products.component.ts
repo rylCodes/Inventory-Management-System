@@ -2,7 +2,7 @@ import { Component, OnInit, Renderer2, HostListener } from '@angular/core';
 import { Product, Menu } from 'src/app/interface/Product';
 import { Stock } from 'src/app/interface/Stock';
 import { ProductsService } from 'src/app/services/products/products.service';
-import { StocksService } from 'src/app/services/stocks/stocks';
+import { StocksService } from 'src/app/services/stocks/stocks.service';
 import { UiService } from 'src/app/services/ui/ui.service';
 import { faPen, faTrashCan, faXmark, faRectangleList, faPlus, faMinus, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { Router } from '@angular/router';
@@ -173,7 +173,9 @@ export class ProductsComponent implements OnInit {
     this.productService
       .getMenus()
       .subscribe({
-        next: menus => this.menus = menus,
+        next: menus => {
+          this.menus = menus;
+        },
         error: err => this.uiService.displayErrorMessage(err),
       });
   }

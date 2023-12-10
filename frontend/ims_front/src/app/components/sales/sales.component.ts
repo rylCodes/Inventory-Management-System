@@ -7,7 +7,9 @@ import { UiService } from 'src/app/services/ui/ui.service';
 import { faPen, faTrashCan, faXmark, faRectangleList, faPlus, faMinus, faTimes, faPrint, faLocationDot, faPhone, faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import { Router } from '@angular/router';
 import { SalesService } from 'src/app/services/sales/sales.service';
-import { StocksService } from 'src/app/services/stocks/stocks';
+import { StocksService } from 'src/app/services/stocks/stocks.service';
+import { Owner } from 'src/app/interface/Owner';
+import { OwnerService } from 'src/app/services/owner/owner.service';
 
 @Component({
   selector: 'app-sales',
@@ -40,6 +42,7 @@ export class SalesComponent implements OnInit {
   eachBillItems: SaleItem[] = [];
   menus: Menu[] = [];
   stocks: Stock[] = [];
+  owners: Owner[] = [];
   amountChange: number = 0;
   eachBill: [] = [];
 
@@ -51,12 +54,13 @@ export class SalesComponent implements OnInit {
     remarks: "",
     amount_tendered: 0,
     grand_total: 0,
+    mode_of_payment: "Cash",
     status: true,
   };
 
   item: SaleItem = {
     id: undefined,
-    billno: null,
+    billno: undefined,
     menu: undefined,
     quantity: 0,
     price: 0,
@@ -71,6 +75,7 @@ export class SalesComponent implements OnInit {
       private uiService: UiService,
       private router: Router,
       private renderer: Renderer2,
+      private ownerService: OwnerService,
     ) {}
 
   resetBill() {
@@ -81,6 +86,7 @@ export class SalesComponent implements OnInit {
       remarks: "",
       amount_tendered: 0,
       grand_total: 0,
+      mode_of_payment: "Cash",
       status: false,
     };
   }
@@ -126,6 +132,7 @@ export class SalesComponent implements OnInit {
     this.loadAllItems();
     this.loadMenus();
     this.loadStocks();
+    this.loadOwners();
   }  
 
   loadBills() {
@@ -183,6 +190,19 @@ export class SalesComponent implements OnInit {
         const activeStocks = stocks.filter(stock => stock.status === true);
         this.stocks = activeStocks;
       })
+  }
+
+  loadOwners() {
+    this.ownerService
+      .getOwners()
+      .subscribe({
+        next: owners => {
+          this.owners = owners;
+        },
+        error: (error) => {
+          this.uiService.displayErrorMessage(error);
+        }
+      });
   }
 
   getItemLength(bill: SaleBill) {

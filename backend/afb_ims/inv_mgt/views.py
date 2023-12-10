@@ -104,3 +104,14 @@ class NotificationDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Notification.objects.all()
     serializer_class = NotificationSerializer
     permission_classes = [IsAdminUser]
+
+# Owner views
+class OwnerList(generics.ListAPIView):
+    queryset = Owner.objects.all()
+    serializer_class = OwnerSerializer
+    permission_classes = [IsAdminUser]
+
+class OwnerDetail(generics.RetrieveAPIView):
+    queryset = Owner.objects.all()
+    serializer_class = OwnerSerializer
+    permission_classes = [IsAdminUser]

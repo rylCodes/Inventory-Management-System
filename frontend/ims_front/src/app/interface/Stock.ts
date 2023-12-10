@@ -8,4 +8,5 @@ export interface Stock {
     date_added?: string,
     date_updated?: string,
     status: boolean,
+    show_notification: boolean,
 }

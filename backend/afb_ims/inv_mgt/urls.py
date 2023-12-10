@@ -37,4 +37,8 @@ urlpatterns = [
     # Notification URLs
     path('notifications/', views.NotificationList.as_view(), name='notification-list'),
     path('notifications/<int:pk>/', views.NotificationDetail.as_view(), name='notification-detail'),
+
+    # User URLs
+    path('owners/', views.OwnerList.as_view(), name='owner-list'),
+    path('owners/<int:pk>/', views.OwnerDetail.as_view(), name='owner-detail')
 ]

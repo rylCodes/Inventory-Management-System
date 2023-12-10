@@ -50,7 +50,7 @@
                 <div class="flex items-center mt-4">
                     <label class="" for="menu.status">Status:</label>
                     <div class="flex items-center ml-10">
-                        <input class="border border-neutral-900 px-1 py-0.5 rounded-sm w-4 h-4" type="checkbox"
+                        <input class="border border-neutral-900 px-1 py-0.5 rounded-sm w-[14px] h-[14px]" type="checkbox"
                             name="menu.status" id="menu.status" [(ngModel)]="menu.status" checked>
                         <label class="ml-1" for="menu.status">Active</label>
                     </div>
@@ -223,10 +223,10 @@
     <div *ngIf="showMenuTable" class="w-full text-center shadow-xl rounded-xl mt-6 lg:mt-8">
         <table class="w-full table-fixed rounded-xl">
             <thead class="text-neutral-300 bg-neutral-900">
-                <th class="w-1/4 md:w-auto">Code</th>
+                <th class="w-1/3 md:w-1/6">Code</th>
                 <th>Name</th>
                 <th>Category</th>
-                <th class="hidden md:table-cell">Description</th>
+                <th class="hidden w-1/6 md:table-cell">Description</th>
                 <th>Price</th>
                 <th class="hidden md:table-cell">Status</th>
                 <th class="hidden md:table-cell">Date Added</th>

@@ -7,7 +7,7 @@ import { UiService } from 'src/app/services/ui/ui.service';
 import { faPen, faTrashCan, faXmark, faRectangleList, faPlus, faMinus, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { Router } from '@angular/router';
 import { PurchasesService } from 'src/app/services/purchases/purchases.service';
-import { StocksService } from 'src/app/services/stocks/stocks';
+import { StocksService } from 'src/app/services/stocks/stocks.service';
 
 @Component({
   selector: 'app-purchases',
@@ -350,7 +350,8 @@ export class PurchasesComponent implements OnInit {
   
           // Adjusted inventories upon saving the purchase.
           stocks.map(stock => {
-            this.stockService.editStock(stock).subscribe();
+            this.stockService.editStock(stock)
+            .subscribe();
           });
   
           this.resetBillForm();

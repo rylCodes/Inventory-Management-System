@@ -4,9 +4,12 @@
         <app-header *ngIf="hasRoute('/login')"></app-header>
         <div class="relative flex flex-col justify-between flex-1">
             <router-outlet class="absolute top-0"></router-outlet>
-            <div *ngIf="hasRoute('/login')" class="flex justify-between bg-white w-full text-neutral-700 p-4 mt-12 text-xs">
-                <p><span class="font-bold">&copy;2023 {{title}}</span>. All rights reserved.</p>
-                <p><span class="font-bold">Version</span> 1.0.0</p>
+            <div class="flex flex-col mt-12">
+                <button class="text-neutral-500 text-center text-xs hover:text-neutral-400 p-3" (click)="scrollToTop()">Go-to-top</button>
+                <div *ngIf="hasRoute('/login')" class="flex justify-between bg-white w-full text-neutral-700 p-4 text-xs">
+                    <p><span class="font-bold">&copy;2023 {{title}}</span>. All rights reserved.</p>
+                    <p><span class="font-bold">Version</span> 1.0.0</p>
+                </div>
             </div>
         </div>
     </div>

@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { UserDetails } from 'src/app/interface/UserDetails';
 import { UiService } from 'src/app/services/ui/ui.service';
-import { StocksService } from 'src/app/services/stocks/stocks';
+import { StocksService } from 'src/app/services/stocks/stocks.service';
 import { ProductsService } from 'src/app/services/products/products.service';
 import { SalesService } from 'src/app/services/sales/sales.service';
 import { PurchasesService } from 'src/app/services/purchases/purchases.service';
@@ -13,6 +13,7 @@ import { PurchaseBill, PurchaseItem } from 'src/app/interface/Purchase';
 import { SaleBill, SaleItem } from 'src/app/interface/Sale';
 import { DatePipe } from '@angular/common';
 import { faCircleArrowRight, faBoxesPacking, faRectangleList, faBoxesStacked, faMoneyBillTrendUp } from '@fortawesome/free-solid-svg-icons';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard',
@@ -20,19 +21,23 @@ import { faCircleArrowRight, faBoxesPacking, faRectangleList, faBoxesStacked, fa
   styleUrls: ['./dashboard.component.css']
 })
 
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
 
   dashboardItems: any = [];
   stocks: Stock[] = [];
+  stocksToCheck: Stock[] = [];
   products: Menu[] = [];
   saleBills: SaleBill[] = [];
   saleItems: SaleItem[] = [];
   todaySaleBills: SaleBill[] = [];
+  yesterdaySaleBills: SaleBill[] = [];
+  lastWeekSaleBills: SaleBill[] = [];
   purchaseBills: PurchaseBill[] = [];
   purchaseItems: PurchaseItem[] = [];
   suppliers: Supplier[] = [];
+  sortStockByQty: any;
 
-  today: Date = new Date;
+  saleBillsSubscription: Subscription = new Subscription();
 
   faBoxesStacked = faBoxesStacked;
   faCircleArrowRight = faCircleArrowRight;
@@ -51,65 +56,130 @@ export class DashboardComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.saleService.getSaleBills()
-    .subscribe(saleBills => {
-      this.saleBills = saleBills;
-      this.todaySaleBills = saleBills.filter(bill => {
-        const dateToday = this.datePipe.transform(this.today, 'MM-dd-yyyy');
-        const billToday = this.datePipe.transform(bill.time, 'MM-dd-yyyy');
-        return billToday === dateToday && bill.status ;
-      })
-    })
-
-    this.saleService.getSaleItems()
-    .subscribe(saleItems => {
-      this.saleItems = saleItems; 
-    })
-
-    this.supplierService.getSuppliers()
-    .subscribe(suppliers => {
-      this.suppliers = suppliers;
-    })
-
-    this.stockServices.getStocks()
-    .subscribe(stocks => {
-      this.stocks = stocks;
+    this.saleBillsSubscription = this.saleService.fetchSaleBills()
+    .subscribe({
+      next: (saleBills) => {
+        this.saleBills = saleBills;
+      },
+      error: (err) => {
+        console.log(err);
+      }
     });
 
-    this.productService.getMenus()
-    .subscribe(products => {
-      this.products = products;
-    })
+    this.supplierService.getSuppliers()
+    .subscribe({
+      next: (suppliers) => {
+        this.suppliers = suppliers;
+      },
+      error: (err) => {
+        console.log(err);
+      }
+    });
 
-    this.purchaseService.getPurchaseBills()
-    .subscribe(purchaseBills => {
-      this.purchaseBills = purchaseBills;
-    })
+    this.stockServices
+    .getStocks()
+    .subscribe({
+      next: (stocks) => {
+        this.stocks = stocks;
+        this.stocksToCheck = stocks.filter(stock => stock.unit !== 'ml' && stock.unit !== 'gram');
+        this.sortStockByQty = this.stocks.sort((a, b) => {
+          return a.quantity - b.quantity;
+        })
+      },
+      error: (err) => {
+        console.log(err);
+      }
+    });
 
-    this.purchaseService.getPurchaseItems()
-    .subscribe(purchaseItems => {
-      this.purchaseItems = purchaseItems;
-    })
+    // this.productService.getMenus()
+    // .subscribe({
+    //   next: (products) => {
+    //     this.products = products;
+    //   },
+    //   error: (err) => {
+    //     console.log(err);
+    //   }
+    // });
 
-    const dashboardItems: any = [
-      { title: "stocks", length: this.stocks.length },
-      { title: "menu", length: this.products.length },
-      { title: "purchaseBills", length: this.purchaseBills.length },
-      { title: "purchaseItems", length: this.purchaseItems.length },
-      { title: "saleBills", length: this.saleBills.length },
-      { title: "saleItems", length: this.saleItems.length },
-      { title: "suppliers", length: this.suppliers.length },
-    ]
-
-    this.dashboardItems = dashboardItems;
+    // this.saleService.getSaleItems()
+    // .subscribe({
+    //   next: (saleItems) => {
+    //     this.saleItems = saleItems;
+    //   },
+    //   error: (err) => {
+    //     console.log(err);
+    //   }
+    // });
   }
 
-  getTodaySales():number | null {
+  ngOnDestroy(): void {
+    this.saleBillsSubscription.unsubscribe();
+  }
+
+  getTodaySales(): number {
     let total = 0;
-    this.todaySaleBills.map(bill => {
+    this.todaySaleBills = this.saleBills.filter(bill => {
+      const currentDate = new Date();
+      const dateToday = this.datePipe.transform(currentDate, 'MM-dd-yyyy');
+      const billDate = this.datePipe.transform(bill.time, 'MM-dd-yyyy');
+      return billDate === dateToday && bill.status;
+    })
+
+    if (!this.todaySaleBills || this.todaySaleBills.length === 0) {
+      return 0;
+    }
+    this.todaySaleBills.forEach(bill => {
       if (bill && bill.grand_total) {
         total += bill.grand_total;
-      } 
+      }
+    })
+    return total;
+  }
+
+  getYesterdaySales(): number {
+    let total = 0;
+    this.yesterdaySaleBills = this.saleBills.filter(bill => {
+      const currentDate = new Date();
+      const yesterday = currentDate.setDate(currentDate.getDate() - 1);
+      const dateYesterday = this.datePipe.transform(yesterday, 'MM-dd-yyyy');
+      const billDate = this.datePipe.transform(bill.time, 'MM-dd-yyyy');
+      return billDate === dateYesterday && bill.status;
+    })
+
+    if (!this.yesterdaySaleBills || this.yesterdaySaleBills.length === 0) {
+      return 0;
+    }
+    this.yesterdaySaleBills.forEach(bill => {
+      if (bill && bill.grand_total) {
+        total += bill.grand_total;
+      }
+    })
+    return total;
+  }
+
+  getLastWeekSales(): number {
+    let total = 0;
+    this.lastWeekSaleBills = this.saleBills.filter(bill => {
+      const currentDate = new Date();
+      const currentDay = currentDate.getDay();
+      const daysToSubtract = currentDay === 0 ? 6 : currentDay -1;
+
+      const previousMonday = new Date(currentDate);
+      previousMonday.setDate(currentDate.getDate() - daysToSubtract);
+
+      const previousSunday = new Date(previousMonday);
+      previousSunday.setDate(previousMonday.getDate() + 6);
+      const saleDate = new Date(bill.time);
+      return saleDate >= previousMonday && saleDate <= previousSunday && bill.status;
+    })
+
+    if (!this.lastWeekSaleBills || this.lastWeekSaleBills.length === 0) {
+      return 0;
+    }
+    this.lastWeekSaleBills.forEach(bill => {
+      if (bill && bill.grand_total) {
+        total += bill.grand_total;
+      }
     })
     return total;
   }

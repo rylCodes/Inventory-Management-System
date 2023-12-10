@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, catchError, throwError } from 'rxjs';
+import { Observable, catchError, throwError, BehaviorSubject } from 'rxjs';
 import { SaleBill, SaleItem } from 'src/app/interface/Sale';
 const httpOptions = {
   headers: new HttpHeaders({
@@ -13,6 +13,7 @@ const httpOptions = {
 })
 export class SalesService {
   private apiUrl = 'http://localhost:8000/ims-api/';
+  private saleBills = new BehaviorSubject<SaleBill[]>([]);
 
   constructor(private http: HttpClient) { }
   
@@ -39,6 +40,13 @@ export class SalesService {
           return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to display sale transactions!`)
         })
       );
+  }
+
+  fetchSaleBills(): BehaviorSubject<SaleBill[]> {
+    this.http.get<SaleBill[]>(`${this.apiUrl}sales-bill/`).subscribe(
+      (saleBills: SaleBill[]) => {this.saleBills.next(saleBills)}
+    )
+    return this.saleBills;
   }
 
   editSaleBill(saleBill: SaleBill) {

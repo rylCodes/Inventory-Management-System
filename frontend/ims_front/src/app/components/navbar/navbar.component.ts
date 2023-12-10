@@ -3,6 +3,8 @@ import { faMagnifyingGlass, faTimes, faHouse, faBoxesStacked, faList, faDesktop,
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { Router } from '@angular/router';
 import { RotateProp } from '@fortawesome/fontawesome-svg-core';
+import { Subject } from 'rxjs';
+import { UiService } from 'src/app/services/ui/ui.service';
 
 @Component({
   selector: 'app-navbar',
@@ -10,6 +12,7 @@ import { RotateProp } from '@fortawesome/fontawesome-svg-core';
   styleUrls: ['./navbar.component.css']
 })
 export class NavbarComponent {
+  private query = new Subject<string>();
   title: string = "RylCodes-IMS";
 
   showLogOutActionModal: boolean = false;
@@ -27,20 +30,21 @@ export class NavbarComponent {
   faXmark = faXmark;
   logOutIcon = faRightFromBracket;
 
-  searchQuery: string | null = null;
-  filterText: string | null = null;
+  searchQuery: string= "";
+  filterText: string= "";
   isFilter: boolean = false;
 
-  constructor (private authService: AuthService, private router: Router) {}
+  constructor (private authService: AuthService, private router: Router, uiService: UiService) {}
 
   onSearch() {
     this.filterText = this.searchQuery
     this.isFilter = true;
-    this.searchQuery = null;
+    this.searchQuery = "";
+    this.setQuery(this.filterText)
   }
 
   clearSearch() {
-    this.filterText = null;
+    this.filterText = "";
     this.isFilter = false;
   }
 
@@ -51,6 +55,10 @@ export class NavbarComponent {
   logOut() {
     this.authService.clearToken();
     this.router.navigate(["login"]);
+  }
+
+  setQuery(query: string) {
+    this.query.next(query);
   }
 
 }

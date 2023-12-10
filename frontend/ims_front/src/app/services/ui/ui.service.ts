@@ -5,9 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
   providedIn: 'root'
 })
 export class UiService {
-  constructor() { }
-
-  private nonPrintableElements: NodeListOf<HTMLElement> | null = null
+  constructor() { }  
 
   wait(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -30,23 +28,6 @@ export class UiService {
     const formattedNumber = sequentialNumber?.toString().padStart(4, '0');
     const sequentialCode = `${prefix}-${yearCode}-${formattedNumber}`;
     return sequentialCode;
-  }
-
-  hideNonPrintableElements(elements: string): void {
-    this.nonPrintableElements = document.querySelectorAll(elements) as NodeListOf<HTMLElement>;
-    if (this.nonPrintableElements) {
-      this.nonPrintableElements.forEach(element => {
-        element.style.display = 'none';
-      })
-    }
-  }
-
-  showPrintableElements(): void {
-    if (this.nonPrintableElements) {
-      this.nonPrintableElements.forEach(element => {
-        element.style.display = '';
-      })
-    }
   }
 
   displayErrorMessage(err: any): void {

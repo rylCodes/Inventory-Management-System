@@ -227,7 +227,7 @@ export class StocksComponent implements OnInit {
     if (!this.stock.stock_name) {
       window.alert("Enter stock name!");
       return;
-    } else if (this.stock.quantity < 0 || this.stock.quantity === null) {
+    } else if (this.stock.quantity === null) {
       window.alert("Invalid stock quantity!");
       return;
     }
@@ -263,9 +263,15 @@ export class StocksComponent implements OnInit {
             this.stocks[index] = stockData;
             this.loadStocks();
             this.toggleForm();
-            this.addNotification();
+            
+            if (stockData.show_notification) {
+              this.addNotification();
+            }
 
             await this.uiService.wait(100);
+            if (stockData.quantity < 0) {
+              window.alert("If the product quantity is correct, leave it unchanged. Please verify and correct if it's showing a negative value.")
+            }
             window.alert("Successfully saved changes to the stock.");
           },
           error: (err) => {

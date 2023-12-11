@@ -58,7 +58,6 @@ export class PosComponent implements OnInit {
   stocks: Stock[] = [];
   stocksToCheck: Stock[] = [];
   products: Product[] = [];
-  owners: Owner[] = [];
   amountChange: number = 0;
 
   saleBill: SaleBill = {
@@ -90,6 +89,16 @@ export class PosComponent implements OnInit {
     is_read: false,
     warning_type: ""
   }
+
+  owner: Owner = {
+    id: undefined,
+    first_name: "",
+    last_name: "",
+    business_name: "",
+    business_address: "",
+    phone: "",
+    email: "",
+  };
 
   constructor(
       private salesService: SalesService,
@@ -225,7 +234,7 @@ export class PosComponent implements OnInit {
     this.loadMenus();
     this.loadStocks();
     this.loadProducts();
-    this.loadOwners();
+    this.loadOwner();
     this.loadItems();
     this.loadBills();
   }  
@@ -289,6 +298,7 @@ export class PosComponent implements OnInit {
       next: stocks => {
         const activeStocks = stocks.filter(stock => stock.status === true);
         this.stocks = activeStocks;
+        this.stocksToCheck = stocks.filter(stock => stock.show_notification);
       },
       error: err => console.log(err)
     })
@@ -305,12 +315,12 @@ export class PosComponent implements OnInit {
     })
   }
 
-  loadOwners() {
+  loadOwner() {
     this.ownerService
     .getOwners()
     .subscribe({
       next: owners => {
-        this.owners = owners;
+        this.owner = owners[0];
       },
       error: err => console.log(err)
     })
@@ -370,13 +380,14 @@ export class PosComponent implements OnInit {
           this.saleItems.map(item => {
             if (!item.billno) {
               item.billno = bill.id;
+              this.salesService.editSaleItem(item).subscribe(item => {
+                const index = this.saleItems.findIndex(i => i.id === item.id);
+                this.saleItems[index] = item;
+                this.loadItems();
+              })
             }
-            this.salesService.editSaleItem(item).subscribe(item => {
-              const index = this.saleItems.findIndex(i => i.id === item.id);
-              this.saleItems[index] = item;
-              this.loadItems();
-            })
           })
+
           this.resetBillForm();
           await this.uiService.wait(100);
           if (!bill.grand_total || bill.grand_total < 1) {
@@ -419,17 +430,15 @@ export class PosComponent implements OnInit {
 
         if (this.updatingOrder) {
           this.saleBill.grand_total += saleItem.sub_total;
+          this.salesService.editSaleBill(this.saleBill)
+          .subscribe({
+            next: () => {
+              this.loadBills();
+              this.addNotification();
+            },
+            error: err => console.log(err) 
+          });
         }
-    
-        this.salesService.editSaleBill(this.saleBill)
-        .subscribe({
-          next: bill => {
-            this.saleBill = bill;
-            this.loadBills();
-            this.addNotification();
-          },
-          error: err => console.log(err) 
-        });
 
         this.resetItemForm();
         await this.uiService.wait(100);
@@ -594,16 +603,17 @@ export class PosComponent implements OnInit {
     // Reduce total bill upon deleting an item
     this.saleBill.grand_total -= this.deletingSaleItem.sub_total;
 
-    this.salesService.editSaleBill(this.saleBill)
-    .subscribe({
-      next: data => {
-        this.saleBill = data;
-        this.addNotification();
-      },
-      error: (err) => {
-        console.log(err);
-      }
-    });
+    if (this.updatingOrder) {
+      this.salesService.editSaleBill(this.saleBill)
+      .subscribe({
+        next: () => {
+          this.addNotification();
+        },
+        error: (err) => {
+          console.log(err);
+        }
+      });
+    }
 
     this.isLoading = true;
     this.salesService

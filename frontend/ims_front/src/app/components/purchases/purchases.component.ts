@@ -58,6 +58,15 @@ export class PurchasesComponent implements OnInit {
     remarks: "",
   };
 
+  originalBill: PurchaseBill = {
+    id: undefined,
+    billno: "",
+    time: undefined,
+    supplier_id: undefined,
+    grand_total: 0,
+    remarks: "",
+  };
+
   item: PurchaseItem = {
     id: undefined,
     stock_id: undefined,
@@ -194,9 +203,9 @@ export class PurchasesComponent implements OnInit {
 
   // SHOW BILLS
   ngOnInit(): void {
+    this.loadSuppliers();
     this.loadFilteredItems();
     this.loadAllItems();
-    this.loadSuppliers();
     this.loadStocks();
     this.loadBills();
   }  
@@ -447,12 +456,18 @@ export class PurchasesComponent implements OnInit {
 
     bill.billno.toUpperCase();
 
-    this.bill = bill;
+    this.bill = { ...bill };
+    this.originalBill = { ...bill };
 
     this.toggleBillForm();
   }
 
   onSaveUpdate() {
+    if (JSON.stringify(this.originalBill) === JSON.stringify(this.bill)) {
+      this.toggleBillForm();
+      return;
+    }
+
     this.bill.billno.toUpperCase();
     
     const editingPurchaseBill = {

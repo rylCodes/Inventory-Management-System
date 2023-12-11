@@ -1,5 +1,6 @@
 <nav class="bg-neutral-900 h-auto w-[250px]">
-    <div class="flex flex-col items-center py-4 text-neutral-900 bg-gradient-to-r from-neutral-300 via-white to-neutral-300">
+    <div
+        class="flex flex-col items-center py-4 text-neutral-900 bg-gradient-to-r from-neutral-300 via-white to-neutral-300">
         <h1 class="text-[28px] font-extrabold mt-2">{{ title }}</h1>
         <p class="text-[10px] mt-1">Inventory Management System with POS</p>
     </div>
@@ -25,43 +26,50 @@
     <hr class="border-t-2 border-neutral-300 mx-4 mt-4">
     <div class="text-neutral-300 mt-2">
         <a class="flex items-center px-4 py-2 hover:bg-neutral-900 transition-all duration-500" routerLink="/"
-            routerLinkActive="bg-neutral-950 text-neutral-200 font-semibold hover:bg-neutral-950" [routerLinkActiveOptions]="{exact: true}">
+            routerLinkActive="bg-neutral-950 text-neutral-200 font-semibold hover:bg-neutral-950"
+            [routerLinkActiveOptions]="{exact: true}">
             <fa-icon class="scale-90" [icon]="faHouse"></fa-icon>
             <p class="ml-3">Dashboard</p>
         </a>
 
         <a class="flex items-center px-4 py-2 hover:bg-neutral-900 transition-all duration-500" routerLink="/stocks"
-            routerLinkActive="bg-neutral-950 text-neutral-200 font-semibold hover:bg-neutral-950" [routerLinkActiveOptions]="{exact: true}">
+            routerLinkActive="bg-neutral-950 text-neutral-200 font-semibold hover:bg-neutral-950"
+            [routerLinkActiveOptions]="{exact: true}">
             <fa-icon class="scale-90" [icon]="faBoxesStacked"></fa-icon>
             <p class="ml-3">Inventory</p>
         </a>
 
         <a class="flex items-center px-4 py-2 hover:bg-neutral-900 transition-all duration-500" routerLink="/products"
-            routerLinkActive="bg-neutral-950 text-neutral-200 font-semibold hover:bg-neutral-950" [routerLinkActiveOptions]="{exact: true}">
+            routerLinkActive="bg-neutral-950 text-neutral-200 font-semibold hover:bg-neutral-950"
+            [routerLinkActiveOptions]="{exact: true}">
             <fa-icon class="scale-90" [icon]="faList"></fa-icon>
             <p class="ml-3">Menu</p>
         </a>
 
         <a class="flex items-center px-4 py-2 hover:bg-neutral-900 transition-all duration-500" routerLink="/pos"
-            routerLinkActive="bg-neutral-950 text-neutral-200 font-semibold hover:bg-neutral-950" [routerLinkActiveOptions]="{exact: true}">
+            routerLinkActive="bg-neutral-950 text-neutral-200 font-semibold hover:bg-neutral-950"
+            [routerLinkActiveOptions]="{exact: true}">
             <fa-icon class="scale-90" [icon]="faDesktop"></fa-icon>
             <p class="ml-3">POS</p>
         </a>
 
         <a class="flex items-center px-4 py-2 hover:bg-neutral-900 transition-all duration-500" routerLink="/suppliers"
-            routerLinkActive="bg-neutral-950 text-neutral-200 font-semibold hover:bg-neutral-950" [routerLinkActiveOptions]="{exact: true}">
+            routerLinkActive="bg-neutral-950 text-neutral-200 font-semibold hover:bg-neutral-950"
+            [routerLinkActiveOptions]="{exact: true}">
             <fa-icon class="scale-90" [icon]="faHandshake"></fa-icon>
             <p class="ml-3">Suppliers</p>
         </a>
 
         <a class="flex items-center px-4 py-2 hover:bg-neutral-900 transition-all duration-500" routerLink="/purchases"
-            routerLinkActive="bg-neutral-950 text-neutral-200 font-semibold hover:bg-neutral-950" [routerLinkActiveOptions]="{exact: true}">
+            routerLinkActive="bg-neutral-950 text-neutral-200 font-semibold hover:bg-neutral-950"
+            [routerLinkActiveOptions]="{exact: true}">
             <fa-icon class="scale-90" [icon]="faCreditCard"></fa-icon>
             <p class="ml-3">Purchases</p>
         </a>
 
         <a class="flex items-center px-4 py-2 hover:bg-neutral-900 transition-all duration-500" routerLink="/sales"
-            routerLinkActive="bg-neutral-950 text-neutral-200 font-semibold hover:bg-neutral-950" [routerLinkActiveOptions]="{exact: true}">
+            routerLinkActive="bg-neutral-950 text-neutral-200 font-semibold hover:bg-neutral-950"
+            [routerLinkActiveOptions]="{exact: true}">
             <fa-icon class="scale-90" [icon]="faWallet"></fa-icon>
             <p class="ml-3">Sales</p>
         </a>
@@ -79,13 +87,12 @@
 <div *ngIf="showLogOutActionModal"
     class="flex justify-center top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] fixed z-[9999]">
     <div class="relative flex flex-col items-center bg-white rounded-lg w-96 h-fit p-4 mt-32">
-        <fa-icon class="place-self-end scale-125 hover:scale-110" [icon]="faXmark"
-            [ngStyle]="{color: 'rgb(64 64 64 )'}" (click)="toggleLogOutActionModal()">
+        <fa-icon class="place-self-end scale-125 hover:scale-110" [icon]="faXmark" [ngStyle]="{color: 'rgb(64 64 64 )'}"
+            (click)="toggleLogOutActionModal()">
         </fa-icon>
         <p class="mb-8 mt-6 text-center">
             Are you sure you want to log out?
         </p>
-        <app-button (btnClick)="logOut()" bgColor="red" txtColor="bg-white"
-            txtContent="Logout"></app-button>
+        <app-button (btnClick)="logOut()" bgColor="red" txtColor="bg-white" txtContent="Logout"></app-button>
     </div>
 </div>

@@ -2,7 +2,7 @@ import { Component, HostListener, OnInit, OnDestroy, ElementRef, ViewChild } fro
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import {
-  faRightFromBracket, faXmark, faUserCircle, faBell, faBars,
+  faRightFromBracket, faXmark, faUserCircle, faBell, faBars, faEllipsis,
   faMagnifyingGlass, faTimes, faHouse, faBoxesStacked, faList,
   faDesktop, faWallet, faCreditCard, faCircleInfo, faHandshake
 } from '@fortawesome/free-solid-svg-icons';
@@ -58,6 +58,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   faHandshake = faHandshake;
   faCreditCard = faCreditCard;
   faCircleInfo = faCircleInfo;
+  faEllipsis = faEllipsis;
 
   showLogOutActionModal: boolean = false;
   showUserDetails: boolean = false;

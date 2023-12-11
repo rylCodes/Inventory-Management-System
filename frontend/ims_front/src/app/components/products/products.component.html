@@ -50,8 +50,8 @@
                 <div class="flex items-center mt-4">
                     <label class="" for="menu.status">Status:</label>
                     <div class="flex items-center ml-10">
-                        <input class="border border-neutral-900 px-1 py-0.5 rounded-sm w-[14px] h-[14px]" type="checkbox"
-                            name="menu.status" id="menu.status" [(ngModel)]="menu.status" checked>
+                        <input class="border border-neutral-900 px-1 py-0.5 rounded-sm w-[14px] h-[14px]"
+                            type="checkbox" name="menu.status" id="menu.status" [(ngModel)]="menu.status" checked>
                         <label class="ml-1" for="menu.status">Active</label>
                     </div>
                 </div>
@@ -103,7 +103,7 @@
             </button>
         </form>
 
-        <!-- FORM CONTAINER: Add items and create new product -->
+        <!-- FLEX CONTAINER: Add items and create new product -->
         <div *ngIf="showFormContainer" class="flex flex-col justify-center space-x-0 w-full md:flex-row md:space-x-2">
             <!-- ITEM TABLE -->
             <div class="table-container w-full text-center shadow-xl mt-4 md:w-3/4">
@@ -133,9 +133,6 @@
                 </table>
                 <div class="w-full h-[5vh]" *ngIf="!products.length && !isFetching">
                     <p class="text-center my-4">No items to show.</p>
-                </div>
-                <div *ngIf="isFetching && updatingMenuItems" class="h-[10vh]">
-                    <app-loader></app-loader>
                 </div>
             </div>
 
@@ -180,8 +177,8 @@
                 </h2>
                 <form class="flex flex-col" (ngSubmit)="onSubmitMenu()">
                     <label class="mt-2" for="menu.name">Name:</label>
-                    <input class="text-center uppercase border border-neutral-900 px-1 py-0.5 rounded-sm mt-1"
-                        type="text" name="menu.name" id="menu.name" [(ngModel)]="menu.name">
+                    <input class="uppercase border border-neutral-900 px-1 py-0.5 rounded-sm mt-1" type="text"
+                        name="menu.name" id="menu.name" [(ngModel)]="menu.name">
 
                     <label class="mt-2" for="menu.category">Category:</label>
                     <select class="border border-neutral-900 px-2 py-1 rounded-sm mt-1" name="menu.category"
@@ -197,8 +194,8 @@
                         id="customCategory" [(ngModel)]="customCategory" placeholder="Please specify.">
 
                     <label class="mt-2" for="menu.description">Description:</label>
-                    <input class="text-center uppercase border border-neutral-900 px-1 py-0.5 rounded-sm mt-1"
-                        type="text" name="menu.description" id="menu.description" [(ngModel)]="menu.description">
+                    <input class="uppercase border border-neutral-900 px-1 py-0.5 rounded-sm mt-1" type="text"
+                        name="menu.description" id="menu.description" [(ngModel)]="menu.description">
 
                     <label class="mt-2" for="menu.price">Price:</label>
                     <input class="text-center uppercase border border-neutral-900 px-1 py-0.5 rounded-sm mt-1"
@@ -218,7 +215,9 @@
                         Save
                     </button>
                 </form>
+                <!-- ** Menu form ends here ** -->
             </div>
+            <!-- ** Flex container ends here ** -->
         </div>
     </div>
 
@@ -275,9 +274,9 @@
             </tbody>
         </table>
         <div class="w-full h-[5vh]" *ngIf="!menus.length && !isFetching">
-            <p class="text-center my-4">No items to show.</p>
+            <p class="text-center my-4">No products.</p>
         </div>
-        <div *ngIf="isFetching" class="h-[10vh]">
+        <div *ngIf="!menus.length && isFetching" class="h-[10vh]">
             <app-loader></app-loader>
         </div>
     </div>

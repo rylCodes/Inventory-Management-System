@@ -105,8 +105,7 @@
                     <tr *ngFor="let item of items">
                         <td class="p-2">
                             <div class="flex items-center justify-center space-x-2 md:space-x-4">
-                                <button class="px-1.5 py-1 rounded-md bg-[#ff0000]"
-                                    (click)="deleteItem(item)">
+                                <button class="px-1.5 py-1 rounded-md bg-[#ff0000]" (click)="deleteItem(item)">
                                     <fa-icon class="scale-75" [icon]="faTrashCan"
                                         [ngStyle]="{color: 'rgb(212 212 212)'}">
                                     </fa-icon>
@@ -124,10 +123,6 @@
             <!-- When no items to show. -->
             <div class="w-full h-[5vh]" *ngIf="!items.length && !isFetching">
                 <p class="text-center my-4">No items to show.</p>
-            </div>
-            <!-- While fetching data. -->
-            <div *ngIf="isFetching && showPurchaseBill" class="h-[10vh]">
-                <app-loader></app-loader>
             </div>
         </div>
 
@@ -237,10 +232,10 @@
         </table>
         <!-- When no items to show. -->
         <div class="w-full h-[5vh]" *ngIf="!bills.length && !isFetching">
-            <p class="text-center my-4">No items to show.</p>
+            <p class="text-center my-4">No purchases.</p>
         </div>
         <!-- While fetching data. -->
-        <div *ngIf="isFetching" class="h-[10vh]">
+        <div *ngIf="!bills.length && isFetching" class="h-[10vh]">
             <app-loader></app-loader>
         </div>
     </div>

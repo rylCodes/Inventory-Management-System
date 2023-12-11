@@ -8,68 +8,85 @@
             </fa-icon>
         </div>
 
-        <!-- NOTIFICATION CONTAINER -->
+        <!-- NOTIFICATION AND USER CONTAINER -->
         <div id="notifcontainer" class="relative flex px-2 justify-self-end space-x-3">
             <!-- Bell Icon -->
             <div id="notif-icon"
-                class="relative flex justify-center items-center rounded-full bg-neutral-300 w-7 h-7 hover:scale-105"
+                class="relative flex justify-center items-center rounded-full bg-neutral-300 w-7 h-7 hover:scale-105 transition-all duration-300"
                 (click)="toggleNotifications()">
                 <fa-icon class="cursor-pointer" [ngStyle]="{'font-size': '20px'}" [ngClass]="'text-neutral-900'"
                     [icon]="faBell">
                 </fa-icon>
-                <div *ngIf="unreadNotifications.length && !isNotificationClicked" class="flex justify-center items-center rounded-full h-4 w-4 text-[11px] bg-[#ff0000] text-white text-center absolute -top-1.5 -right-1.5">
+                <div *ngIf="unreadNotifications.length && !isNotificationClicked"
+                    class="flex justify-center items-center rounded-full h-4 w-4 text-[11px] bg-[#ff0000] text-white text-center absolute -top-1.5 -right-1.5">
                     <p class="font-semibold">{{unreadNotifications.length}}</p>
                 </div>
             </div>
 
             <!-- User Icon -->
-            <div id="user-icon" class="hover:scale-105">
+            <div id="user-icon" class="hover:scale-105 transition-all duration-300">
                 <fa-icon class="cursor-pointer" [ngStyle]="{color: 'rgb(212 212 212)', 'font-size': '28px'}"
-                        [icon]="faUserCircle" (click)="toggleUserDetails()">
+                    [icon]="faUserCircle" (click)="toggleUserDetails()">
                 </fa-icon>
             </div>
 
             <div *ngIf="showNotifications || showUserDetails"
                 class="flex flex-col rounded-md p-3 absolute top-[125%] right-0 bg-neutral-100 shadow-xl z-20 w-96 md:w-[450px]"
                 [ngClass]="{'max-h-[80vh] overflow-y-auto': showNotifications}">
-                <!-- Current User -->
-                <div *ngIf="showUserDetails" class="flex items-center space-x-2 p-4 shadow-lg bg-neutral-50">
-                    <fa-icon class="" [ngStyle]="{color: 'rgb(82 82 82)', 'font-size': '15px'}" [icon]="faUserCircle">
-                    </fa-icon>
-                    <p class="capitalize font-semibold">{{getUser()}}</p>
-                </div>
+                <div *ngIf="showUserDetails">
+                    <!-- Current User -->
+                    <div class="flex items-center space-x-2 p-3 shadow-lg bg-neutral-50">
+                        <fa-icon class="text-lg" [ngStyle]="{color: 'rgb(82 82 82)'}" [icon]="faUserCircle">
+                        </fa-icon>
+                        <p class="capitalize font-semibold text-base">{{getUser()}}</p>
+                    </div>
 
-                <!-- Logout Button -->
-                <button *ngIf="showUserDetails" class="flex hover:bg-[rgba(0,0,0,0.1)] p-3 mt-3 rounded-md transition-all duration-500"
+                    <!-- Logout Button -->
+                    <button
+                        class="flex w-full hover:bg-[rgba(0,0,0,0.1)] p-3 mt-3 rounded-md transition-all duration-300"
                         (click)="toggleLogOutActionModal()">
-                    <fa-icon [ngStyle]="{color: 'rgb(82 82 82)'}" [icon]="logOutIcon"></fa-icon>
-                    <p class="text-neutral-900 ml-2">Logout</p>
-                    <hr>
-                </button>
+                        <fa-icon [ngStyle]="{color: 'rgb(82 82 82)'}" [icon]="logOutIcon"></fa-icon>
+                        <p class="text-neutral-900 ml-2">Logout</p>
+                        <hr>
+                    </button>
 
-                <div *ngIf="showUserDetails" class="flex justify-between text-xxs text-neutral-500 mt-4">
-                    <p><span class="font-semibold">&copy;2023 {{title}}</span>. All rights reserved.</p>
-                    <p><span class="font-semibold">Version</span> 1.0.0</p>
+                    <div class="flex justify-between text-xxs text-neutral-500 mt-4">
+                        <p><span class="font-semibold">&copy;2023 {{title}}</span>. All rights reserved.</p>
+                        <p><span class="font-semibold">Version</span> 1.0.0</p>
+                    </div>
                 </div>
 
-                <div *ngIf="!notifications.length && showNotifications" class="text-neutral-900 ml-2">No notification to show.</div>
-                <div *ngIf="notifications.length && showNotifications">
-                    <div class="cursor-pointer"
-                        [ngClass]="{'bg-blue-100': !notif.is_read, 'bg-inherit': notif.is_read}"
-                        *ngFor="let notif of notifications">
-                        <div (click)="markAsRead(notif)" (dblclick)="deleteNotification(notif)"
-                            class="hover:bg-[rgba(0,0,0,0.1)] p-2 whitespace-nowrap text-ellipsis overflow-hidden transition-all duration-500">
-                            <p>
-                                <span class="font-semibold"
-                                    [ngClass]="{
-                                        'text-[#ffa500]': notif.warning_type === 'Low stock level',
-                                        'text-[#ff0000]': notif.warning_type === 'Critical stock level',
-                                        }">
-                                    {{notif.warning_type}}: 
-                                </span> 
-                                {{notif.content}}
-                            </p>
-                            <p class="text-neutral-500 text-xxs mt-1 md:text-xs">{{notif.timestamp | date: "dd MMM 'at' hh:mm a"}}</p>
+                <div *ngIf="showNotifications" class="text-neutral-900">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-[18px] lg:text-[24px] font-bold">Notifications</h3>
+                        <div
+                            class="flex items-center justify-center w-9 h-9 rounded-full hover:bg-[rgba(0,0,0,0.1)] transition-all duration-300">
+                            <fa-icon class="text-base text-neutral-500 lg:text-xl" [icon]="faEllipsis"></fa-icon>
+                        </div>
+                    </div>
+                    <div *ngIf="!notifications.length" class="ml-2">
+                        No notification to show.
+                    </div>
+
+                    <div *ngIf="notifications.length">
+                        <div class="cursor-pointer"
+                            [ngClass]="{'bg-blue-100': !notif.is_read, 'bg-inherit': notif.is_read}"
+                            *ngFor="let notif of notifications">
+                            <div (click)="markAsRead(notif)" (dblclick)="deleteNotification(notif)"
+                                class="hover:bg-[rgba(0,0,0,0.1)] p-2 whitespace-nowrap text-ellipsis overflow-hidden transition-all duration-300">
+                                <p>
+                                    <span class="font-semibold" [ngClass]="{
+                                            'text-[#ffa500]': notif.warning_type === 'Low stock level',
+                                            'text-[#ff0000]': notif.warning_type === 'Critical stock level',
+                                            }">
+                                        {{notif.warning_type}}:
+                                    </span>
+                                    {{notif.content}}
+                                </p>
+                                <p class="text-neutral-500 text-xxs mt-1 md:text-xs">
+                                    {{notif.timestamp | date: "dd MMM 'at' hh:mm a"}}
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>

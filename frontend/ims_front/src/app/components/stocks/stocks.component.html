@@ -49,12 +49,13 @@
                         <label class="ml-1" for="stock.status">Active</label>
                     </div>
                 </div>
-    
+
                 <div class="flex items-center lg:mt-4">
                     <label class="" for="stock.status">Notification:</label>
                     <div class="flex items-center ml-6">
                         <input class="border border-neutral-900 px-2 py-1 rounded-sm w-[14px] h-[14px]" type="checkbox"
-                            name="stock.show_notification" id="stock.show_notification" [(ngModel)]="stock.show_notification" checked>
+                            name="stock.show_notification" id="stock.show_notification"
+                            [(ngModel)]="stock.show_notification" checked>
                         <label class="ml-1" for="stock.show_notification">Enable</label>
                     </div>
                 </div>
@@ -86,8 +87,7 @@
                     <td class="p-2">{{stock.code}}</td>
                     <td class="p-2">{{stock.stock_name}}</td>
                     <td class="p-2">{{stock.description}}</td>
-                    <td class="p-2"
-                        [ngClass]="{
+                    <td class="p-2" [ngClass]="{
                             'text-[#ff0000]' : stock.quantity <= 5,
                             'text-[#ffa500]': stock.quantity <= 20 && stock.quantity > 5,
                             'font-semibold': stock.quantity <= 20,
@@ -115,9 +115,11 @@
                         </div>
                         <!-- Delete Stock -->
                         <div class="absolute top-0 right-0 h-full w-3 flex items-center justify-center pr-1 sm:w-6">
-                            <fa-icon class="text-neutral-400 text-xxs sm:text-xs" *ngIf="stock.show_notification" [icon]="faBell">
+                            <fa-icon class="text-neutral-400 text-xxs sm:text-xs" *ngIf="stock.show_notification"
+                                [icon]="faBell">
                             </fa-icon>
-                            <fa-icon class="text-neutral-400 text-xxs sm:text-xs" *ngIf="!stock.show_notification" [icon]="faBellSlash">
+                            <fa-icon class="text-neutral-400 text-xxs sm:text-xs" *ngIf="!stock.show_notification"
+                                [icon]="faBellSlash">
                             </fa-icon>
                         </div>
                     </td>
@@ -129,7 +131,7 @@
             <p class="text-center my-4">No items to show.</p>
         </div>
         <!-- While fetching data. -->
-        <div *ngIf="isFetching" class="h-[10vh]">
+        <div *ngIf="!stocks.length && isFetching" class="h-[10vh]">
             <app-loader></app-loader>
         </div>
     </div>

@@ -43,7 +43,6 @@ export class SalesComponent implements OnInit {
   eachBillItems: SaleItem[] = [];
   menus: Menu[] = [];
   stocks: Stock[] = [];
-  owners: Owner[] = [];
   amountChange: number = 0;
   eachBill: [] = [];
 
@@ -68,6 +67,16 @@ export class SalesComponent implements OnInit {
     sale_date: "",
     sub_total: 0,
   }
+
+  owner: Owner = {
+    id: undefined,
+    first_name: "",
+    last_name: "",
+    business_name: "",
+    business_address: "",
+    phone: "",
+    email: "",
+  };
 
   constructor(
       private salesService: SalesService,
@@ -118,11 +127,11 @@ export class SalesComponent implements OnInit {
   onKeyUp(event: KeyboardEvent) {
     if (event.key === 'Escape') {
       if (this.showItemActionModal) {
-        this.toggleItemActionModal();
+        this.showItemActionModal = false;
       } else if (this.showBillActionModal) {
-        this.toggleBillActionModal();
+        this.showBillActionModal = false;
       } else if (this.showInvoice) {
-        this.toggleInvoice(this.bill); 
+        this.showInvoice = false; 
       }
     }
   }
@@ -133,7 +142,7 @@ export class SalesComponent implements OnInit {
     this.loadAllItems();
     this.loadMenus();
     this.loadStocks();
-    this.loadOwners();
+    this.loadOwner();
   }  
 
   loadBills() {
@@ -196,12 +205,12 @@ export class SalesComponent implements OnInit {
       })
   }
 
-  loadOwners() {
+  loadOwner() {
     this.ownerService
       .getOwners()
       .subscribe({
         next: owners => {
-          this.owners = owners;
+          this.owner = owners[0];
         },
         error: (err) => console.log(err)
       });

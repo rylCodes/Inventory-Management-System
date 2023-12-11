@@ -3,14 +3,15 @@ import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import {
   faRightFromBracket, faXmark, faUserCircle, faBell, faBars, faEllipsis,
-  faMagnifyingGlass, faTimes, faHouse, faBoxesStacked, faList,
-  faDesktop, faWallet, faCreditCard, faCircleInfo, faHandshake
+  faMagnifyingGlass, faTimes, faHouse, faBoxesStacked, faList, faCheck,
+  faDesktop, faWallet, faCreditCard, faCircleInfo, faHandshake, faTrashCan
 } from '@fortawesome/free-solid-svg-icons';
 import { StocksService } from 'src/app/services/stocks/stocks.service';
 import { NotificationsService } from 'src/app/services/notifications/notifications.service';
 import { Stock } from 'src/app/interface/Stock';
 import { Notification } from 'src/app/interface/Notification';
-import { Subscription } from 'rxjs';
+import { Observable, Subscription, forkJoin } from 'rxjs';
+import { UiService } from 'src/app/services/ui/ui.service';
 
 @Component({
   selector: 'app-header',
@@ -19,12 +20,15 @@ import { Subscription } from 'rxjs';
 })
 export class HeaderComponent implements OnInit, OnDestroy {
   @ViewChild('notifcontainer', {static: true}) notifContainer: any;
+  @ViewChild('notifoption', {static: true}) notifoption: any;
 
   @HostListener('document:keyup.escape', ['$event'])
   onKeyUp(event: KeyboardEvent) {
     if (event.key === 'Escape') {
       if (this.showLogOutActionModal) {
         this.showLogOutActionModal = false;
+      } else if (this.showDelAllNotifModal) {
+        this.showDelAllNotifModal = false;
       }
     }
   }
@@ -34,7 +38,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
     if(!(event.target as HTMLElement).closest('#notifcontainer')) {
       this.showUserDetails = false;
       this.showNotifications = false;
-    }; 
+    };
+
+    if(!(event.target as HTMLElement).closest('#notifoption')) {
+      this.showNotifOption = false;
+    };
 
     if(!(event.target as HTMLElement).closest('.menu-icon')) {
       this.isHidden = true;
@@ -59,11 +67,15 @@ export class HeaderComponent implements OnInit, OnDestroy {
   faCreditCard = faCreditCard;
   faCircleInfo = faCircleInfo;
   faEllipsis = faEllipsis;
+  faCheck = faCheck;
+  faTrashCan = faTrashCan;
 
   showLogOutActionModal: boolean = false;
+  showDelAllNotifModal: boolean = false;
   showUserDetails: boolean = false;
   showNotifications: boolean = false;
   showUserDropDown: boolean = false;
+  showNotifOption: boolean = false;
 
   isNotificationClicked: boolean = false;
   isNotifServiceInUse: boolean = false;
@@ -98,7 +110,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     private router: Router,
     private stocksService: StocksService,
     private notificationService: NotificationsService,
-    private elementRef: ElementRef,
+    private uiService: UiService,
     ) { this.notifServiceSubscription = this.notificationService.notifServiceStatus$
       .subscribe((status) => {
         if (status) {
@@ -178,6 +190,14 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.showLogOutActionModal = !this.showLogOutActionModal;
   }
 
+  toggleDelAllNotifModal() {
+    if (this.notifications.length < 1) {
+      this.showNotifOption = false;
+    } else {
+      this.showDelAllNotifModal = !this.showDelAllNotifModal;
+    }
+  }
+
   toggleNavigation() {
     this.isHidden = !this.isHidden;
   }
@@ -195,6 +215,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
     if (this.showUserDetails) {
       this.showNotifications = false;
     }
+  }
+
+  toggleNotifOption() {
+    this.showNotifOption = !this.showNotifOption
   }
 
   getUser(): string | null {
@@ -222,12 +246,59 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }
   }
 
-  deleteNotification(notif: Notification) {
+  deleteEachNotif(notif: Notification) {
     this.notificationService.deleteNotification(notif).subscribe(() => {
       this.notifications = this.notifications.filter(notification => {
         notification.id !== notif.id;
       });
       this.loadNotifications();
     });
+  }
+
+  async deleteAllNotifs() {
+    if (this.notifications.length < 1) {
+      this.showNotifOption = false;
+      return;
+    }
+
+    let deletingNotifs: Observable<Notification>[] = [];
+
+    this.notifications.forEach(notif => {
+      deletingNotifs.push(this.notificationService.deleteNotification(notif));
+    });
+
+    forkJoin(deletingNotifs).subscribe({
+      next: async () => {
+        this.showDelAllNotifModal = false;
+        this.loadNotifications();
+        await this.uiService.wait(100);
+        window.alert("Success: All notifications are now deleted.")    
+      },
+      error: err => this.uiService.displayErrorMessage(err),
+    })
+  }
+
+  async markAllAsRead() {
+    if (this.unreadNotifications.length < 1) {
+      this.showNotifOption = false;
+      return;
+    }
+
+    let markingAllNotifsAsRead: Observable<Notification>[] =[];
+
+    this.unreadNotifications.forEach(notif => {
+      notif.is_read = true;
+      markingAllNotifsAsRead.push(this.notificationService.updateNotification(notif));
+    });
+
+    forkJoin(markingAllNotifsAsRead).subscribe({
+      next: async() => {
+        this.showNotifOption = false;
+        await this.uiService.wait(100);
+        window.alert("Success: All notifications are now marked as read.")  
+      },
+      error: err => this.uiService.displayErrorMessage(err),
+    });
+
   }
 }

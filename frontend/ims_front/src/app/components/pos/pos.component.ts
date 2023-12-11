@@ -23,7 +23,8 @@ export class PosComponent implements OnInit {
   deletingSaleBill?: SaleBill | null = null;
   deletingSaleItem?: SaleItem | null = null;
 
-  isLoading = false;
+  isFetching: boolean = false;
+  isLoading: boolean = false;
 
   proceedEditBill: boolean = false;
   proceedEditItem: boolean = false;
@@ -221,33 +222,38 @@ export class PosComponent implements OnInit {
 
   // SHOW BILLS
   ngOnInit(): void {
-    this.loadBills();
-    this.loadItems();
     this.loadMenus();
     this.loadStocks();
     this.loadProducts();
     this.loadOwners();
+    this.loadItems();
+    this.loadBills();
   }  
 
   loadBills() {
+    this.isFetching = true;
     this.salesService
     .getSaleBills()
     .subscribe({
       next: (salesBills) => {
+        this.isFetching = false;
         this.activeBills = salesBills.filter(item => !item.status);
         this.allBills = salesBills;
       },
       error: (err) => {
+        this.isFetching = false;
         this.uiService.displayErrorMessage(err);
       }
     });
   }
 
   loadItems() {
+    this.isFetching = true;
     this.salesService
     .getSaleItems()
     .subscribe({
       next: (saleItems) => {
+        this.isFetching = false;
         this.allItems = saleItems;
 
         if (this.updatingOrder) {
@@ -258,6 +264,7 @@ export class PosComponent implements OnInit {
         }
       },
       error: (err) => {
+        this.isFetching = false;
         this.uiService.displayErrorMessage(err);
       }
     });
@@ -271,34 +278,41 @@ export class PosComponent implements OnInit {
         const activeMenus = menus.filter(menu => menu.status === true);
         this.menus = activeMenus;
       },
-      error: (err) => {
-        this.uiService.displayErrorMessage(err);
-      }
+      error: err => console.log(err)
     })
   }
 
   loadStocks() {
     this.stockService
     .getStocks()
-    .subscribe(stocks => {
-      const activeStocks = stocks.filter(stock => stock.status === true);
-      this.stocks = activeStocks;
+    .subscribe({
+      next: stocks => {
+        const activeStocks = stocks.filter(stock => stock.status === true);
+        this.stocks = activeStocks;
+      },
+      error: err => console.log(err)
     })
   }
 
   loadProducts() {
     this.productService
     .getProducts()
-    .subscribe(products => {
-      this.products = products;
+    .subscribe({
+      next: products => {
+        this.products = products;
+      },
+      error: err => console.log(err)
     })
   }
 
   loadOwners() {
     this.ownerService
     .getOwners()
-    .subscribe(owners => {
-      this.owners = owners;
+    .subscribe({
+      next: owners => {
+        this.owners = owners;
+      },
+      error: err => console.log(err)
     })
   }
 
@@ -336,7 +350,7 @@ export class PosComponent implements OnInit {
   // Add Bills
   addBill() {
     if (!this.saleBill.customer_name) {
-      window.alert("Enter customer name");
+      window.alert("Enter customer");
       return;
     }
     
@@ -440,6 +454,11 @@ export class PosComponent implements OnInit {
   }
 
   onSaveUpdate() {
+    if (!this.saleBill.customer_name) {
+      window.alert("Enter customer");
+      return;
+    }
+
     const editingSaleBill = {
       ...this.saleBill,
       customer_name: this.saleBill.customer_name.toUpperCase(),

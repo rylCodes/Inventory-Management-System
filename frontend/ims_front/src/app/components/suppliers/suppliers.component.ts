@@ -14,7 +14,9 @@ import { EmailValidator } from '@angular/forms';
 export class SuppliersComponent implements OnInit {
   deletingSupplier?: Supplier | null = null;
   proceedEdit: boolean = false;
+
   isLoading = false;
+  isFetching = false;
 
   faXmark = faXmark;
   faPen = faPen;
@@ -73,13 +75,16 @@ export class SuppliersComponent implements OnInit {
   }
 
   loadSuppliers() {
+    this.isFetching = true;
     this.supplierService
     .getSuppliers()
     .subscribe({
       next: (suppliers) => {
+        this.isFetching = false;
         this.suppliers = suppliers;
       },
       error: (err) => {
+        this.isFetching = false;
         this.uiService.displayErrorMessage(err);
       }
     });

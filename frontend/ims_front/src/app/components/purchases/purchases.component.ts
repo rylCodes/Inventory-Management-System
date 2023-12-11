@@ -17,6 +17,8 @@ import { StocksService } from 'src/app/services/stocks/stocks.service';
 export class PurchasesComponent implements OnInit {
   deletingBill?: PurchaseBill | null = null;
   deletingItem?: PurchaseItem | null = null;
+
+  isFetching: boolean = false;
   isLoading: boolean = false;
 
   proceedEditBill: boolean = false;
@@ -192,37 +194,45 @@ export class PurchasesComponent implements OnInit {
 
   // SHOW BILLS
   ngOnInit(): void {
-    this.loadSuppliers();
-    this.loadAllItems();
-    this.loadBills();
     this.loadFilteredItems();
+    this.loadAllItems();
+    this.loadSuppliers();
     this.loadStocks();
+    this.loadBills();
   }  
 
   loadBills() {
+    this.isFetching = true;
     this.purchaseService
       .getPurchaseBills()
       .subscribe({
-        next: bills => this.bills = bills,
-        error: error => this.uiService.displayErrorMessage(error),
+        next: bills => {
+          this.isFetching = false;
+          this.bills = bills
+        },
+        error: error => {
+          this.isFetching = false;
+          this.uiService.displayErrorMessage(error)
+        },
       });
   }
 
   loadFilteredItems() {
+    this.isFetching = true;
     this.purchaseService
       .getPurchaseItems()
       .subscribe({
         next: (items) => {
           if (this.showPurchaseBill) {
+            this.isFetching = false;
             this.items = items.filter(item => item.purchaseBill_id === this.bill.id);
           } else {
+            this.isFetching = false;
             this.items = items.filter(item => item.purchaseBill_id === null);
             this.bill.grand_total = this.calculateGrandtotal(this.items);
           }
         },
-        error: (error) => {
-          this.uiService.displayErrorMessage(error);
-        }
+        error: (err) => console.log(err),
       });
   }
 
@@ -231,25 +241,30 @@ export class PurchasesComponent implements OnInit {
       .getPurchaseItems()
       .subscribe({
         next: items => this.allItems = items,
-        error: err => this.uiService.displayErrorMessage(err),
+        error: err => console.log(err),
       });
   }
 
   loadSuppliers() {
     this.supplierService
       .getSuppliers()
-      .subscribe(suppliers => {
-        const activeSuppliers = suppliers.filter(supplier => supplier.status === true);
-        this.suppliers = activeSuppliers;
+      .subscribe({
+        next: suppliers => {
+          const activeSuppliers = suppliers.filter(supplier => supplier.status === true);
+          this.suppliers = activeSuppliers;
+        },
+        error: err => console.log(err)
       })
   }
 
   loadStocks() {
     this.stockService
       .getStocks()
-      .subscribe(stocks => {
-        const activeStocks = stocks.filter(stock => stock.status === true);
-        this.stocks = activeStocks;
+      .subscribe({
+        next: stocks => {
+          this.stocks = stocks;
+        },
+        error: err => console.log(err)
       })
   }
 

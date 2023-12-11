@@ -121,8 +121,13 @@
                     </tr>
                 </tbody>
             </table>
-            <div class="w-full h-[5vh]" *ngIf="!items.length">
+            <!-- When no items to show. -->
+            <div class="w-full h-[5vh]" *ngIf="!items.length && !isFetching">
                 <p class="text-center my-4">No items to show.</p>
+            </div>
+            <!-- While fetching data. -->
+            <div *ngIf="isFetching && showPurchaseBill" class="h-[10vh]">
+                <app-loader></app-loader>
             </div>
         </div>
 
@@ -184,7 +189,6 @@
                     Save</button>
             </form>
         </div>
-
     </div>
 
     <!-- BILL TABLE -->
@@ -231,6 +235,14 @@
                 </tr>
             </tbody>
         </table>
+        <!-- When no items to show. -->
+        <div class="w-full h-[5vh]" *ngIf="!bills.length && !isFetching">
+            <p class="text-center my-4">No items to show.</p>
+        </div>
+        <!-- While fetching data. -->
+        <div *ngIf="isFetching" class="h-[10vh]">
+            <app-loader></app-loader>
+        </div>
     </div>
 
     <!-- PRODUCT MODAL: Confirm to Delete Product -->

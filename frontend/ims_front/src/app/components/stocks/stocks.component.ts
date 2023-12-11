@@ -28,6 +28,7 @@ export class StocksComponent implements OnInit {
   deletingStock?: Stock | null = null;
   proceedEdit: boolean = false;
   isLoading: boolean = false;
+  isFetching: boolean = false;
 
   faXmark = faXmark;
   faPen = faPen;
@@ -38,7 +39,6 @@ export class StocksComponent implements OnInit {
   stocks: Stock[] = [];
   stocksToCheck: Stock[] = [];
   menus: Menu[] = [];
-  inactiveMenus: Menu[] = [];
   products: Product[] = [];
 
   stock: Stock = {
@@ -125,54 +125,36 @@ export class StocksComponent implements OnInit {
 
   // SHOW STOCKS
   ngOnInit(): void {
-    this.loadStocks();
-    this.loadMenus();
     this.loadProducts();
+    this.loadMenus();
+    this.loadStocks();
   }
 
   loadStocks(): void {
+    this.isFetching = true;
     this.stockService
       .getStocks()
       .subscribe({
         next: (stocks) => {
+          this.isFetching = false;
           this.stocks = stocks;
           this.stocksToCheck = stocks.filter(stock => stock.show_notification);
         },
         error: (err) => {
-          console.log(err);
+          this.isFetching = false;
           this.uiService.displayErrorMessage(err);
         }
       });
   }
 
-  loadMenus(): Promise<void> {
-    return new Promise((resolve, reject) => {
-      this.productService.getMenus().subscribe({
-        next: (menus) => {
-          this.menus = menus;
-          resolve();
-        },
-        error: (err) => {
-          console.error(err);
-          reject(err);
-        }
-      });
-    });
+  loadMenus(): void {
+    this.productService.getMenus()
+    .subscribe(menus => this.menus = menus);
   }
 
-  loadProducts(): Promise<void> {
-    return new Promise((resolve, reject) => {
-      this.productService.getProducts().subscribe({
-        next: (products) => {
-          this.products = products;
-          resolve();
-        },
-        error: (err) => {
-          console.error(err);
-          reject(err);
-        }
-      });
-    });
+  loadProducts(): void {
+    this.productService.getProducts()
+    .subscribe(products => this.products = products);
   }
 
   onSubmit() {
@@ -275,19 +257,7 @@ export class StocksComponent implements OnInit {
         .editStock(editingStock)
         .subscribe({
           next: async (stockData) => {
-            if (!stockData.status) {
-              console.log(this.products);
-              const relatedProduct = this.products.find(product => product.stock_id = stockData.id);
-              const relatedMenu = this.menus.filter(menu => menu.id === relatedProduct?.stock_id);
-              const updatedMenu = relatedMenu.map(menu => {
-                menu.status = false;
-                return menu;
-              });
-              updatedMenu.forEach(menu => {
-                this.productService.updateMenu(menu).subscribe();
-              })
-            }
-
+            this.updateRelatedMenu(stockData);
             this.isLoading = false;
             const index = this.stocks.findIndex(stock => stock.id === stockData.id);
             this.stocks[index] = stockData;
@@ -375,5 +345,24 @@ export class StocksComponent implements OnInit {
         });
       });
     };
+  }
+
+  updateRelatedMenu(stock: Stock) {
+    const relatedProducts = this.products.filter(product => product.stock_id === stock.id);
+    const relatedMenu = this.menus.filter(menu => {
+      return relatedProducts.some(product => product.menu === menu.id);
+    });
+
+    if (!stock.status) {
+      relatedMenu.map(menu => {
+        menu.status = false;
+        this.productService.updateMenu(menu).subscribe();
+      });
+    } else {
+      relatedMenu.map(menu => {
+        menu.status = true;
+        this.productService.updateMenu(menu).subscribe();
+      });
+    }
   }
 }

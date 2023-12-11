@@ -10,7 +10,7 @@
 
     <!-- MENU FORM: Edit -->
     <div *ngIf="showMenuForm" class="flex justify-center top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] fixed">
-        <div class="relative flex flex-col items-center bg-white rounded-lg h-fit p-4 mt-32 w-1/2 lg:w-1/4 md:w-1/3">
+        <div class="relative flex flex-col items-center bg-white rounded-lg h-fit p-4 mt-24 w-1/2 lg:w-1/4 md:w-1/3">
             <fa-icon class="place-self-end scale-125 hover:scale-110" [icon]="faXmark"
                 [ngStyle]="{color: 'rgb(64 64 64 )'}" (click)="toggleMenuForm()">
             </fa-icon>
@@ -131,8 +131,11 @@
                         </tr>
                     </tbody>
                 </table>
-                <div class="w-full h-[5vh]" *ngIf="!products.length">
+                <div class="w-full h-[5vh]" *ngIf="!products.length && !isFetching">
                     <p class="text-center my-4">No items to show.</p>
+                </div>
+                <div *ngIf="isFetching && updatingMenuItems" class="h-[10vh]">
+                    <app-loader></app-loader>
                 </div>
             </div>
 
@@ -271,6 +274,12 @@
                 </tr>
             </tbody>
         </table>
+        <div class="w-full h-[5vh]" *ngIf="!menus.length && !isFetching">
+            <p class="text-center my-4">No items to show.</p>
+        </div>
+        <div *ngIf="isFetching" class="h-[10vh]">
+            <app-loader></app-loader>
+        </div>
     </div>
 
     <!-- PRODUCT MODAL: Confirm to Delete Product -->

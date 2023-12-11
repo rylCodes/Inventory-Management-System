@@ -7,6 +7,8 @@ import { UiService } from 'src/app/services/ui/ui.service';
 import { faPen, faTrashCan, faXmark, faRectangleList, faPlus, faMinus, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { Router } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
+import { SaleItem } from 'src/app/interface/Sale';
+import { SalesService } from 'src/app/services/sales/sales.service';
 
 @Component({
   selector: 'app-products',
@@ -16,6 +18,8 @@ import { DecimalPipe } from '@angular/common';
 export class ProductsComponent implements OnInit {
   deletingMenu?: Menu | null = null;
   deletingProduct?: Product | null = null;
+
+  isFetching: boolean = false;
   isLoading: boolean = false;
 
   proceedEditMenu: boolean = false;
@@ -41,6 +45,7 @@ export class ProductsComponent implements OnInit {
   menus: Menu[] = [];
   products: Product[] = [];
   stocks: Stock[] = [];
+  saleItems: SaleItem[] = [];
 
   menu: Menu = {
     id: undefined,
@@ -77,6 +82,7 @@ export class ProductsComponent implements OnInit {
       private uiService: UiService,
       private router: Router,
       private renderer: Renderer2,
+      private saleService: SalesService,
     ) {}
 
   resetMenuForm() {
@@ -163,46 +169,81 @@ export class ProductsComponent implements OnInit {
 
   // SHOW PRODUCTS
   ngOnInit(): void {
-    this.loadMenus();
+    this.loadSaleItems();
     this.loadProducts();
-    this.loadMenus();
     this.loadStocks();
-  }  
+    this.loadMenus();
+  }
+  
+  loadSaleItems() {
+    this.saleService
+    .getSaleItems()
+    .subscribe({
+      next: items => {
+        this.saleItems = items;
+      },
+      error: err => console.log(err),
+    });
+  }
 
   loadMenus() {
     this.productService
-      .getMenus()
-      .subscribe({
-        next: menus => {
-          this.menus = menus;
-        },
-        error: err => this.uiService.displayErrorMessage(err),
-      });
+    .getMenus()
+    .subscribe({
+      next: menus => {
+        this.menus = menus;
+        menus.forEach(menu => {
+          if (!menu.status) {
+            this.deleteRelatedSaleItem(menu);
+          }
+        })
+      },
+      error: err => this.uiService.displayErrorMessage(err),
+    });
   }
 
   loadProducts() {
+    this.isFetching = true;
     this.productService
-      .getProducts()
-      .subscribe({
-        next: (products) => {
-          if (this.updatingMenuItems) {
-            this.products = products.filter(product => product.menu === this.menu.id);
-          } else {
-            this.products = products.filter(product => product.menu === null);
-          }
-        },
-        error: (err) => {
-          this.uiService.displayErrorMessage(err);
+    .getProducts()
+    .subscribe({
+      next: (products) => {
+        this.isFetching = false;
+
+        if (this.updatingMenuItems) {
+          this.products = products.filter(product => product.menu === this.menu.id);
+        } else {
+          this.products = products.filter(product => product.menu === null);
         }
-      });
+
+        this.productService
+        .getMenus().subscribe(menus => {
+          const menuWithOutProduct = menus.filter(menu => {
+            return !products.some(product => product.menu === menu.id);
+          });
+
+          menuWithOutProduct.map(menu => {
+            menu.status = false;
+            this.productService.updateMenu(menu).subscribe();
+          });
+        });
+      },
+      error: (err) => {
+        this.isFetching = false;
+        console.log(err);
+      }
+    });
   }
 
   loadStocks() {
     this.stockService
       .getStocks()
-      .subscribe(stocks => {
-        const activeStocks = stocks.filter(stock => stock.status === true);
-        this.stocks = activeStocks;
+      .subscribe({
+        next: stocks => {
+          const activeStocks = stocks.filter(stock => stock.status === true);
+          this.stocks = activeStocks;
+        },
+        error: err => console.log(err)
       })
   }
 
@@ -348,7 +389,7 @@ export class ProductsComponent implements OnInit {
       ...this.menu,
       name: this.menu.name.toUpperCase(),
       category: this.menu.category.toUpperCase(),
-      description: this.menu.description.toUpperCase(),
+      description: this.menu.description? this.menu.description.toUpperCase() : "",
     }
 
     const isMenuNameExist = this.menus.some(menu => menu.id !== editingMenu.id && menu.name === editingMenu.name);
@@ -362,6 +403,8 @@ export class ProductsComponent implements OnInit {
       .updateMenu(editingMenu)
       .subscribe({
         next: async (menuData) => {
+          this.deleteRelatedSaleItem(menuData);
+
           this.isLoading = false;
           const index = this.menus.findIndex(menu => menu.id === menuData.id);
           this.menus[index] = menuData;
@@ -499,4 +542,15 @@ export class ProductsComponent implements OnInit {
         }
       });
   }
+
+  deleteRelatedSaleItem(menuData: Menu) {
+    const relatedSaleItems = this.saleItems.filter(item => item.menu === menuData.id);
+    if (!menuData.status) {
+      relatedSaleItems.forEach(item => {
+        this.saleService.deleteSaleItem(item).subscribe();
+      });
+    }
+  }
+
+  // Class ends here.
 }

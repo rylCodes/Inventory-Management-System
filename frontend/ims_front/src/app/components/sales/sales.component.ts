@@ -24,6 +24,7 @@ export class SalesComponent implements OnInit {
   showItemActionModal: boolean = false;
   showOrder: boolean = false;
   showInvoice: boolean = false;
+  isFetching: boolean = false;
 
   faXmark = faXmark;
   faPen = faPen;
@@ -136,13 +137,16 @@ export class SalesComponent implements OnInit {
   }  
 
   loadBills() {
+    this.isFetching = true;
     this.salesService
       .getSaleBills()
       .subscribe({
         next: bills => {
+          this.isFetching = false;
           this.bills = bills.filter(bill => bill.status)
         },
         error: (error) => {
+          this.isFetching = false;
           this.uiService.displayErrorMessage(error);
         }
       });
@@ -155,9 +159,7 @@ export class SalesComponent implements OnInit {
         next: (items) => {
           this.eachBillItems = items.filter(item => item.billno === this.bill.id);
         },
-        error: (error) => {
-          this.uiService.displayErrorMessage(error);
-        }
+        error: (err) => console.log(err)
       });
   }
 
@@ -165,30 +167,32 @@ export class SalesComponent implements OnInit {
     this.salesService
       .getSaleItems()
       .subscribe({
-        next: (items) => {
-          this.allItems = items;
-        },
-        error: (error) => {
-          this.uiService.displayErrorMessage(error);
-        }
+        next: (items) => this.allItems = items,
+        error: (err) => console.log(err),
       });
   }
 
   loadMenus() {
     this.productService
       .getMenus()
-      .subscribe(menus => {
-        const activeMenus = menus.filter(menu => menu.status === true);
-        this.menus = activeMenus;
+      .subscribe({
+        next: menus => {
+          const activeMenus = menus.filter(menu => menu.status === true);
+          this.menus = activeMenus;
+        },
+        error: err => console.log(err),
       })
   }
 
   loadStocks() {
     this.stockService
       .getStocks()
-      .subscribe(stocks => {
-        const activeStocks = stocks.filter(stock => stock.status === true);
-        this.stocks = activeStocks;
+      .subscribe({
+        next: stocks => {
+          const activeStocks = stocks.filter(stock => stock.status === true);
+          this.stocks = activeStocks;
+        },
+        error: err => console.log(err),
       })
   }
 
@@ -199,9 +203,7 @@ export class SalesComponent implements OnInit {
         next: owners => {
           this.owners = owners;
         },
-        error: (error) => {
-          this.uiService.displayErrorMessage(error);
-        }
+        error: (err) => console.log(err)
       });
   }
 

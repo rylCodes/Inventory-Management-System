@@ -34,7 +34,7 @@ class Stock(models.Model):
         return self.stock_name
     
     class Meta:
-        ordering = ['-date_updated']
+        ordering = ['-date_added']
     
 @receiver(post_save, sender=Stock)
 def update_stock_code(sender, instance, created, **kwargs):
@@ -57,7 +57,7 @@ class Menu(models.Model):
         return self.name
     
     class Meta:
-        ordering = ['-date_updated']
+        ordering = ['-date_added']
     
 @receiver(post_save, sender=Menu)
 def update_stock_code(sender, instance, created, **kwargs):
@@ -93,7 +93,7 @@ class Supplier(models.Model):
         return self.name
     
     class Meta:
-        ordering = ['-date_updated']
+        ordering = ['-date_added']
     
 @receiver(post_save, sender=Supplier)
 def update_supplier_code(sender, instance, created, **kwargs):
@@ -176,7 +176,7 @@ class Notification(models.Model):
     warning_type = models.CharField(max_length=50)
 
     def __str__(self):
-        return self.timestamp
+        return self.content
 
     class Meta:
         ordering = ['-timestamp']

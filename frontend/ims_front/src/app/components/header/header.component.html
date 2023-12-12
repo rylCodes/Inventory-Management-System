@@ -62,14 +62,13 @@
                     <div class="flex justify-between items-center mb-2">
                         <h3 class="text-[18px] lg:text-[24px] font-bold">Notifications</h3>
                         <!-- Option Button for Notifications -->
-                        <div id="notifoption" (click)="toggleNotifOption()" 
+                        <div id="notifoption" (click)="toggleNotifOption()"
                             class="flex items-center justify-center w-9 h-9 rounded-full hover:bg-[rgba(0,0,0,0.1)] transition-all duration-300">
-                            <fa-icon class="text-base text-neutral-500 cursor-pointer lg:text-xl"
-                                    [icon]="faEllipsis">
+                            <fa-icon class="text-base text-neutral-500 cursor-pointer lg:text-xl" [icon]="faEllipsis">
                             </fa-icon>
                         </div>
                         <!-- Option Notif Div -->
-                        <div *ngIf="showNotifOption" 
+                        <div *ngIf="showNotifOption"
                             class="bg-white flex flex-col p-1 rounded-md absolute top-10 right-0 shadow-xl w-56 z-30">
                             <div class="cursor-pointer flex items-center p-1.5 rounded-sm space-x-3 hover:bg-[rgba(0,0,0,0.1)]"
                                 (click)="markAllAsRead()">
@@ -83,7 +82,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div *ngIf="!notifications.length" class="ml-2">
                         No notifications.
                     </div>

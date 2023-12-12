@@ -1,8 +1,38 @@
 /* You can add global styles to this file, and also import other style files */
+@import 'ngx-toastr/toastr';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+
+/* TOASTR STYLE */
+.toast-success,
+.toast-error,
+.toast-warning,
+.toast-info {
+    box-shadow: none !important;
+    margin-top: 16px !important;
+}
+
+.toast-success {
+    background-color: #008000 !important;
+}
+
+.toast-error {
+    background-color: #ff0000 !important;
+}
+
+.toast-info {
+    background-color: #0000ff !important;
+}
+
+.toast-warning {
+    background-color: #ffa500 !important;
+}
+
+
+/* FONT SIZE */
 .text-xxs {
     font-size: 10px;
     line-height: 12px;
@@ -13,6 +43,8 @@
     line-height: 18px;
 }
 
+
+/* TABLE STYLE */
 table {
     border-radius: 10px;
 }

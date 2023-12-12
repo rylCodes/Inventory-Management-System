@@ -4,6 +4,7 @@ import { AuthService } from 'src/app/services/auth/auth.service';
 import { catchError, first } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { UiService } from 'src/app/services/ui/ui.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-login',
@@ -20,6 +21,7 @@ export class LoginComponent implements OnInit {
     private authService: AuthService,
     private router: Router,
     private uiService: UiService,
+    private toastrService: ToastrService,
     ) {}
 
   ngOnInit(): void {
@@ -31,7 +33,8 @@ export class LoginComponent implements OnInit {
 
   onSubmit() {
     if (!this.loginForm.get("username")?.value || !this.loginForm.get("password")?.value) {
-      window.alert("Please enter username and password!");
+      // window.alert("Please enter username and password!");
+      this.toastrService.error("Please enter username and password!", undefined, {positionClass: 'toast-top-center'})
       return;
     }
 
@@ -41,10 +44,9 @@ export class LoginComponent implements OnInit {
       .subscribe({
         next: async () => {
           this.isLoading = false;
-          console.log(this.authService.getToken());
           this.router.navigate(['']);
           await this.uiService.wait(100);
-          window.alert("You've successfully logged in!");
+          this.toastrService.success("You've successfully logged in!", undefined, {positionClass: 'toast-top-center'})
               },
         error: (err) => {
           this.isLoading = false;

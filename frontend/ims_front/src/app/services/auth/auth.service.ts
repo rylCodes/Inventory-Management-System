@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { catchError, map } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { ToastrService } from 'ngx-toastr';
 
 const httpOptions = {
   headers: new HttpHeaders({
@@ -15,15 +16,25 @@ const httpOptions = {
 export class AuthService {
   private apiUrl = 'http://localhost:8000/';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private toastrService: ToastrService) { }
 
   handleLoginError(error: any): void {
     if (error.error.error === "Invalid username or password!") {
       console.log("Error here →", error.error.error);
-      window.alert(error.error.error);
+      this.toastrService
+      .error(
+        `${error.error.error? error.error.error: "Invalid username or password!"}`,
+        undefined,
+        {positionClass: 'toast-top-center'}
+      );
     } else {
       console.log("Error here →", error.statusText);
-      window.alert(`${error.statusText}! Please try again later.`);
+      this.toastrService
+      .error(
+        `${error.statusText? error.statusText: 'An error'} occured! Please try again later.`,
+        undefined,
+        {positionClass: 'toast-top-center'}
+      );
     }
   }
 

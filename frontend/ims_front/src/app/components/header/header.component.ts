@@ -12,6 +12,7 @@ import { Stock } from 'src/app/interface/Stock';
 import { Notification } from 'src/app/interface/Notification';
 import { Observable, Subscription, forkJoin } from 'rxjs';
 import { UiService } from 'src/app/services/ui/ui.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-header',
@@ -111,6 +112,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     private stocksService: StocksService,
     private notificationService: NotificationsService,
     private uiService: UiService,
+    private toastrService: ToastrService,
     ) { this.notifServiceSubscription = this.notificationService.notifServiceStatus$
       .subscribe((status) => {
         if (status) {
@@ -255,7 +257,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     });
   }
 
-  async deleteAllNotifs() {
+  deleteAllNotifs() {
     if (this.notifications.length < 1) {
       this.showNotifOption = false;
       return;
@@ -268,17 +270,16 @@ export class HeaderComponent implements OnInit, OnDestroy {
     });
 
     forkJoin(deletingNotifs).subscribe({
-      next: async () => {
+      next: () => {
         this.showDelAllNotifModal = false;
         this.loadNotifications();
-        await this.uiService.wait(100);
-        window.alert("Success: All notifications are now deleted.")    
+        this.toastrService.success("Success: All notifications are now deleted.");  
       },
       error: err => this.uiService.displayErrorMessage(err),
     })
   }
 
-  async markAllAsRead() {
+  markAllAsRead() {
     if (this.unreadNotifications.length < 1) {
       this.showNotifOption = false;
       return;
@@ -294,8 +295,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     forkJoin(markingAllNotifsAsRead).subscribe({
       next: async() => {
         this.showNotifOption = false;
-        await this.uiService.wait(100);
-        window.alert("Success: All notifications are now marked as read.")  
+        this.toastrService.success("Success: All notifications are now marked as read.");  
       },
       error: err => this.uiService.displayErrorMessage(err),
     });

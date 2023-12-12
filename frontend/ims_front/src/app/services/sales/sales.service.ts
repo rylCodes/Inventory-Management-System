@@ -37,7 +37,7 @@ export class SalesService {
       .pipe(
         catchError((err) => {
           this.handleSaleError(err);
-          return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to display sale transactions!`)
+          return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to display transactions!`)
         })
       );
   }
@@ -87,7 +87,7 @@ export class SalesService {
       .pipe(
         catchError((err) => {
           this.handleSaleError(err);
-          return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to display sale items!`)
+          return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to display items!`)
         })
       );
   }

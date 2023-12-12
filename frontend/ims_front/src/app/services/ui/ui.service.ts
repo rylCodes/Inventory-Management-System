@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
+import { ToastrService } from 'ngx-toastr';
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UiService {
-  constructor() { }  
+  constructor(private toastrService: ToastrService) { }  
 
   wait(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -32,6 +33,11 @@ export class UiService {
 
   displayErrorMessage(err: any): void {
     console.log("Error here →", err);
-    window.alert(err);
+    this.toastrService
+    .error(
+      err? err: "Unknow error occured! Please try again later.",
+      undefined,
+      {positionClass: 'toast-top-center'}
+    ); 
   } 
 }

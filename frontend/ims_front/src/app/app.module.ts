@@ -5,9 +5,19 @@ import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http'
 import { AppRoutingModule } from './app-routing.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+// import { ToastrModule } from 'ngx-toastr';
+import { ToastrModule } from 'ngx-toastr';
+import { NgxPrintModule } from 'ngx-print';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
 import { DatePipe } from '@angular/common';
 
 import { authGuard } from './guard/auth.guard';
+import { AuthService } from './services/auth/auth.service';
+import { AuthInterceptor } from './interceptor/auth.interceptor';
+
+import { SelectAllTextDirective } from './directives/select-all-text/select-all-text.directive';
+import { FocusOnShowDirective } from './directives/focus-on-show/focus-on-show.directive';
 
 import { AppComponent } from './app.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
@@ -21,12 +31,7 @@ import { ButtonComponent } from './components/button/button.component';
 import { PosComponent } from './components/pos/pos.component';
 import { PurchasesComponent } from './components/purchases/purchases.component';
 import { SuppliersComponent } from './components/suppliers/suppliers.component';
-import { SelectAllTextDirective } from './directives/select-all-text/select-all-text.directive';
-import { FocusOnShowDirective } from './directives/focus-on-show/focus-on-show.directive';
 import { SalesComponent } from './components/sales/sales.component';
-import { AuthService } from './services/auth/auth.service';
-import { AuthInterceptor } from './interceptor/auth.interceptor';
-import { NgxPrintModule } from 'ngx-print';
 import { AboutComponent } from './components/about/about.component';
 import { LoaderComponent } from './components/loader/loader.component';
 
@@ -71,6 +76,12 @@ const appRoutes: Routes = [
     ReactiveFormsModule,
     FontAwesomeModule,
     NgxPrintModule,
+    BrowserAnimationsModule,
+    ToastrModule.forRoot({
+      positionClass: 'toast-bottom-left',
+      closeButton: true,
+      progressBar: true,
+    }),
   ],
   providers: [
     DatePipe,

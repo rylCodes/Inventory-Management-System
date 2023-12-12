@@ -10,6 +10,7 @@ import { SalesService } from 'src/app/services/sales/sales.service';
 import { StocksService } from 'src/app/services/stocks/stocks.service';
 import { Owner } from 'src/app/interface/Owner';
 import { OwnerService } from 'src/app/services/owner/owner.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-sales',
@@ -86,6 +87,7 @@ export class SalesComponent implements OnInit {
       private router: Router,
       private renderer: Renderer2,
       private ownerService: OwnerService,
+      private toastrService: ToastrService,
     ) {}
 
   resetBill() {
@@ -239,7 +241,7 @@ export class SalesComponent implements OnInit {
         this.deletingSaleBill = null;
         this.toggleBillActionModal()
         await this.uiService.wait(100);
-        window.alert("Transaction history has been deleted successfully!");
+        this.toastrService.success("Transaction history has been deleted successfully!");
       });
   }
 

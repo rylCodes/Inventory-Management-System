@@ -95,16 +95,16 @@
         <div class="table-container w-full text-center shadow-xl mt-4 md:w-3/4">
             <table class="w-full table-fixed">
                 <thead class="text-neutral-300 bg-neutral-900">
-                    <th>Date Time</th>
+                    <th class="w-1/4">Date Time</th>
                     <th>Item</th>
                     <th>Price</th>
-                    <th>Quantity</th>
+                    <th class="w-[10%]">Qty</th>
                     <th>Sub Total</th>
                 </thead>
                 <tbody>
                     <tr *ngFor="let item of items">
                         <td class="p-2">
-                            <div class="flex items-center justify-center space-x-2 md:space-x-4">
+                            <div class="flex items-center justify-center space-x-1 md:space-x-3">
                                 <button class="px-1.5 py-1 rounded-md bg-[#ff0000]" (click)="deleteItem(item)">
                                     <fa-icon class="scale-75" [icon]="faTrashCan"
                                         [ngStyle]="{color: 'rgb(212 212 212)'}">

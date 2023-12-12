@@ -9,6 +9,7 @@ import { Router } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
 import { SaleItem } from 'src/app/interface/Sale';
 import { SalesService } from 'src/app/services/sales/sales.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-products',
@@ -83,6 +84,7 @@ export class ProductsComponent implements OnInit {
       private router: Router,
       private renderer: Renderer2,
       private saleService: SalesService,
+      private toastrService: ToastrService,
     ) {}
 
   resetMenuForm() {
@@ -258,13 +260,13 @@ export class ProductsComponent implements OnInit {
   // Create Product
   addMenu() {
     if (!this.menu.name) {
-      window.alert("Enter name");
+      this.toastrService.error("Enter name");
       return;
     } else if (!this.menu.category) {
-      window.alert("Enter category");
+      this.toastrService.error("Enter category");
       return;
     } else if (this.menu.price < 0 || this.menu.price === null) {
-      window.alert("Invalid price input!");
+      this.toastrService.error("Invalid price input!");
       return;
     }
 
@@ -282,10 +284,10 @@ export class ProductsComponent implements OnInit {
     const isMenuNameExist = this.menus.some(menu => menu.name === newMenu.name);
   
     if (isMenuNameExist) {
-      window.alert("Failed: Menu with this name already exists!");
+      this.toastrService.error("Failed: Menu with this name already exists!");
       return;
     } else if (this.products.length < 1) {
-      window.alert("Failed: Please add at least one item to the product.");
+      this.toastrService.error("Failed: Please add at least one item to the product.");
       return;
     } else {
       this.isLoading = true;
@@ -311,9 +313,13 @@ export class ProductsComponent implements OnInit {
           this.toggleFormContainer();
           await this.uiService.wait(100);
           if (!menu.price || menu.price < 1) {
-            window.alert("Warning: You have saved a product without a price amount. Make sure it is correct.");
+            this.toastrService.warning(
+              "You have saved a product without a price amount. Make sure it is correct.",
+              "Zero Price!",
+              {timeOut: 5000}
+            );
           }
-          window.alert("Success: New product has been added to the menu.");
+          this.toastrService.success("Success: New product has been added to the menu.");
         },
         error: (err) => {
           this.isLoading = false;
@@ -326,10 +332,10 @@ export class ProductsComponent implements OnInit {
   // Add Items
   addProduct() {
     if (!this.product.stock_id) {
-      window.alert("Select a product!");
+      this.toastrService.error("Select an item!");
       return;
     } else if (!this.product.qty_per_order || this.product.qty_per_order <= 0) {
-      window.alert("Enter quantity!");
+      this.toastrService.error("Enter quantity");
       return;
     }
     
@@ -366,13 +372,13 @@ export class ProductsComponent implements OnInit {
 
   onSaveUpdateMenu() {
     if (!this.menu.name) {
-      window.alert("Enter name");
+      this.toastrService.error("Enter name");
       return;
     } else if (!this.menu.category) {
-      window.alert("Enter category");
+      this.toastrService.error("Enter category");
       return;
     } else if (this.menu.price < 0 || this.menu.price === null) {
-      window.alert("Invalid price input!");
+      this.toastrService.error("Invalid price input!");
       return;
     }
 
@@ -395,7 +401,7 @@ export class ProductsComponent implements OnInit {
     const isMenuNameExist = this.menus.some(menu => menu.id !== editingMenu.id && menu.name === editingMenu.name);
 
     if (isMenuNameExist) {
-      window.alert("Menu with this name already exists!");
+      this.toastrService.error("Menu with this name already exists!");
       return;
     } else {
       this.isLoading = true;
@@ -411,7 +417,7 @@ export class ProductsComponent implements OnInit {
           this.toggleMenuForm();
   
           await this.uiService.wait(100);
-          window.alert("Successfully saved changes to the menu details.");
+          this.toastrService.success("Successfully saved changes to the product details.");
         },
         error: (err) => {
           this.isLoading = false;
@@ -442,7 +448,7 @@ export class ProductsComponent implements OnInit {
           this.deletingMenu = null;
           this.toggleMenuActionModal()
           await this.uiService.wait(100);
-          window.alert("Menu has been deleted successfully!");
+          this.toastrService.success("Product has been deleted successfully.");
         },
         error: (err) => {
           this.isLoading = false;
@@ -501,7 +507,7 @@ export class ProductsComponent implements OnInit {
           const index = this.products.findIndex(product => product.id === productData.id);
   
           await this.uiService.wait(100);
-          window.alert("Successfully saved changes to the item.");
+          this.toastrService.success("Successfully saved changes to the item.");
   
           this.products[index] = productData;
         },
@@ -534,7 +540,7 @@ export class ProductsComponent implements OnInit {
           this.toggleProductActionModal()
           this.loadProducts();
           await this.uiService.wait(100);
-          window.alert("Product has been deleted successfully!");
+          this.toastrService.success("Item has been deleted successfully!");
         },
         error: (err) => {
           this.isLoading = false;

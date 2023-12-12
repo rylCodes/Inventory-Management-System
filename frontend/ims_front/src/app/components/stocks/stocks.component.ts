@@ -8,6 +8,7 @@ import { Notification } from 'src/app/interface/Notification';
 import { NotificationsService } from 'src/app/services/notifications/notifications.service';
 import { ProductsService } from 'src/app/services/products/products.service';
 import { Menu, Product } from 'src/app/interface/Product';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-stocks',
@@ -84,6 +85,7 @@ export class StocksComponent implements OnInit {
     private uiService: UiService,
     private notifService: NotificationsService,
     private productService: ProductsService,
+    private toastrService: ToastrService,
     ) {}
 
   resetNotification() {
@@ -168,10 +170,10 @@ export class StocksComponent implements OnInit {
   // CREATE STOCK
   addStock() {
     if (!this.stock.stock_name) {
-      window.alert("Enter stock name!");
+      this.toastrService.error("Enter stock name!");
       return;
     } else if (this.stock.quantity < 0 || this.stock.quantity === null) {
-      window.alert("Invalid stock quantity!");
+      this.toastrService.error("Invalid stock quantity!");
       return;
     }
 
@@ -195,7 +197,7 @@ export class StocksComponent implements OnInit {
     const isStockNameExist = this.stocks.some(stock => stock.stock_name === newStock.stock_name);
   
     if (isStockNameExist) {
-      window.alert("Stock with this name already exists!");
+      this.toastrService.error("Stock with this name already exists!");
     } else {
       this.isLoading = true;
       this.stockService.addStock(newStock)
@@ -205,7 +207,7 @@ export class StocksComponent implements OnInit {
           this.stocks.push(stock);
           this.toggleForm();
           await this.uiService.wait(100);
-          window.alert("New stock has been created successfully!");
+          this.toastrService.success("New stock has been created successfully!");
         },
         error: (err) => {
           this.isLoading = false;
@@ -225,10 +227,10 @@ export class StocksComponent implements OnInit {
 
   saveUpdate() {
     if (!this.stock.stock_name) {
-      window.alert("Enter stock name!");
+      this.toastrService.error("Enter stock name!");
       return;
     } else if (this.stock.quantity === null) {
-      window.alert("Invalid stock quantity!");
+      this.toastrService.error("Invalid stock quantity!");
       return;
     }
 
@@ -250,7 +252,7 @@ export class StocksComponent implements OnInit {
     const isStockNameExist = this.stocks.some(stock => stock.id !== editingStock.id && stock.stock_name === editingStock.stock_name);
 
     if (isStockNameExist) {
-      window.alert("Stock with this name already exists!");
+      this.toastrService.error("Stock with this name already exists!");
       return;
     } else {
         this.stockService
@@ -270,9 +272,14 @@ export class StocksComponent implements OnInit {
 
             await this.uiService.wait(100);
             if (stockData.quantity < 0) {
-              window.alert("If the product quantity is correct, leave it unchanged. Please verify and correct if it's showing a negative value.")
+              this.toastrService
+              .warning(
+                "Please verify if the product's quantity is correct.",
+                "Negative Quantity!",
+                {timeOut: 5000}
+              );
             }
-            window.alert("Successfully saved changes to the stock.");
+            this.toastrService.success("Successfully saved changes to the stock.");
           },
           error: (err) => {
             this.isLoading = false;
@@ -303,7 +310,7 @@ export class StocksComponent implements OnInit {
           this.deletingStock = null;
           this.toggleActionModal()
           await this.uiService.wait(100);
-          window.alert("Stock has been deleted successfully!");
+          this.toastrService.success("Stock has been deleted successfully!");
         },
         error: (err) => {
           if (err) {

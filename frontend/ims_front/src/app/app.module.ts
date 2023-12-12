@@ -78,9 +78,12 @@ const appRoutes: Routes = [
     NgxPrintModule,
     BrowserAnimationsModule,
     ToastrModule.forRoot({
-      positionClass: 'toast-bottom-left',
+      positionClass: 'toast-top-center',
       closeButton: true,
-      progressBar: true,
+      // progressBar: true,
+      preventDuplicates: true,
+      resetTimeoutOnDuplicate: true,
+      timeOut: 3000,
     }),
   ],
   providers: [

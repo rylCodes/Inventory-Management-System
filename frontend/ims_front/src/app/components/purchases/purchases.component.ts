@@ -8,6 +8,7 @@ import { faPen, faTrashCan, faXmark, faRectangleList, faPlus, faMinus, faTimes }
 import { Router } from '@angular/router';
 import { PurchasesService } from 'src/app/services/purchases/purchases.service';
 import { StocksService } from 'src/app/services/stocks/stocks.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-purchases',
@@ -84,6 +85,7 @@ export class PurchasesComponent implements OnInit {
     private uiService: UiService,
     private router: Router,
     private renderer: Renderer2,
+    private toastrService: ToastrService,
   ) {}
 
   resetBillForm() {
@@ -114,15 +116,15 @@ export class PurchasesComponent implements OnInit {
     this.showSaveBillModal = !this.showSaveBillModal;
     if (this.showSaveBillModal) {
       if (!this.bill.billno) {
-        window.alert("Failed: Please enter bill no.");
+        this.toastrService.error("Failed: Please enter bill no.");
         this.showSaveBillModal = false;
         return;
       } else if (!this.bill.supplier_id) {
-        window.alert("Failed: Please enter supplier.");
+        this.toastrService.error("Failed: Please enter supplier.");
         this.showSaveBillModal = false;
         return;
       } else if (this.items.length < 1) {
-        window.alert("Failed: Please add at least one item to the purchase.");
+        this.toastrService.error("Failed: Please add at least one item to the purchase.");
         this.showSaveBillModal = false;
         return;
       }
@@ -351,7 +353,7 @@ export class PurchasesComponent implements OnInit {
 
     const isBillnoExist = this.bills.some(bill => bill.billno === newBill.billno);
     if (isBillnoExist) {
-      window.alert("Billno with this name already exists!");
+      this.toastrService.error("Billno with this name already exists!");
     } else {
       this.isLoading = true;
       this.purchaseService.addPurchaseBill(newBill)
@@ -384,9 +386,13 @@ export class PurchasesComponent implements OnInit {
   
           await this.uiService.wait(100);
           if (!bill.grand_total || bill.grand_total < 1) {
-            window.alert("Warning: You have saved a purchase without a total amount. Make sure it is correct.");
+            this.toastrService.warning(
+              "You have saved a purchase without a total amount. Make sure it is correct.",
+              "Zero Total Amount!",
+              {timeOut: 5000}
+            );
           }
-          window.alert("Success: New purchase has been added.");
+          this.toastrService.success("Success: New purchase has been added.");
         },
 
         error: (err) => {
@@ -400,10 +406,10 @@ export class PurchasesComponent implements OnInit {
   // Add Items
   addItem() {
     if (!this.item.stock_id) {
-      window.alert("Select a product!");
+      this.toastrService.error("Select a product!");
       return;
     } else if (!this.item.quantity_purchased || this.item.quantity_purchased <= 0) {
-      window.alert("Enter quantity!");
+      this.toastrService.error("Enter quantity!");
       return;
     }
     
@@ -439,7 +445,11 @@ export class PurchasesComponent implements OnInit {
   
           await this.uiService.wait(100);
           if (!item || item.item_price < 1) {
-            window.alert("Warning: You have added an item without a price. Make sure it is correct.");
+            this.toastrService.warning(
+              "You have added an item without a price. Make sure it is correct.",
+              "Zero Price!",
+              {timeOut: 5000}
+            );
           }
         },
         error: (err) => {
@@ -478,7 +488,7 @@ export class PurchasesComponent implements OnInit {
     const isBillNoExist = this.bills.some(bill => bill.id !== editingPurchaseBill.id && bill.billno === editingPurchaseBill.billno);
 
     if (isBillNoExist) {
-      window.alert("Purchase with this billno already exists!");
+      this.toastrService.error("Purchase with this billno already exists!");
       return;
     } else {
       this.isLoading = true;
@@ -492,7 +502,7 @@ export class PurchasesComponent implements OnInit {
           this.toggleBillForm();
   
           await this.uiService.wait(100);
-          window.alert("Successfully saved changes to the bill details.");
+          this.toastrService.success("Successfully saved changes to the bill details.");
         },
         error: (err) => {
           this.isLoading = false;
@@ -524,7 +534,7 @@ export class PurchasesComponent implements OnInit {
           const index = this.items.findIndex(saleItem => saleItem.id === itemData.id);
   
           await this.uiService.wait(100);
-          window.alert("Successfully saved changes to the item.");
+          this.toastrService.success("Successfully saved changes to the item.");
   
           this.items[index] = itemData;
         },
@@ -557,7 +567,7 @@ export class PurchasesComponent implements OnInit {
           this.deletingBill = null;
           this.toggleBillActionModal()
           await this.uiService.wait(100);
-          window.alert("Transaction has been deleted successfully!");
+          this.toastrService.success("Transaction has been deleted successfully!");
         },
         error: (err) => {
           this.isLoading = false;
@@ -623,7 +633,7 @@ export class PurchasesComponent implements OnInit {
           this.toggleItemActionModal()
           this.loadFilteredItems();
           await this.uiService.wait(100);
-          window.alert("Item has been deleted successfully!");
+          this.toastrService.error("Item has been deleted successfully!");
         },
         error: (err) => {
           this.isLoading = false;

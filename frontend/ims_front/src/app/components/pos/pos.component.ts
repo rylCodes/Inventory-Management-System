@@ -13,6 +13,7 @@ import { OwnerService } from 'src/app/services/owner/owner.service';
 import { Owner } from 'src/app/interface/Owner';
 import { NotificationsService } from 'src/app/services/notifications/notifications.service';
 import { Notification } from 'src/app/interface/Notification';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-pos',
@@ -109,6 +110,7 @@ export class PosComponent implements OnInit {
       private renderer: Renderer2,
       private ownerService: OwnerService,
       private notifService: NotificationsService,
+      private toastrService: ToastrService,
     ) {}
 
   resetNotification() {
@@ -155,7 +157,7 @@ export class PosComponent implements OnInit {
     this.showInvoice = !this.showInvoice;
     if (!this.showInvoice) {
       await this.uiService.wait(100);
-      window.alert('Transaction has been completed successfully!')
+      this.toastrService.success('Transaction has been completed successfully!');
       this.loadBills();
       this.viewOrder(this.saleBill);
     }
@@ -341,7 +343,7 @@ export class PosComponent implements OnInit {
 
   async onAmountTenderedChange() {
     if (this.saleBill.amount_tendered < 0) {
-      window.alert("Enter valid amount!");
+      this.toastrService.error("Enter valid amount!");
       return;
     }
 
@@ -360,7 +362,7 @@ export class PosComponent implements OnInit {
   // Add Bills
   addBill() {
     if (!this.saleBill.customer_name) {
-      window.alert("Enter customer");
+      this.toastrService.error("Enter customer");
       return;
     }
     
@@ -391,9 +393,14 @@ export class PosComponent implements OnInit {
           this.resetBillForm();
           await this.uiService.wait(100);
           if (!bill.grand_total || bill.grand_total < 1) {
-            window.alert("Warning: You have saved a transaction without a total bill amount. Make sure it is correct.");
+            this.toastrService.warning(
+              "You have saved a transaction without a total bill amount. Make sure it is correct.",
+              "Zero Total Amount!",
+              {timeOut: 5000},
+            );
           }
           window.alert("New transaction has been added successfully!");
+          this.toastrService.success("New transaction has been added successfully!");
         },
         error: (err) => {
           this.isLoading = false;
@@ -405,10 +412,10 @@ export class PosComponent implements OnInit {
   // Add Items
   addItem() {
     if (!this.saleItem.menu) {
-      window.alert("Select a product!");
+      this.toastrService.error("Select a product!");
       return;
     } else if (!this.saleItem.quantity || this.saleItem.quantity <= 0) {
-      window.alert("Enter quantity!");
+      this.toastrService.error("Enter quantity!");
       return;
     }
     
@@ -464,7 +471,7 @@ export class PosComponent implements OnInit {
 
   onSaveUpdate() {
     if (!this.saleBill.customer_name) {
-      window.alert("Enter customer");
+      this.toastrService.success("Enter customer");
       return;
     }
 
@@ -485,7 +492,7 @@ export class PosComponent implements OnInit {
           this.toggleBillForm();
   
           await this.uiService.wait(100);
-          window.alert("Successfully saved changes to the customer details.");
+          this.toastrService.success("Successfully saved changes to the customer details.");
         },
         error: (err) => {
           this.isLoading = false;
@@ -515,7 +522,7 @@ export class PosComponent implements OnInit {
           this.deletingSaleBill = null;
           this.toggleBillActionModal()
           await this.uiService.wait(100);
-          window.alert("Transaction has been deleted successfully!");
+          this.toastrService.success("Transaction has been deleted successfully!");
         },
         error: (err) => {
           this.isLoading = false;
@@ -578,7 +585,7 @@ export class PosComponent implements OnInit {
           const index = this.saleItems.findIndex(saleItem => saleItem.id === saleItemData.id);
   
           await this.uiService.wait(100);
-          window.alert("Successfully saved changes to the item.");
+          this.toastrService.success("Successfully saved changes to the item.");
   
           this.saleItems[index] = saleItemData;
         },
@@ -626,7 +633,7 @@ export class PosComponent implements OnInit {
           this.toggleItemActionModal()
           this.loadItems();
           await this.uiService.wait(100);
-          window.alert("Item has been deleted successfully!");
+          this.toastrService.success("Item has been deleted successfully!");
         },
         error: (err) => {
           this.isLoading = false;
@@ -663,7 +670,7 @@ export class PosComponent implements OnInit {
   onPayment() {
     if (this.saleBill.grand_total) {
       if (this.saleBill.amount_tendered < this.saleBill.grand_total) {
-        window.alert("Invalid amount tendered!");
+        this.toastrService.error("Invalid amount tendered!");
         return;
       }
     }
@@ -724,7 +731,7 @@ export class PosComponent implements OnInit {
             this.toggleProceedPayment();
             this.addNotification();
           } else {
-            window.alert("No payable amount!");
+            this.toastrService.error("No payable amount!");
             return;
           }
         },

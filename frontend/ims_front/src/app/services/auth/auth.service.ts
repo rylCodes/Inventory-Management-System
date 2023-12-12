@@ -22,19 +22,11 @@ export class AuthService {
     if (error.error.error === "Invalid username or password!") {
       console.log("Error here →", error.error.error);
       this.toastrService
-      .error(
-        `${error.error.error? error.error.error: "Invalid username or password!"}`,
-        undefined,
-        {positionClass: 'toast-top-center'}
-      );
+      .error(`${error.error.error? error.error.error: "Invalid username or password!"}`);
     } else {
       console.log("Error here →", error.statusText);
       this.toastrService
-      .error(
-        `${error.statusText? error.statusText: 'An error'} occured! Please try again later.`,
-        undefined,
-        {positionClass: 'toast-top-center'}
-      );
+      .error(`${error.statusText? error.statusText: 'An error'} occured! Please try again later.`);
     }
   }
 

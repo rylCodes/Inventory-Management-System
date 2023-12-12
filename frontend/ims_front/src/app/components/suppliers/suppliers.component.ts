@@ -5,6 +5,7 @@ import { UiService } from 'src/app/services/ui/ui.service';
 import { Subscription } from 'rxjs';
 import { faPen, faTrashCan, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { EmailValidator } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-suppliers',
@@ -42,7 +43,11 @@ export class SuppliersComponent implements OnInit {
   showActionModal: boolean = false;
   actionModalSubscription: Subscription = new Subscription;
 
-  constructor(private supplierService: SuppliersService, private uiService: UiService) {}
+  constructor(
+    private supplierService: SuppliersService,
+    private uiService: UiService,
+    private toastrService: ToastrService,
+    ) {}
 
   validateEmail(email: string): boolean {
     const emailPattern: RegExp = /^[a-zA-Z0-9.%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -101,7 +106,7 @@ export class SuppliersComponent implements OnInit {
   // CREATE SUPPLIER
   addSupplier() {
     if (!this.supplier.name) {
-      window.alert("Enter supplier name!");
+      this.toastrService.error("Enter supplier!")
       return;
     }
 
@@ -122,13 +127,13 @@ export class SuppliersComponent implements OnInit {
     const isEmailExist = this.suppliers.some(supplier => supplier.email && supplier.email == newSupplier.email);
   
     if (isSupplierExist) {
-      window.alert("Supplier with this name already exists!");
+      this.toastrService.error("Supplier with this name already exists!")
     } else if (isPhoneExist) {
-      window.alert("Supplier with this phone already exists!");
+      this.toastrService.error("Supplier with this phone already exists!")
     } else if (isEmailExist) {
-      window.alert("Supplier with this email already exists!");
+      this.toastrService.error("Supplier with this email already exists!")
     } else if (newSupplier.email && !this.validateEmail(newSupplier.email)) {
-      window.alert("Enter valid email!");
+      this.toastrService.error("Enter valid email!")
     } else {
       this.isLoading = true;
       this.supplierService.addSupplier(newSupplier)
@@ -138,7 +143,7 @@ export class SuppliersComponent implements OnInit {
           this.suppliers.push(Supplier);
           this.toggleForm();
           await this.uiService.wait(100);
-          window.alert("New supplier has been created successfully!");
+          this.toastrService.success("New supplier has been created successfully!")
         },
         error: (err) => {
           this.isLoading = false;
@@ -169,7 +174,7 @@ export class SuppliersComponent implements OnInit {
           this.deletingSupplier = null;
           this.toggleActionModal()
           await this.uiService.wait(100);
-          window.alert("Supplier has been deleted successfully!");
+          this.toastrService.success("Supplier has been deleted successfully!")
         },
         error: (err) => {
           this.isLoading = false;
@@ -209,13 +214,13 @@ saveUpdate() {
   const isEmailExist = this.suppliers.some(supplier => supplier.email && supplier.id !== editingSupplier.id && supplier.email === editingSupplier.email);
 
   if (isSupplierExist) {
-    window.alert("Supplier with this name already exists!");
+    this.toastrService.error("Supplier with this name already exists!")
   } else if (isPhoneExist) {
-    window.alert("Supplier with this phone already exists!");
+    this.toastrService.error("Supplier with this phone already exists!")
   } else if (isEmailExist) {
-    window.alert("Supplier with this email already exists!");
+    this.toastrService.error("Supplier with this email already exists!")
   } else if (editingSupplier.email && !this.validateEmail(editingSupplier.email)) {
-    window.alert("Enter valid email!");
+    this.toastrService.error("Enter valid email!")
   } else {
       this.isLoading = true;
       this.supplierService
@@ -226,7 +231,7 @@ saveUpdate() {
           this.suppliers[index] = supplierData;
           this.toggleForm();
           await this.uiService.wait(100);
-          window.alert("Successfully saved changes to the supplier.");
+          this.toastrService.success("Successfully saved changes to the supplier.")
         },
         error: (err) => {
           this.isLoading = false;
@@ -235,5 +240,5 @@ saveUpdate() {
       });
     }
   }
-  
+  // ** Class ends here. **
 }

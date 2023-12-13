@@ -284,6 +284,10 @@
         </div>
     </div>
 
+    <app-modal *ngIf="showModal" [inputType]="'password'" [inputField]="true" [placeHolder]="'Enter admin password.'"
+        (closeModal)="toggleModal()" (valueChanged)="onValueChanged($event)" (buttonClick)="onProceedDelete()">
+    </app-modal>
+
     <!-- CSS Loader -->
     <div *ngIf="isLoading" class="top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.3)] fixed">
         <app-loader></app-loader>

@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { faIcons, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { faXmark } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-modal',
@@ -7,31 +7,31 @@ import { faIcons, faXmark } from '@fortawesome/free-solid-svg-icons';
   styleUrls: ['./modal.component.css']
 })
 export class ModalComponent {
-  @Input() showModal: string = "";
+  @Input() faXmark: any = faXmark; // Font Awesome X mark icon
   @Input() title: string = "";
   @Input() content: string = "";
+  @Input() inputType: string = "text";
+  @Input() inputField: boolean = false;
   @Input() placeHolder: string = "";
-  @Input() btnText: string = "Procceed";
   @Input() btnBgColor: string = "";
   @Input() btnTxtColor: string = "";
-  @Input() inputField: string = "false";
-  @Output() btnClick = new EventEmitter();
-  @Output() toggleModal = new EventEmitter();
-  @Output() inputValueChange = new EventEmitter<string>();
-  
-  faXmark = faXmark;
+  @Input() btnText: string = "Procceed";
+
+  @Output() closeModal = new EventEmitter<void>();
+  @Output() valueChanged = new EventEmitter<string>();
+  @Output() buttonClick: EventEmitter<void> = new EventEmitter<void>();
+
+  inputValue: string = '';
 
   onToggleModal() {
-    this.toggleModal.emit();
+    this.closeModal.emit();
+  }
+
+  onInputChange(): void {
+    this.valueChanged.emit(this.inputValue);
   }
 
   onClick() {
-    this.btnClick.emit();
-  }
-
-
-  onInputChange(inputValue: string): void {
-    // Emit the input value in real-time
-    this.inputValueChange.emit(inputValue);
+    this.buttonClick.emit();
   }
 }

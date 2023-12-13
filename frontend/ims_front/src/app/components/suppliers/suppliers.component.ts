@@ -38,13 +38,11 @@ export class SuppliersComponent implements OnInit {
   }
 
   showForm: boolean = false;
-  formSubscription: Subscription = new Subscription;
+
+  modalInputValue?: string = "";
 
   showModal: boolean = false;
   showActionModal: boolean = false;
-  actionModalSubscription: Subscription = new Subscription;
-
-  modalInputValue = ""
 
   constructor(
     private supplierService: SuppliersService,
@@ -150,7 +148,6 @@ export class SuppliersComponent implements OnInit {
           this.isLoading = false;
           this.suppliers.push(Supplier);
           this.toggleForm();
-          await this.uiService.wait(100);
           this.toastrService.success("New supplier has been created successfully!")
         },
         error: (err) => {
@@ -208,7 +205,6 @@ saveUpdate() {
           const index = this.suppliers.findIndex(supplier => supplier.id === supplierData.id);
           this.suppliers[index] = supplierData;
           this.toggleForm();
-          await this.uiService.wait(100);
           this.toastrService.success("Successfully saved changes to the supplier.")
         },
         error: (err) => {
@@ -226,31 +222,13 @@ saveUpdate() {
   }
 
   onConfirmDelete() {
-    if (!this.deletingSupplier) {
-      return;
-    }
-
     const is_staff = sessionStorage.getItem("is_staff");
     if (is_staff === "false") {
+      this.toastrService.warning("Request permission to proceed with these action.")
       this.toggleModal();
     } else {
-    this.isLoading = true;
-      this.supplierService
-      .deleteSupplier(this.deletingSupplier)
-      .subscribe({
-        next: async () => {
-          this.isLoading = false;
-          this.suppliers = this.suppliers.filter(s => s.id !== this.deletingSupplier?.id);
-          this.deletingSupplier = null;
-          this.toggleActionModal()
-          await this.uiService.wait(100);
-          this.toastrService.success("Supplier has been deleted successfully!")
-        },
-        error: (err) => {
-          this.isLoading = false;
-          this.uiService.displayErrorMessage(err);
-        }
-      });
+      this.modalInputValue = undefined;
+      this.proceedDelete();
     }
   }
 
@@ -258,28 +236,26 @@ saveUpdate() {
     if (!this.deletingSupplier) {
       return;
     }
-
-    const adminPassword = this.modalInputValue;
     this.isLoading = true;
-      this.supplierService
-      .deleteSupplier(this.deletingSupplier, adminPassword)
-      .subscribe({
-        next: async () => {
-          this.isLoading = false;
-          this.suppliers = this.suppliers.filter(s => s.id !== this.deletingSupplier?.id);
-          this.deletingSupplier = null;
-          this.toggleActionModal()
-          await this.uiService.wait(100);
-          this.toastrService.success("Supplier has been deleted successfully!")
-        },
-        error: (err) => {
-          this.isLoading = false;
-          this.uiService.displayErrorMessage(err);
-        }
-      });
+    this.supplierService
+    .deleteSupplier(this.deletingSupplier, this.modalInputValue)
+    .subscribe({
+      next: async () => {
+        this.isLoading = false;
+        this.suppliers = this.suppliers.filter(s => s.id !== this.deletingSupplier?.id);
+        this.deletingSupplier = null;
+        this.showActionModal = false;
+        this.showModal = false;
+        this.toastrService.success("Supplier has been deleted successfully!")
+      },
+      error: (err) => {
+        this.isLoading = false;
+        this.uiService.displayErrorMessage(err);
+      }
+    });
   }
 
-  onInputValueChange(value: string): void {
+  onValueChanged(value: string): void {
     this.modalInputValue = value;
   }
 

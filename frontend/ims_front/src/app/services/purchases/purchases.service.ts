@@ -96,9 +96,10 @@ export class PurchasesService {
     );
   }
 
-  deletePurchaseItem(purchaseItem: PurchaseItem) {
+  deletePurchaseItem(purchaseItem: PurchaseItem, adminPassword?: string) {
     const url = `${this.apiUrl}purchase-item/` + `${purchaseItem.id}`;
-    return this.http.delete<PurchaseItem>(url)
+    const body = { admin_password: adminPassword };
+    return this.http.delete<PurchaseItem>(url, { body })
       .pipe(
         catchError((err) => {
           this.handlePurchaseError(err);

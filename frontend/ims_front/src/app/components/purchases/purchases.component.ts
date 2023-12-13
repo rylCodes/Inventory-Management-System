@@ -1,4 +1,4 @@
-import { Component, OnInit, Renderer2, HostListener } from '@angular/core';
+import { Component, OnInit, Renderer2, HostListener, ChangeDetectorRef, AfterContentChecked } from '@angular/core';
 import { PurchaseBill, PurchaseItem } from 'src/app/interface/Purchase';
 import { Supplier } from 'src/app/interface/Supplier';
 import { Stock } from 'src/app/interface/Stock';
@@ -15,7 +15,7 @@ import { ToastrService } from 'ngx-toastr';
   templateUrl: './purchases.component.html',
   styleUrls: ['./purchases.component.css']
 })
-export class PurchasesComponent implements OnInit {
+export class PurchasesComponent implements OnInit, AfterContentChecked {
   deletingBill?: PurchaseBill | null = null;
   deletingItem?: PurchaseItem | null = null;
 
@@ -31,6 +31,10 @@ export class PurchasesComponent implements OnInit {
   showBillTable: boolean = true;  
   showPurchaseBill: boolean = false;
 
+
+  modalInputValue?: string = "";
+
+  showModal: boolean = false;
   showSaveBillModal: boolean = false;
   showBillActionModal: boolean = false;
   showItemActionModal: boolean = false;
@@ -86,6 +90,7 @@ export class PurchasesComponent implements OnInit {
     private router: Router,
     private renderer: Renderer2,
     private toastrService: ToastrService,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   resetBillForm() {
@@ -133,6 +138,10 @@ export class PurchasesComponent implements OnInit {
 
   toggleBillActionModal() {
     this.showBillActionModal = !this.showBillActionModal;
+  }
+
+  toggleModal() {
+    this.showModal = !this.showModal;
   }
 
   toggleItemActionModal() {
@@ -211,6 +220,10 @@ export class PurchasesComponent implements OnInit {
     this.loadStocks();
     this.loadBills();
   }  
+
+  ngAfterContentChecked() {
+    this.cdr.detectChanges();
+  }
 
   loadBills() {
     this.isFetching = true;
@@ -319,6 +332,14 @@ export class PurchasesComponent implements OnInit {
       this.onSaveUpdate();
     } else {
       this.addBill();
+    }
+  }
+
+  onProceedDelete() {
+    if (this.deletingItem !== null) {
+      this.proceedDeleteItem();
+    } else if (this.deletingBill) {
+      this.proceedDeleteBill();
     }
   }
 
@@ -553,27 +574,38 @@ export class PurchasesComponent implements OnInit {
   }
 
   onConfirmDeleteBill() {
+    const is_staff = sessionStorage.getItem("is_staff");
+    if (is_staff === "false") {
+      this.toastrService.warning("Request permission to proceed with these action.")
+      this.toggleModal();
+    } else {
+      this.modalInputValue = undefined;
+      this.proceedDeleteBill();
+    }
+  }
+
+  proceedDeleteBill() {
     if (!this.deletingBill) {
       return;
     }
 
     this.isLoading = true;
     this.purchaseService
-      .deletePurchaseBill(this.deletingBill)
-      .subscribe({
-        next: async () => {
-          this.isLoading = false;
-          this.bills = this.bills.filter(s => s.id !== this.deletingBill?.id);
-          this.deletingBill = null;
-          this.toggleBillActionModal()
-          await this.uiService.wait(100);
-          this.toastrService.success("Transaction has been deleted successfully!");
-        },
-        error: (err) => {
-          this.isLoading = false;
-          this.uiService.displayErrorMessage(err);
-        },
-      });
+    .deletePurchaseBill(this.deletingBill)
+    .subscribe({
+      next: async () => {
+        this.isLoading = false;
+        this.bills = this.bills.filter(s => s.id !== this.deletingBill?.id);
+        this.deletingBill = null;
+        this.toggleBillActionModal()
+        await this.uiService.wait(100);
+        this.toastrService.success("Transaction has been deleted successfully!");
+      },
+      error: (err) => {
+        this.isLoading = false;
+        this.uiService.displayErrorMessage(err);
+      },
+    });
   }
 
   onSubmitItem() {
@@ -605,6 +637,17 @@ export class PurchasesComponent implements OnInit {
   }
 
   onConfirmDeleteItem() {
+    const is_staff = sessionStorage.getItem("is_staff");
+    if (is_staff === "false") {
+      this.toastrService.warning("Request permission to proceed with these action.")
+      this.toggleModal();
+    } else {
+      this.modalInputValue = undefined;
+      this.proceedDeleteItem();
+    }
+  }
+
+  proceedDeleteItem() {
     if (!this.deletingItem) {
       return;
     }
@@ -624,21 +667,27 @@ export class PurchasesComponent implements OnInit {
 
     this.isLoading = true;
     this.purchaseService
-      .deletePurchaseItem(this.deletingItem)
-      .subscribe({
-        next: async () => {
-          this.isLoading = false;
-          this.bills = this.bills.filter(s => s.id !== this.deletingItem?.id);
-          this.deletingItem = null;
-          this.toggleItemActionModal()
-          this.loadFilteredItems();
-          await this.uiService.wait(100);
-          this.toastrService.error("Item has been deleted successfully!");
-        },
-        error: (err) => {
-          this.isLoading = false;
-          this.uiService.displayErrorMessage(err);
-        }
-      });
+    .deletePurchaseItem(this.deletingItem, this.modalInputValue)
+    .subscribe({
+      next: async () => {
+        this.isLoading = false;
+        this.bills = this.bills.filter(s => s.id !== this.deletingItem?.id);
+        this.deletingItem = null;
+        this.modalInputValue = "";
+        this.showModal = false;
+        this.toggleItemActionModal()
+        this.loadFilteredItems();
+        await this.uiService.wait(100);
+        this.toastrService.error("Item has been deleted successfully!");
+      },
+      error: (err) => {
+        this.isLoading = false;
+        this.uiService.displayErrorMessage(err);
+      }
+    });
+  }
+
+  onValueChanged(value: string): void {
+    this.modalInputValue = value;
   }
 }

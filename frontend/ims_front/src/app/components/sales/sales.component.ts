@@ -26,6 +26,7 @@ export class SalesComponent implements OnInit {
   showOrder: boolean = false;
   showInvoice: boolean = false;
   isFetching: boolean = false;
+  isLoading: boolean = false;
 
   faXmark = faXmark;
   faPen = faPen;
@@ -234,14 +235,23 @@ export class SalesComponent implements OnInit {
       return;
     }
 
+    this.isLoading = true;
     this.salesService
       .deleteSaleBill(this.deletingSaleBill)
-      .subscribe(async () => {
-        this.bills = this.bills.filter(s => s.id !== this.deletingSaleBill?.id);
-        this.deletingSaleBill = null;
-        this.toggleBillActionModal()
-        await this.uiService.wait(100);
-        this.toastrService.success("Transaction history has been deleted successfully!");
+      .subscribe({
+        next: async () => {
+          this.isLoading = false
+          this.bills = this.bills.filter(s => s.id !== this.deletingSaleBill?.id);
+          this.deletingSaleBill = null;
+          this.toggleBillActionModal()
+          await this.uiService.wait(100);
+          this.toastrService.success("Transaction history has been deleted successfully!");
+        },
+        error: (err) => {
+          this.isLoading = false;
+          this.showBillActionModal = false;
+          this.uiService.displayErrorMessage(err);
+        }
       });
   }
 

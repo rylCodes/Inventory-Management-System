@@ -278,7 +278,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.loadNotifications();
         this.toastrService.success("Success: All notifications are now deleted.");  
       },
-      error: err => this.uiService.displayErrorMessage(err),
+      error: err => {
+        this.showDelAllNotifModal = false;
+        this.uiService.displayErrorMessage(err)
+      },
     })
   }
 

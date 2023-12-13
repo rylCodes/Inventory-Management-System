@@ -38,10 +38,6 @@ export class SuppliersComponent implements OnInit {
   }
 
   showForm: boolean = false;
-
-  modalInputValue?: string = "";
-
-  showModal: boolean = false;
   showActionModal: boolean = false;
 
   constructor(
@@ -75,14 +71,9 @@ export class SuppliersComponent implements OnInit {
     this.showActionModal = !this.showActionModal;
   }
 
-  toggleModal() {
-    this.showModal = !this.showModal;
-  }
-
   // SHOW SUPPLIERS
   ngOnInit(): void {
     this.loadSuppliers();
-    console.log(this.modalInputValue);
   }
 
   loadSuppliers() {
@@ -222,41 +213,26 @@ saveUpdate() {
   }
 
   onConfirmDelete() {
-    const is_staff = sessionStorage.getItem("is_staff");
-    if (is_staff === "false") {
-      this.toastrService.warning("Request permission to proceed with these action.")
-      this.toggleModal();
-    } else {
-      this.modalInputValue = undefined;
-      this.proceedDelete();
-    }
-  }
-
-  proceedDelete() {
     if (!this.deletingSupplier) {
       return;
     }
     this.isLoading = true;
     this.supplierService
-    .deleteSupplier(this.deletingSupplier, this.modalInputValue)
+    .deleteSupplier(this.deletingSupplier)
     .subscribe({
       next: async () => {
         this.isLoading = false;
         this.suppliers = this.suppliers.filter(s => s.id !== this.deletingSupplier?.id);
         this.deletingSupplier = null;
         this.showActionModal = false;
-        this.showModal = false;
         this.toastrService.success("Supplier has been deleted successfully!")
       },
       error: (err) => {
         this.isLoading = false;
+        this.showActionModal = false;
         this.uiService.displayErrorMessage(err);
       }
     });
-  }
-
-  onValueChanged(value: string): void {
-    this.modalInputValue = value;
   }
 
   // ** Class ends here. **

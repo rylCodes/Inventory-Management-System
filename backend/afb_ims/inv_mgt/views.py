@@ -54,7 +54,7 @@ class SupplierList(generics.ListCreateAPIView):
 class SupplierDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Supplier.objects.all()
     serializer_class = SupplierSerializer
-    permission_classes = [DeleteWithAdminPasswordPermission]
+    permission_classes = [IsAdminUser]
 
 # Purchase Bill views
 class PurchaseBillList(generics.ListCreateAPIView):
@@ -104,14 +104,13 @@ class NotificationList(generics.ListCreateAPIView):
 class NotificationDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Notification.objects.all()
     serializer_class = NotificationSerializer
-    permission_classes = [IsAdminUser]
 
 # Owner views
 class OwnerList(generics.ListAPIView):
     queryset = Owner.objects.all()
     serializer_class = OwnerSerializer
 
-class OwnerDetail(generics.RetrieveAPIView):
+class OwnerDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Owner.objects.all()
     serializer_class = OwnerSerializer
     permission_classes = [IsAdminUser]

@@ -10,9 +10,13 @@ class DeleteWithAdminPasswordPermission(permissions.BasePermission):
             return True
 
         try:
-            admin_user = User.objects.get(is_staff=True)
-            actual_admin_password = admin_user.password
-            return check_password(admin_password, actual_admin_password)
+            admin_users = User.objects.filter(is_staff=True)
+            for admin_user in admin_users:
+                actual_admin_password = admin_user.password
+                if check_password(admin_password, actual_admin_password):
+                    return True
+                
+            return False
         
         except User.DoesNotExist:
             return False

@@ -42,9 +42,10 @@ export class PurchasesService {
       );
   }
 
-  editPurchaseBill(purchaseBill: PurchaseBill) {
+  editPurchaseBill(purchaseBill: PurchaseBill, adminPassword?: string) {
     const url = `${this.apiUrl}purchase-bill/` + `${purchaseBill.id}/`;
-    return this.http.put<PurchaseBill>(url, purchaseBill, httpOptions)
+    const body = adminPassword? { admin_password: adminPassword, ...purchaseBill } : purchaseBill;
+    return this.http.put<PurchaseBill>(url, body, httpOptions)
     .pipe(
       catchError((err) => { 
         this.handlePurchaseError(err);

@@ -273,6 +273,11 @@ export class ProductsComponent implements OnInit {
     if (this.menu.category === "otherCategory" && this.customCategory) {
       this.menu.category = this.customCategory;
     }
+
+    const is_staff = sessionStorage.getItem("is_staff");
+    if (is_staff === "false") {
+      this.menu.status = false;
+    }
     
     const newMenu = {
       ...this.menu,
@@ -452,6 +457,7 @@ export class ProductsComponent implements OnInit {
         },
         error: (err) => {
           this.isLoading = false;
+          this.showMenuActionModal = false;
           this.uiService.displayErrorMessage(err);
         }
       });

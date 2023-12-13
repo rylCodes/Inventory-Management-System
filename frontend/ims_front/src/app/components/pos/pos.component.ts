@@ -1,4 +1,4 @@
-import { Component, OnInit, Renderer2, HostListener } from '@angular/core';
+import { Component, OnInit, Renderer2, HostListener, ChangeDetectorRef, AfterContentChecked } from '@angular/core';
 import { SaleBill, SaleItem } from 'src/app/interface/Sale';
 import { Menu } from 'src/app/interface/Product';
 import { Stock } from 'src/app/interface/Stock';
@@ -20,7 +20,7 @@ import { ToastrService } from 'ngx-toastr';
   templateUrl: './pos.component.html',
   styleUrls: ['./pos.component.css']
 })
-export class PosComponent implements OnInit {
+export class PosComponent implements OnInit, AfterContentChecked {
   deletingSaleBill?: SaleBill | null = null;
   deletingSaleItem?: SaleItem | null = null;
 
@@ -38,6 +38,9 @@ export class PosComponent implements OnInit {
   showBillActionModal: boolean = false;
   showItemActionModal: boolean = false;
   showInvoice: boolean = false;
+  showModal: boolean = false;
+
+  modalInputValue?: string;
 
   faXmark = faXmark;
   faPen = faPen;
@@ -62,6 +65,18 @@ export class PosComponent implements OnInit {
   amountChange: number = 0;
 
   saleBill: SaleBill = {
+    id: undefined,
+    billno: "",
+    time: "",
+    customer_name: "",
+    remarks: "",
+    amount_tendered: 0,
+    grand_total: 0,
+    mode_of_payment: "Cash",
+    status: false,
+  };
+
+  originalBill: SaleBill = {
     id: undefined,
     billno: "",
     time: "",
@@ -111,6 +126,7 @@ export class PosComponent implements OnInit {
       private ownerService: OwnerService,
       private notifService: NotificationsService,
       private toastrService: ToastrService,
+      private cdr: ChangeDetectorRef,
     ) {}
 
   resetNotification() {
@@ -156,11 +172,14 @@ export class PosComponent implements OnInit {
   async toggleInvoice() {
     this.showInvoice = !this.showInvoice;
     if (!this.showInvoice) {
-      await this.uiService.wait(100);
       this.toastrService.success('Transaction has been completed successfully!');
       this.loadBills();
       this.viewOrder(this.saleBill);
     }
+  }
+
+  toggleModal() {
+    this.showModal = !this.showModal;
   }
 
   toggleBillActionModal() {
@@ -239,7 +258,11 @@ export class PosComponent implements OnInit {
     this.loadOwner();
     this.loadItems();
     this.loadBills();
-  }  
+  }
+  
+  ngAfterContentChecked() {
+    this.cdr.detectChanges();
+  }
 
   loadBills() {
     this.isFetching = true;
@@ -333,6 +356,14 @@ export class PosComponent implements OnInit {
     return items.length;
   }
 
+  onAdminPermission() {
+    if (this.proceedEditBill) {
+      this.proceedUpdateBill();
+    } else if (this.deletingSaleItem !== null) {
+      this.proceedDeleteItem();
+    }
+  }
+
   onSubmitBill() {
     if (this.proceedEditBill) {
       this.onSaveUpdate();
@@ -391,7 +422,6 @@ export class PosComponent implements OnInit {
           })
 
           this.resetBillForm();
-          await this.uiService.wait(100);
           if (!bill.grand_total || bill.grand_total < 1) {
             this.toastrService.warning(
               "You have saved a transaction without a total bill amount. Make sure it is correct.",
@@ -448,7 +478,6 @@ export class PosComponent implements OnInit {
         }
 
         this.resetItemForm();
-        await this.uiService.wait(100);
       },
       error: (err) => {
         this.isLoading = false;
@@ -464,12 +493,29 @@ export class PosComponent implements OnInit {
     saleBill.customer_name.toUpperCase();
     saleBill.remarks.toUpperCase();
 
-    this.saleBill = saleBill;
+    this.saleBill = { ...saleBill };
+    this.originalBill = { ...saleBill };
 
     this.toggleBillForm();
   }
 
   onSaveUpdate() {
+    if (JSON.stringify(this.originalBill) === JSON.stringify(this.saleBill)) {
+      this.toggleBillForm();
+      return;
+    }
+
+    const is_staff = sessionStorage.getItem("is_staff");
+    if (is_staff === "false") {
+      this.toastrService.warning("Request permission to proceed with these action.")
+      this.toggleModal();
+    } else {
+      this.modalInputValue = undefined;
+      this.proceedUpdateBill();
+    }
+  }
+
+  proceedUpdateBill() {
     if (!this.saleBill.customer_name) {
       this.toastrService.success("Enter customer");
       return;
@@ -483,22 +529,23 @@ export class PosComponent implements OnInit {
 
     this.isLoading = true;
     this.salesService
-      .editSaleBill(editingSaleBill)
-      .subscribe({
-        next: async (saleBillData) => {
-          this.isLoading = false;
-          const index = this.activeBills.findIndex(saleBill => saleBill.id === saleBillData.id);
-          this.activeBills[index] = saleBillData;
-          this.toggleBillForm();
-  
-          await this.uiService.wait(100);
-          this.toastrService.success("Successfully saved changes to the customer details.");
-        },
-        error: (err) => {
-          this.isLoading = false;
-          this.uiService.displayErrorMessage(err);
-        }
-      });
+    .editSaleBill(editingSaleBill, this.modalInputValue)
+    .subscribe({
+      next: async (saleBillData) => {
+        this.isLoading = false;
+        const index = this.activeBills.findIndex(saleBill => saleBill.id === saleBillData.id);
+        this.activeBills[index] = saleBillData;
+        this.modalInputValue = undefined;
+        this.showModal = false;
+        this.showBillForm = false;
+
+        this.toastrService.success("Successfully saved changes to the customer details.");
+      },
+      error: (err) => {
+        this.isLoading = false;
+        this.uiService.displayErrorMessage(err);
+      }
+    });
   }
   
   // DELETE BILL
@@ -521,7 +568,6 @@ export class PosComponent implements OnInit {
           this.activeBills = this.activeBills.filter(s => s.id !== this.deletingSaleBill?.id);
           this.deletingSaleBill = null;
           this.toggleBillActionModal()
-          await this.uiService.wait(100);
           this.toastrService.success("Transaction has been deleted successfully!");
         },
         error: (err) => {
@@ -584,7 +630,6 @@ export class PosComponent implements OnInit {
           this.isLoading = false;
           const index = this.saleItems.findIndex(saleItem => saleItem.id === saleItemData.id);
   
-          await this.uiService.wait(100);
           this.toastrService.success("Successfully saved changes to the item.");
   
           this.saleItems[index] = saleItemData;
@@ -603,6 +648,17 @@ export class PosComponent implements OnInit {
   }
 
   onConfirmDeleteItem() {
+    const is_staff = sessionStorage.getItem("is_staff");
+    if (is_staff === "false") {
+      this.toastrService.warning("Request permission to proceed with these action.")
+      this.toggleModal();
+    } else {
+      this.modalInputValue = undefined;
+      this.proceedDeleteItem();
+    }
+  }
+
+  proceedDeleteItem() {
     if (!this.deletingSaleItem) {
       return;
     }
@@ -624,22 +680,24 @@ export class PosComponent implements OnInit {
 
     this.isLoading = true;
     this.salesService
-      .deleteSaleItem(this.deletingSaleItem)
-      .subscribe({
-        next: async () => {
-          this.isLoading = false;
-          this.activeBills = this.activeBills.filter(bill => bill.id !== this.deletingSaleItem?.id);
-          this.deletingSaleItem = null;
-          this.toggleItemActionModal()
-          this.loadItems();
-          await this.uiService.wait(100);
-          this.toastrService.success("Item has been deleted successfully!");
-        },
-        error: (err) => {
-          this.isLoading = false;
-          this.uiService.displayErrorMessage(err);
-        }
-      });
+    .deleteSaleItem(this.deletingSaleItem, this.modalInputValue)
+    .subscribe({
+      next: async () => {
+        this.isLoading = false;
+        this.activeBills = this.activeBills.filter(bill => bill.id !== this.deletingSaleItem?.id);
+        this.deletingSaleItem = null;
+        this.modalInputValue = undefined;
+        this.showModal = false;
+        this.showItemActionModal = false;
+        this.loadItems();
+        this.toastrService.success("Item has been deleted successfully!");
+      },
+      error: (err) => {
+        this.showBillActionModal = false;
+        this.isLoading = false;
+        this.uiService.displayErrorMessage(err);
+      }
+    });
   }
 
   onBillOut() {
@@ -783,7 +841,10 @@ export class PosComponent implements OnInit {
       });
     };
   }
-
+  
+  onValueChanged(value: string): void {
+    this.modalInputValue = value;
+  }
 
   /* This class end here.*/
 }

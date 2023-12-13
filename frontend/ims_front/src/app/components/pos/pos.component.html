@@ -214,11 +214,11 @@
                     </p>
                     <label class="mt-4" for="saleBill.customer_name">Customer:</label>
                     <input class="uppercase border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text"
-                        name="saleBill.customer_name" id="saleBill.customer_name" [(ngModel)]="saleBill.customer_name">
+                        name="saleBill.customer_name" id="saleBill.customer_name-edit" [(ngModel)]="saleBill.customer_name">
 
                     <label class="mt-4" for="remarks">Remarks:</label>
                     <input class="uppercase border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text"
-                        name="remarks" id="remarks" [(ngModel)]="saleBill.remarks">
+                        name="remarks" id="remarks-edit" [(ngModel)]="saleBill.remarks">
 
                     <!-- Submit Button -->
                     <button class="mt-10 bg-neutral-800 text-neutral-300 font-bold p-2 rounded hover:bg-[rgb(48,48,48)]"
@@ -395,6 +395,10 @@
                     txtContent="Delete"></app-button>
             </div>
         </div>
+
+        <app-modal *ngIf="showModal" [inputType]="'password'" [inputField]="true" [placeHolder]="'Enter admin password.'"
+            (closeModal)="toggleModal()" (valueChanged)="onValueChanged($event)" (buttonClick)="onAdminPermission()">
+        </app-modal>
 
         <!-- CSS Loader -->
         <div *ngIf="isLoading" class="top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.3)] fixed">

@@ -49,9 +49,10 @@ export class SalesService {
     return this.saleBills;
   }
 
-  editSaleBill(saleBill: SaleBill) {
+  editSaleBill(saleBill: SaleBill, adminPassword?: string) {
     const url = `${this.apiUrl}sales-bill/` + `${saleBill.id}/`;
-    return this.http.put<SaleBill>(url, saleBill, httpOptions)
+    const body = adminPassword? { admin_password: adminPassword, ...saleBill } : saleBill;
+    return this.http.put<SaleBill>(url, body, httpOptions)
     .pipe(
       catchError((err) => { 
         this.handleSaleError(err);
@@ -103,9 +104,10 @@ export class SalesService {
     );
   }
 
-  deleteSaleItem(saleItem: SaleItem) {
+  deleteSaleItem(saleItem: SaleItem, adminPassword?: string) {
     const url = `${this.apiUrl}sales-item/` + `${saleItem.id}`;
-    return this.http.delete<SaleItem>(url)
+    const body = { admin_password: adminPassword }
+    return this.http.delete<SaleItem>(url, { body })
       .pipe(
         catchError((err) => {
           this.handleSaleError(err);

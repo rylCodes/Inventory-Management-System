@@ -249,11 +249,14 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   deleteEachNotif(notif: Notification) {
-    this.notificationService.deleteNotification(notif).subscribe(() => {
-      this.notifications = this.notifications.filter(notification => {
-        notification.id !== notif.id;
-      });
-      this.loadNotifications();
+    this.notificationService.deleteNotification(notif).subscribe({
+      next: () => {
+        this.notifications = this.notifications.filter(notification => {
+          notification.id !== notif.id;
+        });
+        this.loadNotifications();
+      },
+      error: (err) => this.uiService.displayErrorMessage(err)
     });
   }
 

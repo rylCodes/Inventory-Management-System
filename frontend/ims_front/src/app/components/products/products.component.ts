@@ -284,10 +284,10 @@ export class ProductsComponent implements OnInit {
     const isMenuNameExist = this.menus.some(menu => menu.name === newMenu.name);
   
     if (isMenuNameExist) {
-      this.toastrService.error("Failed: Menu with this name already exists!");
+      this.toastrService.error("Product with this name already exists!");
       return;
     } else if (this.products.length < 1) {
-      this.toastrService.error("Failed: Please add at least one item to the product.");
+      this.toastrService.error("Please add at least one item to the product.");
       return;
     } else {
       this.isLoading = true;
@@ -401,7 +401,7 @@ export class ProductsComponent implements OnInit {
     const isMenuNameExist = this.menus.some(menu => menu.id !== editingMenu.id && menu.name === editingMenu.name);
 
     if (isMenuNameExist) {
-      this.toastrService.error("Menu with this name already exists!");
+      this.toastrService.error("Product with this name already exists!");
       return;
     } else {
       this.isLoading = true;

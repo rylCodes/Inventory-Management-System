@@ -34,6 +34,7 @@ import { SuppliersComponent } from './components/suppliers/suppliers.component';
 import { SalesComponent } from './components/sales/sales.component';
 import { AboutComponent } from './components/about/about.component';
 import { LoaderComponent } from './components/loader/loader.component';
+import { ModalComponent } from './components/modal/modal.component';
 
 const appRoutes: Routes = [
   {path: 'login', component: LoginComponent},
@@ -66,6 +67,7 @@ const appRoutes: Routes = [
     SalesComponent,
     AboutComponent,
     LoaderComponent,
+    ModalComponent,
   ],
   imports: [
     BrowserModule,

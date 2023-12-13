@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, catchError, throwError } from 'rxjs';
 import { Supplier } from 'src/app/interface/Supplier';
+import { ToastrService } from 'ngx-toastr';
 
 const httpOptions = {
   headers: new HttpHeaders({
@@ -14,7 +15,7 @@ const httpOptions = {
 })
 export class SuppliersService {
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private toastrService: ToastrService) { }
 
   private apiUrl = 'http://localhost:8000/ims-api/suppliers/';
   searchQuery: string | null = null;
@@ -58,14 +59,15 @@ export class SuppliersService {
     );
   }
 
-  deleteSupplier(supplier: Supplier) {
+  deleteSupplier(supplier: Supplier, adminPassword?: string) {
     const url = this.apiUrl + `${supplier.id}`;
-    return this.http.delete<Supplier>(url)
-      .pipe(
-        catchError((err) => {
-          this.handleSupplierError(err);
-          return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to delete supplier!`)
-        })
-      );
+    const body = { admin_password: adminPassword };
+    return this.http.delete<Supplier>(url, { body })
+    .pipe(
+      catchError((err) => {
+        this.handleSupplierError(err);
+        return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to delete supplier!`)
+      })
+    );
   }
 }

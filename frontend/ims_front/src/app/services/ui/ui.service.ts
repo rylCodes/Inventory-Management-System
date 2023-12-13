@@ -39,5 +39,9 @@ export class UiService {
       undefined,
       {positionClass: 'toast-top-center'}
     ); 
-  } 
+  }
+  
+  adminPermission(err: any) {
+    
+  }
 }

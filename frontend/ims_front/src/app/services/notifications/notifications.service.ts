@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, catchError, throwError, BehaviorSubject, Subject } from 'rxjs';
 import { Notification } from 'src/app/interface/Notification';
 import { Stock } from 'src/app/interface/Stock';
+import { ToastrService } from 'ngx-toastr';
 
 const httpOptions = {
   headers: new HttpHeaders({

@@ -42,6 +42,7 @@ export class AuthService {
           // const token = JSON.stringify(user.token);
           this.setToken(user.token);
           sessionStorage.setItem("user", user.first_name);
+          sessionStorage.setItem("is_staff", user.is_staff);
         }
         return user;
       })

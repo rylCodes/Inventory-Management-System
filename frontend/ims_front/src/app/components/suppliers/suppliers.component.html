@@ -105,8 +105,13 @@
             </fa-icon>
             <p class="mb-8 mt-6 text-center">Are you sure you want to delete this supplier?<br>This action cannot be
                 undone.</p>
-            <app-button (btnClick)="onConfirmDelete()" bgColor="red" txtColor="bg-white"
+            <app-button (btnClick)="onConfirmDelete()" bgColor="red" txtColor="text-white"
                 txtContent="Delete"></app-button>
         </div>
     </div>
+
+    <app-modal *ngIf="showModal" inputField="true" placeHolder="Enter admin password." (toggleModal)="toggleModal()"
+                (inputValueChange)="onInputValueChange($event)"
+                (btnClick)="onConfirmDelete()">
+    </app-modal>
 </div>

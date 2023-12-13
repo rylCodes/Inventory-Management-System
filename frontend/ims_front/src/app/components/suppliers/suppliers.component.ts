@@ -40,8 +40,11 @@ export class SuppliersComponent implements OnInit {
   showForm: boolean = false;
   formSubscription: Subscription = new Subscription;
 
+  showModal: boolean = false;
   showActionModal: boolean = false;
   actionModalSubscription: Subscription = new Subscription;
+
+  modalInputValue = ""
 
   constructor(
     private supplierService: SuppliersService,
@@ -74,9 +77,14 @@ export class SuppliersComponent implements OnInit {
     this.showActionModal = !this.showActionModal;
   }
 
+  toggleModal() {
+    this.showModal = !this.showModal;
+  }
+
   // SHOW SUPPLIERS
   ngOnInit(): void {
     this.loadSuppliers();
+    console.log(this.modalInputValue);
   }
 
   loadSuppliers() {
@@ -153,36 +161,6 @@ export class SuppliersComponent implements OnInit {
     }
   }
 
-  // DELETE SUPPLIER
-  deleteSupplier(supplier: Supplier) {
-    this.deletingSupplier = supplier;
-    this.toggleActionModal();
-  }
-
-  onConfirmDelete() {
-    if (!this.deletingSupplier) {
-      return;
-    }
-
-    this.isLoading = true;
-    this.supplierService
-      .deleteSupplier(this.deletingSupplier)
-      .subscribe({
-        next: async () => {
-          this.isLoading = false;
-          this.suppliers = this.suppliers.filter(s => s.id !== this.deletingSupplier?.id);
-          this.deletingSupplier = null;
-          this.toggleActionModal()
-          await this.uiService.wait(100);
-          this.toastrService.success("Supplier has been deleted successfully!")
-        },
-        error: (err) => {
-          this.isLoading = false;
-          this.uiService.displayErrorMessage(err);
-        }
-      });
-  }
-
 // UPDATE SUPPLIER
 updateSupplier(supplier: Supplier) {
   this.proceedEdit = true;
@@ -240,5 +218,70 @@ saveUpdate() {
       });
     }
   }
+
+  // DELETE SUPPLIER
+  deleteSupplier(supplier: Supplier) {
+    this.deletingSupplier = supplier;
+    this.toggleActionModal();
+  }
+
+  onConfirmDelete() {
+    if (!this.deletingSupplier) {
+      return;
+    }
+
+    const is_staff = sessionStorage.getItem("is_staff");
+    if (is_staff === "false") {
+      this.toggleModal();
+    } else {
+    this.isLoading = true;
+      this.supplierService
+      .deleteSupplier(this.deletingSupplier)
+      .subscribe({
+        next: async () => {
+          this.isLoading = false;
+          this.suppliers = this.suppliers.filter(s => s.id !== this.deletingSupplier?.id);
+          this.deletingSupplier = null;
+          this.toggleActionModal()
+          await this.uiService.wait(100);
+          this.toastrService.success("Supplier has been deleted successfully!")
+        },
+        error: (err) => {
+          this.isLoading = false;
+          this.uiService.displayErrorMessage(err);
+        }
+      });
+    }
+  }
+
+  proceedDelete() {
+    if (!this.deletingSupplier) {
+      return;
+    }
+
+    const adminPassword = this.modalInputValue;
+    this.isLoading = true;
+      this.supplierService
+      .deleteSupplier(this.deletingSupplier, adminPassword)
+      .subscribe({
+        next: async () => {
+          this.isLoading = false;
+          this.suppliers = this.suppliers.filter(s => s.id !== this.deletingSupplier?.id);
+          this.deletingSupplier = null;
+          this.toggleActionModal()
+          await this.uiService.wait(100);
+          this.toastrService.success("Supplier has been deleted successfully!")
+        },
+        error: (err) => {
+          this.isLoading = false;
+          this.uiService.displayErrorMessage(err);
+        }
+      });
+  }
+
+  onInputValueChange(value: string): void {
+    this.modalInputValue = value;
+  }
+
   // ** Class ends here. **
 }

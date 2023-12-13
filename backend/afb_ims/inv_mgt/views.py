@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser
 from .models import *
 from .serializers import *
+from .permissions import DeleteWithAdminPasswordPermission
 
 # Stock views
 class StockList(generics.ListCreateAPIView):
@@ -53,7 +54,7 @@ class SupplierList(generics.ListCreateAPIView):
 class SupplierDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Supplier.objects.all()
     serializer_class = SupplierSerializer
-    permission_classes = [IsAdminUser]
+    permission_classes = [DeleteWithAdminPasswordPermission]
 
 # Purchase Bill views
 class PurchaseBillList(generics.ListCreateAPIView):
@@ -75,7 +76,7 @@ class PurchaseItemDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = PurchaseItemSerializer
     permission_classes = [IsAdminUser]
 
-# Sale views
+# Sale Bill views
 class SalesBillList(generics.ListCreateAPIView):
     queryset = SalesBill.objects.all()
     serializer_class = SalesBillSerializer

@@ -1,9 +1,9 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
 import { Stock } from 'src/app/interface/Stock';
 import { StocksService } from 'src/app/services/stocks/stocks.service';
 import { UiService } from 'src/app/services/ui/ui.service';
-import { Subscription, Subject } from 'rxjs';
-import { faPen, faTrashCan, faXmark, faBell, faBellSlash, faEllipsisVertical } from '@fortawesome/free-solid-svg-icons';
+import { Subscription, Subject, Observable, forkJoin } from 'rxjs';
+import { faPen, faTrashCan, faXmark, faBell, faBellSlash, faEllipsisVertical, faSort } from '@fortawesome/free-solid-svg-icons';
 import { Notification } from 'src/app/interface/Notification';
 import { NotificationsService } from 'src/app/services/notifications/notifications.service';
 import { ProductsService } from 'src/app/services/products/products.service';
@@ -16,19 +16,33 @@ import { ToastrService } from 'ngx-toastr';
   styleUrls: ['./stocks.component.css'],
 })
 export class StocksComponent implements OnInit {
+  @ViewChild('tableSettings', {static: true}) tableSettings: any;
+
+  @HostListener('document:click', ['$event'])
+  onClick(event: MouseEvent) {
+    if(!(event.target as HTMLElement).closest('#tableSettings')) {
+      this.showSortOrDelItems = false;
+    };
+  }
+
   @HostListener('document:keyup.escape', ['$event'])
   onKeyUp(event: KeyboardEvent) {
     if (event.key === 'Escape') {
       if (this.showActionModal) {
         this.showActionModal = false;
+      } else if (this.showSearchBar) {
+        this.showSearchBar = false;
       }
     }
   }
+
   private query = new Subject<string>();
   searchQuery: string = "";
   filterText: string= "";
   showSearchBar: boolean = false;
   isFilter: boolean = false;
+  isAscending: boolean = true;
+  isSortedAToZ: boolean = true;
 
   deletingStock?: Stock | null = null;
   proceedEdit: boolean = false;
@@ -41,6 +55,7 @@ export class StocksComponent implements OnInit {
   faBell = faBell;
   faBellSlash = faBellSlash;
   faEllipsisVertical = faEllipsisVertical;
+  faSort = faSort;
 
   stocks: Stock[] = [];
   stocksToCheck: Stock[] = [];
@@ -79,9 +94,12 @@ export class StocksComponent implements OnInit {
     warning_type: ""
   }
 
+  showTableSettings: boolean = true;
+  showSortOrDelItems: boolean = false;
   showForm: boolean = false;
   formSubscription: Subscription = new Subscription;
 
+  showModal: boolean = false;
   showActionModal: boolean = false;
   actionModalSubscription: Subscription = new Subscription;
 
@@ -120,10 +138,17 @@ export class StocksComponent implements OnInit {
 
   toggleForm() {    
     this.showForm = !this.showForm;
+    this.showTableSettings = false;
+    this.showSearchBar = false;
     if (!this.showForm) {
+      this.showTableSettings = true;
       this.proceedEdit = false;
       this.resetForm();
     }
+  }
+
+  toggleModal() {
+    this.showModal = !this.showModal;
   }
 
   toggleActionModal() {
@@ -143,7 +168,6 @@ export class StocksComponent implements OnInit {
       .getStocks(this.filterText)
       .subscribe({
         next: (stocks) => {
-          console.log(stocks);
           this.isFetching = false;
           this.stocks = stocks;
           this.stocksToCheck = stocks.filter(stock => stock.show_notification);
@@ -333,7 +357,7 @@ export class StocksComponent implements OnInit {
     const lowStocks = this.stocksToCheck.filter(stock => stock.quantity <= 20 && stock.quantity > 5);
     if (critStocks.length) {
       critStocks.forEach(stock => {
-        this.notification.content = `${stock.quantity} ${stock.unit}/s of ${stock.stock_name} remaining.`;
+        this.notification.content = `${stock.quantity} ${stock.unit}/s of ${stock.stock_name} remaining. vjh hkigbkjh`;
         this.notification.warning_type = "Critical stock level";
         const newNotif = {
           ...this.notification
@@ -391,21 +415,29 @@ export class StocksComponent implements OnInit {
       this.isFilter = true;
       this.searchQuery = "";
       this.setQuery(this.filterText)
-      this.toggleShowSearchBar();
-      this.loadStocks();
+
+      if (!this.stocks.length) {
+        return;
+      } else {
+        this.loadStocks();
+      }
     }
   }
 
-  clearSearch() {
+  removeFilter() {
     this.filterText = "";
     this.searchQuery = "";
     this.isFilter = false;
-    this.toggleShowSearchBar();
     this.loadStocks();
   }
 
   setQuery(query: string) {
     this.query.next(query);
+  }
+
+  clearText() {
+    this.filterText = "";
+    this.searchQuery = "";
   }
 
   onSearchChanged(value: string): void {
@@ -415,5 +447,78 @@ export class StocksComponent implements OnInit {
 
   toggleShowSearchBar() {
     this.showSearchBar = !this.showSearchBar;
+  }
+
+  toggleTableSettings() {
+    this.showTableSettings = !this.showTableSettings;
+  }
+
+  toggleSortOrDelItems() {
+    this.showSortOrDelItems = !this.showSortOrDelItems
+  }
+
+  deleteAllItems() {
+    this.showSortOrDelItems = false;
+    this.toggleModal();
+    this.toastrService.warning('Caution: All items will be deleted permanently!', undefined, { timeOut: 5000});
+  }
+
+  onConfirmDeleteAll() {
+    if (!this.stocks.length) {
+      this.showModal = false;
+      return;
+    }
+    
+    let deletingStocks: Observable<Stock>[] = [];
+
+    this.stocks.forEach(stock => {
+      deletingStocks.push(this.stockService.deleteStock(stock));
+    });
+
+    forkJoin(deletingStocks).subscribe({
+      next: () => {
+        this.loadStocks();
+        this.showModal = false;
+        this.toastrService.success("All items has been deleted successfully.");
+      },
+      error: (err) => {
+        this.showModal = false;
+        this.uiService.displayErrorMessage(err);
+      }
+    })
+  }
+
+  sortItemsByDate() {
+    this.stocks.sort((a, b): any => {
+      if (a.date_updated && b.date_updated) {
+        const dateA = Date.parse(a.date_updated);
+        const dateB = Date.parse(b.date_updated)
+        let comparison = dateA - dateB;
+
+        if (!this.isAscending) {
+          comparison *= -1;
+        }
+
+        return comparison;
+      }
+    });
+
+    this.isAscending = !this.isAscending;
+  }
+
+  sortItemsByName() {
+    this.stocks.sort((a, b): any => {
+      if (a.stock_name && b.stock_name) {
+        let comparison = a.stock_name.localeCompare(b.stock_name);
+  
+        if (!this.isSortedAToZ) {
+          comparison *= -1;
+        }
+  
+        return comparison;
+      }
+    });
+  
+    this.isSortedAToZ = !this.isSortedAToZ;
   }
 }

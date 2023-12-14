@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { faMagnifyingGlass, faTimes, faXmark, } from '@fortawesome/free-solid-svg-icons';
+import { faMagnifyingGlass, faTimes, faXmark, faFilter } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { Router } from '@angular/router';
 import { RotateProp } from '@fortawesome/fontawesome-svg-core';
@@ -13,7 +13,8 @@ import { UiService } from 'src/app/services/ui/ui.service';
 })
 export class SearchBarComponent {
   @Output() search = new EventEmitter();
-  @Output() clear = new EventEmitter();
+  @Output() removeFilter = new EventEmitter();
+  @Output() clearText = new EventEmitter();
   @Output() searchChanged = new EventEmitter<string>();
   @Output() btnClick = new EventEmitter();
 
@@ -27,6 +28,7 @@ export class SearchBarComponent {
   faMagnifyingGlass = faMagnifyingGlass;
   faTimes = faTimes;
   faXmark = faXmark;
+  faFilter = faFilter;
 
   constructor (private authService: AuthService, private router: Router, uiService: UiService) {}
 
@@ -38,8 +40,12 @@ export class SearchBarComponent {
     this.btnClick.emit();
   }
 
-  onClear() {
-    this.clear.emit();
+  onRemoveFilter() {
+    this.removeFilter.emit();
+  }
+
+  onClearText() {
+    this.clearText.emit();
   }
 
   onInputChange() {

@@ -4,15 +4,15 @@
             [ngStyle]="{ color: 'rgb(64 64 64 )' }" (click)="onToggleModal()">
         </fa-icon>
 
-        <h3 *ngIf="title" class="font-semibold text-base mt-2 md:mt-4">{{ title }}</h3>
-        <p *ngIf="content" class="text-base">{{ content }}</p>
+        <h3 *ngIf="title" class="font-semibold mt-2 sm:text-base md:mt-4">{{ title }}</h3>
+        <p *ngIf="content" class="text-center mt-2 sm:mt-4">{{ content }}</p>
 
-        <input appFocusOnShow *ngIf="inputField" class="mt-2 md:mt-4 p-2 rounded border border-neutral-900 w-full"
+        <input appFocusOnShow *ngIf="inputField" class="mt-2 lg:mt-3 p-2 rounded border border-neutral-900 w-full"
             [type]="inputType" [placeholder]="placeHolder" [(ngModel)]="inputValue" (input)="onInputChange()"
             (keyup.enter)="onClick()">
 
-        <button appFocusOnShow class="btn mt-4" [ngStyle]="{'background-color': btnBgColor, 'color': btnTxtColor}"
-            (click)="onClick()">
+        <button appFocusOnShow class="btn mt-4 lg:mt-6"
+            [ngStyle]="{'background-color': btnBgColor, 'color': btnTxtColor}" (click)="onClick()">
             {{ btnText }}
         </button>
     </div>

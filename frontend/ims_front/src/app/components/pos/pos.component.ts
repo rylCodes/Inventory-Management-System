@@ -429,7 +429,6 @@ export class PosComponent implements OnInit, AfterContentChecked {
               {timeOut: 5000},
             );
           }
-          window.alert("New transaction has been added successfully!");
           this.toastrService.success("New transaction has been added successfully!");
         },
         error: (err) => {

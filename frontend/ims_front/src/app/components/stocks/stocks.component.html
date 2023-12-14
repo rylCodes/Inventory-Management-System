@@ -8,13 +8,34 @@
     </div>
     <hr class="border-b-1 border-neutral-900 mt-4">
 
-    <div class="flex justify-end px-2 mt-2 items-center w-full lg:mt-4">
-        <app-search-bar
-            [filterText]="filterText" [isFilter]="isFilter" [searchQuery]="searchQuery" [showSearchBar]="showSearchBar"
-            (clear)="clearSearch()" (search)="onSearch()" (btnClick)="toggleShowSearchBar()" (searchChanged)="onSearchChanged($event)">
+    <div id="tableSettings" *ngIf="showTableSettings" class="relative flex mt-1 items-center w-full lg:mt-2">
+        <app-search-bar class="w-full" [filterText]="filterText" [isFilter]="isFilter" [searchQuery]="searchQuery"
+            [showSearchBar]="showSearchBar" (removeFilter)="removeFilter()" (search)="onSearch()"
+            (clearText)="clearText()" (btnClick)="toggleShowSearchBar()" (searchChanged)="onSearchChanged($event)">
         </app-search-bar>
-        <fa-icon class="px-2 py-1 text-base lg:text-lg hover:bg-neutral-300 cursor-pointer rounded-md" [icon]="faEllipsisVertical">
-        </fa-icon>
+        <div class="px-2 lg:px-3 py-1 text-base lg:text-lg hover:bg-neutral-300 cursor-pointer rounded-md"
+            (click)="toggleSortOrDelItems()">
+            <fa-icon [icon]="faEllipsisVertical">
+            </fa-icon>
+        </div>
+        <div *ngIf="showSortOrDelItems"
+            class="flex flex-col absolute top-full right-0 w-52 bg-white shadow-xl rounded-md z-10">
+            <button
+                class="flex justify-between items-center px-4 py-2 hover:bg-neutral-100 rounded-md w-full text-start"
+                (click)="sortItemsByDate()">
+                <span>Sort by date updated</span>
+                <span>↑↓</span>
+            </button>
+            <button
+                class="flex justify-between items-center px-4 py-2 hover:bg-neutral-100 rounded-md w-full text-start"
+                (click)="sortItemsByName()">
+                <span>Sort by name</span>
+                <span>↑↓</span>
+            </button>
+            <button class="px-4 py-2 hover:bg-neutral-100 rounded-md w-full text-start" (click)="deleteAllItems()">
+                Delete all items
+            </button>
+        </div>
     </div>
 
     <!-- FORM -->
@@ -79,7 +100,7 @@
     </div>
 
     <!-- TABLE -->
-    <div class="w-full text-center shadow-xl rounded-xl mt-3 lg:mt-4" [ngClass]="showForm? 'hidden': 'block'">
+    <div class="w-full text-center shadow-xl rounded-xl mt-1 lg:mt-2" [ngClass]="showForm? 'hidden': 'block'">
         <table class="w-full table-fixed rounded-xl">
             <thead class="text-neutral-300 bg-neutral-900">
                 <th>Code</th>
@@ -157,6 +178,11 @@
                 txtContent="Delete"></app-button>
         </div>
     </div>
+
+    <app-modal *ngIf="showModal" [title]="'Deleting all items!'"
+        [content]="'Are you sure you want to delete all items? This action cannot be undone!'"
+        (closeModal)="toggleModal()" (buttonClick)="onConfirmDeleteAll()" [btnText]="'Delete all'" [btnBgColor]="'red'">
+    </app-modal>
 
     <!-- CSS Loader -->
     <div *ngIf="isLoading" class="top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.3)] fixed">

@@ -567,11 +567,12 @@ export class PosComponent implements OnInit, AfterContentChecked {
           this.isLoading =false;
           this.activeBills = this.activeBills.filter(s => s.id !== this.deletingSaleBill?.id);
           this.deletingSaleBill = null;
-          this.toggleBillActionModal()
+          this.showBillActionModal = false;
           this.toastrService.success("Transaction has been deleted successfully!");
         },
         error: (err) => {
           this.isLoading = false;
+          this.showBillActionModal = false;
           this.uiService.displayErrorMessage(err);
         }
       });

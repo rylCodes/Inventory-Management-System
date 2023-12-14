@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, catchError, throwError } from 'rxjs';
 import { Product } from 'src/app/interface/Product';
 import { Menu } from 'src/app/interface/Product';
@@ -33,8 +33,12 @@ export class ProductsService {
       );
   }
 
-  getMenus(): Observable<Menu[]> {
-    return this.http.get<Menu[]>(`${this.apiUrl}menus/`)
+  getMenus(searchQuery?: string): Observable<Menu[]> {
+    let params = new HttpParams;
+    if (searchQuery) {
+      params = params.set('search', searchQuery)
+    }
+    return this.http.get<Menu[]>(`${this.apiUrl}menus/`, { params })
       .pipe(
         catchError((err) => {
           this.handleError(err);

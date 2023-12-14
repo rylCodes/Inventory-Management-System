@@ -35,6 +35,7 @@ import { SalesComponent } from './components/sales/sales.component';
 import { AboutComponent } from './components/about/about.component';
 import { LoaderComponent } from './components/loader/loader.component';
 import { ModalComponent } from './components/modal/modal.component';
+import { SearchBarComponent } from './components/search-bar/search-bar.component';
 
 const appRoutes: Routes = [
   {path: 'login', component: LoginComponent},
@@ -68,6 +69,7 @@ const appRoutes: Routes = [
     AboutComponent,
     LoaderComponent,
     ModalComponent,
+    SearchBarComponent,
   ],
   imports: [
     BrowserModule,

@@ -2,8 +2,8 @@ import { Component, HostListener, OnInit } from '@angular/core';
 import { Stock } from 'src/app/interface/Stock';
 import { StocksService } from 'src/app/services/stocks/stocks.service';
 import { UiService } from 'src/app/services/ui/ui.service';
-import { Subscription } from 'rxjs';
-import { faPen, faTrashCan, faXmark, faBell, faBellSlash } from '@fortawesome/free-solid-svg-icons';
+import { Subscription, Subject } from 'rxjs';
+import { faPen, faTrashCan, faXmark, faBell, faBellSlash, faEllipsisVertical } from '@fortawesome/free-solid-svg-icons';
 import { Notification } from 'src/app/interface/Notification';
 import { NotificationsService } from 'src/app/services/notifications/notifications.service';
 import { ProductsService } from 'src/app/services/products/products.service';
@@ -24,8 +24,12 @@ export class StocksComponent implements OnInit {
       }
     }
   }
+  private query = new Subject<string>();
+  searchQuery: string = "";
+  filterText: string= "";
+  showSearchBar: boolean = false;
+  isFilter: boolean = false;
 
-  searchQuery: string = "product";
   deletingStock?: Stock | null = null;
   proceedEdit: boolean = false;
   isLoading: boolean = false;
@@ -36,6 +40,7 @@ export class StocksComponent implements OnInit {
   faTrashCan = faTrashCan;
   faBell = faBell;
   faBellSlash = faBellSlash;
+  faEllipsisVertical = faEllipsisVertical;
 
   stocks: Stock[] = [];
   stocksToCheck: Stock[] = [];
@@ -135,9 +140,10 @@ export class StocksComponent implements OnInit {
   loadStocks(): void {
     this.isFetching = true;
     this.stockService
-      .getStocks()
+      .getStocks(this.filterText)
       .subscribe({
         next: (stocks) => {
+          console.log(stocks);
           this.isFetching = false;
           this.stocks = stocks;
           this.stocksToCheck = stocks.filter(stock => stock.show_notification);
@@ -377,5 +383,37 @@ export class StocksComponent implements OnInit {
         this.productService.updateMenu(menu).subscribe();
       });
     }
+  }
+
+  onSearch() {
+    if (this.searchQuery) {
+      this.filterText = this.searchQuery
+      this.isFilter = true;
+      this.searchQuery = "";
+      this.setQuery(this.filterText)
+      this.toggleShowSearchBar();
+      this.loadStocks();
+    }
+  }
+
+  clearSearch() {
+    this.filterText = "";
+    this.searchQuery = "";
+    this.isFilter = false;
+    this.toggleShowSearchBar();
+    this.loadStocks();
+  }
+
+  setQuery(query: string) {
+    this.query.next(query);
+  }
+
+  onSearchChanged(value: string): void {
+    console.log(value)
+    this.searchQuery = value;
+  }
+
+  toggleShowSearchBar() {
+    this.showSearchBar = !this.showSearchBar;
   }
 }

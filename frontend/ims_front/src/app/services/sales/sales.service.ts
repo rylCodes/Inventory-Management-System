@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, catchError, throwError, BehaviorSubject } from 'rxjs';
 import { SaleBill, SaleItem } from 'src/app/interface/Sale';
 const httpOptions = {
@@ -32,14 +32,18 @@ export class SalesService {
       );
   }
 
-  getSaleBills(): Observable<SaleBill[]> {
-    return this.http.get<SaleBill[]>(`${this.apiUrl}sales-bill/`)
-      .pipe(
-        catchError((err) => {
-          this.handleSaleError(err);
-          return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to display transactions!`)
-        })
-      );
+  getSaleBills(searchQuery?: string): Observable<SaleBill[]> {
+    let params = new HttpParams;
+    if (searchQuery) {
+      params = params.set('search', searchQuery)
+    }
+    
+    return this.http.get<SaleBill[]>(`${this.apiUrl}sales-bill/`, { params }).pipe(
+      catchError((err) => {
+        this.handleSaleError(err);
+        return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to display transactions!`)
+      })
+    );
   }
 
   fetchSaleBills(): BehaviorSubject<SaleBill[]> {

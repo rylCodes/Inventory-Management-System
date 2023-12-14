@@ -14,7 +14,7 @@ class StockList(generics.ListCreateAPIView):
         search_query = request.query_params.get('search', None)
         
         if search_query:
-            queryset = Stock.objects.filter(name__icontains=search_query)
+            queryset = Stock.objects.filter(stock_name__icontains=search_query)
         else:
             queryset = self.get_queryset()
 
@@ -30,6 +30,17 @@ class StockDetail(generics.RetrieveUpdateDestroyAPIView):
 class MenuList(generics.ListCreateAPIView):
     queryset = Menu.objects.all()
     serializer_class = MenuSerializer
+
+    def list(self, request):
+        search_query = request.query_params.get('search', None)
+        
+        if search_query:
+            queryset = Menu.objects.filter(name__icontains=search_query)
+        else:
+            queryset = self.get_queryset()
+
+        serializer = MenuSerializer(queryset, many=True)
+        return Response(serializer.data)
 
 class MenuDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Menu.objects.all()
@@ -51,6 +62,17 @@ class SupplierList(generics.ListCreateAPIView):
     queryset = Supplier.objects.all()
     serializer_class = SupplierSerializer
 
+    def list(self, request):
+        search_query = request.query_params.get('search', None)
+        
+        if search_query:
+            queryset = Supplier.objects.filter(name__icontains=search_query)
+        else:
+            queryset = self.get_queryset()
+
+        serializer = SupplierSerializer(queryset, many=True)
+        return Response(serializer.data)
+
 class SupplierDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Supplier.objects.all()
     serializer_class = SupplierSerializer
@@ -60,6 +82,17 @@ class SupplierDetail(generics.RetrieveUpdateDestroyAPIView):
 class PurchaseBillList(generics.ListCreateAPIView):
     queryset = PurchaseBill.objects.all()
     serializer_class = PurchaseBillSerializer
+
+    def list(self, request):
+        search_query = request.query_params.get('search', None)
+        
+        if search_query:
+            queryset = PurchaseBill.objects.filter(billno__icontains=search_query)
+        else:
+            queryset = self.get_queryset()
+
+        serializer = PurchaseBillSerializer(queryset, many=True)
+        return Response(serializer.data)
 
 class PurchaseBillDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = PurchaseBill.objects.all()
@@ -80,6 +113,17 @@ class PurchaseItemDetail(generics.RetrieveUpdateDestroyAPIView):
 class SalesBillList(generics.ListCreateAPIView):
     queryset = SalesBill.objects.all()
     serializer_class = SalesBillSerializer
+
+    def list(self, request):
+        search_query = request.query_params.get('search', None)
+        
+        if search_query:
+            queryset = SalesBill.objects.filter(customer_name__icontains=search_query)
+        else:
+            queryset = self.get_queryset()
+
+        serializer = SalesBillSerializer(queryset, many=True)
+        return Response(serializer.data)
 
 class SalesBillDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = SalesBill.objects.all()

@@ -4,11 +4,17 @@ import { Supplier } from 'src/app/interface/Supplier';
 import { Stock } from 'src/app/interface/Stock';
 import { SuppliersService } from 'src/app/services/suppliers/suppliers.service';
 import { UiService } from 'src/app/services/ui/ui.service';
-import { faPen, faTrashCan, faXmark, faRectangleList, faPlus, faMinus, faTimes } from '@fortawesome/free-solid-svg-icons';
+
+import {
+  faPen, faTrashCan, faXmark, faRectangleList,
+  faPlus, faMinus, faTimes, faEllipsisVertical,
+} from '@fortawesome/free-solid-svg-icons';
+
 import { Router } from '@angular/router';
 import { PurchasesService } from 'src/app/services/purchases/purchases.service';
 import { StocksService } from 'src/app/services/stocks/stocks.service';
 import { ToastrService } from 'ngx-toastr';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-purchases',
@@ -16,6 +22,11 @@ import { ToastrService } from 'ngx-toastr';
   styleUrls: ['./purchases.component.css']
 })
 export class PurchasesComponent implements OnInit, AfterContentChecked {
+  private query = new Subject<string>();
+  searchQuery: string = "";
+  filterText: string= "";
+  isFilter: boolean = false;
+
   deletingBill?: PurchaseBill | null = null;
   deletingItem?: PurchaseItem | null = null;
 
@@ -47,6 +58,7 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
   faPlus = faPlus;
   faMinus = faMinus;
   faTimes = faTimes;
+  faEllipsisVertical = faEllipsisVertical;
 
   bills: PurchaseBill[] = [];
   items: PurchaseItem[] = [];
@@ -228,7 +240,7 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
   loadBills() {
     this.isFetching = true;
     this.purchaseService
-      .getPurchaseBills()
+      .getPurchaseBills(this.filterText)
       .subscribe({
         next: bills => {
           this.isFetching = false;
@@ -686,5 +698,31 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
 
   onValueChanged(value: string): void {
     this.modalInputValue = value;
+  }
+
+  onSearch() {
+    if (this.searchQuery) {
+      this.filterText = this.searchQuery
+      this.isFilter = true;
+      this.searchQuery = "";
+      this.setQuery(this.filterText)
+      this.loadBills();
+    }
+  }
+
+  clearSearch() {
+    this.filterText = "";
+    this.searchQuery = "";
+    this.isFilter = false;
+    this.loadBills();
+  }
+
+  setQuery(query: string) {
+    this.query.next(query);
+  }
+
+  onSearchChanged(value: string): void {
+    console.log(value)
+    this.searchQuery = value;
   }
 }

@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { Supplier } from 'src/app/interface/Supplier';
 import { SuppliersService } from 'src/app/services/suppliers/suppliers.service';
 import { UiService } from 'src/app/services/ui/ui.service';
-import { Subscription } from 'rxjs';
-import { faPen, faTrashCan, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { Subscription, Subject } from 'rxjs';
+import { faPen, faTrashCan, faXmark, faEllipsisVertical } from '@fortawesome/free-solid-svg-icons';
 import { EmailValidator } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 
@@ -13,6 +13,12 @@ import { ToastrService } from 'ngx-toastr';
   styleUrls: ['./suppliers.component.css']
 })
 export class SuppliersComponent implements OnInit {
+  private query = new Subject<string>();
+  searchQuery: string = "";
+  filterText: string= "";
+  isFilter: boolean = false;
+  showSearchBar: boolean = false;
+
   deletingSupplier?: Supplier | null = null;
   proceedEdit: boolean = false;
 
@@ -22,6 +28,7 @@ export class SuppliersComponent implements OnInit {
   faXmark = faXmark;
   faPen = faPen;
   faTrashCan = faTrashCan;
+  faEllipsisVertical = faEllipsisVertical;
 
   suppliers: Supplier[] = [];
 
@@ -79,7 +86,7 @@ export class SuppliersComponent implements OnInit {
   loadSuppliers() {
     this.isFetching = true;
     this.supplierService
-    .getSuppliers()
+    .getSuppliers(this.filterText)
     .subscribe({
       next: (suppliers) => {
         this.isFetching = false;
@@ -233,6 +240,37 @@ saveUpdate() {
         this.uiService.displayErrorMessage(err);
       }
     });
+  }
+
+  onSearch() {
+    if (this.searchQuery) {
+      this.filterText = this.searchQuery
+      this.isFilter = true;
+      this.searchQuery = "";
+      this.setQuery(this.filterText);
+      this.toggleShowSearchBar()
+      this.loadSuppliers();
+    }
+  }
+
+  clearSearch() {
+    this.filterText = "";
+    this.searchQuery = "";
+    this.isFilter = false;
+    this.loadSuppliers();
+  }
+
+  setQuery(query: string) {
+    this.query.next(query);
+  }
+
+  onSearchChanged(value: string): void {
+    console.log(value)
+    this.searchQuery = value;
+  }
+
+  toggleShowSearchBar() {
+    this.showSearchBar = !this.showSearchBar
   }
 
   // ** Class ends here. **

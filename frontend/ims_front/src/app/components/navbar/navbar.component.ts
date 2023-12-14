@@ -1,5 +1,11 @@
 import { Component } from '@angular/core';
-import { faMagnifyingGlass, faTimes, faHouse, faBoxesStacked, faList, faDesktop, faWallet, faCreditCard, faCircleInfo, faHandshake, faXmark, faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
+
+import {
+  faMagnifyingGlass, faTimes, faHouse, faBoxesStacked,
+  faList, faDesktop, faCreditCard, faCircleInfo,
+  faBoxesPacking, faXmark, faRightFromBracket, faMoneyBillTrendUp,
+} from '@fortawesome/free-solid-svg-icons';
+
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { Router } from '@angular/router';
 import { RotateProp } from '@fortawesome/fontawesome-svg-core';
@@ -12,7 +18,6 @@ import { UiService } from 'src/app/services/ui/ui.service';
   styleUrls: ['./navbar.component.css']
 })
 export class NavbarComponent {
-  private query = new Subject<string>();
   title: string = "RylCodes-IMS";
 
   showLogOutActionModal: boolean = false;
@@ -23,30 +28,18 @@ export class NavbarComponent {
   faBoxesStacked = faBoxesStacked;
   faList = faList;
   faDesktop = faDesktop;
-  faWallet = faWallet;
-  faHandshake = faHandshake;
+  faMoneyBillTrendUp = faMoneyBillTrendUp;
+  faBoxesPacking = faBoxesPacking;
   faCreditCard = faCreditCard;
   faCircleInfo = faCircleInfo;
-  faXmark = faXmark;
   logOutIcon = faRightFromBracket;
+  faXmark = faXmark;
 
   searchQuery: string= "";
   filterText: string= "";
   isFilter: boolean = false;
 
   constructor (private authService: AuthService, private router: Router, uiService: UiService) {}
-
-  onSearch() {
-    this.filterText = this.searchQuery
-    this.isFilter = true;
-    this.searchQuery = "";
-    this.setQuery(this.filterText)
-  }
-
-  clearSearch() {
-    this.filterText = "";
-    this.isFilter = false;
-  }
 
   toggleLogOutActionModal() {
     this.showLogOutActionModal = !this.showLogOutActionModal;
@@ -55,10 +48,6 @@ export class NavbarComponent {
   logOut() {
     this.authService.clearToken();
     this.router.navigate(["login"]);
-  }
-
-  setQuery(query: string) {
-    this.query.next(query);
   }
 
 }

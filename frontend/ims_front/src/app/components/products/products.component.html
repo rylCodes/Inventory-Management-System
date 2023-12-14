@@ -8,6 +8,14 @@
     </div>
     <hr class="border-b-1 border-neutral-900 mt-4">
 
+    <div class="flex justify-end space-x-4 px-2 mt-2 items-center w-full lg:mt-4">
+        <app-search-bar
+            [filterText]="filterText" [isFilter]="isFilter" [searchQuery]="searchQuery"
+            (clear)="clearSearch()" (search)="onSearch()" (searchChanged)="onSearchChanged($event)">
+        </app-search-bar>
+        <fa-icon class="text-[18px] cursor-pointer" [icon]="faEllipsisVertical"></fa-icon>
+    </div>
+
     <!-- MENU FORM: Edit -->
     <div *ngIf="showMenuForm" class="flex justify-center top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] fixed">
         <div class="relative flex flex-col items-center bg-white rounded-lg h-fit p-4 mt-24 w-1/2 lg:w-1/4 md:w-1/3">
@@ -222,7 +230,7 @@
     </div>
 
     <!-- MENU TABLE -->
-    <div *ngIf="showMenuTable" class="w-full text-center shadow-xl rounded-xl mt-6 lg:mt-8">
+    <div *ngIf="showMenuTable" class="w-full text-center shadow-xl rounded-xl mt-3 lg:mt-4">
         <table class="w-full table-fixed rounded-xl">
             <thead class="text-neutral-300 bg-neutral-900">
                 <th class="w-1/3 md:w-1/6">Code</th>

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, catchError, throwError } from 'rxjs';
 import { PurchaseBill, PurchaseItem } from 'src/app/interface/Purchase';
 
@@ -32,8 +32,12 @@ export class PurchasesService {
       );
   }
 
-  getPurchaseBills(): Observable<PurchaseBill[]> {
-    return this.http.get<PurchaseBill[]>(`${this.apiUrl}purchase-bill/`)
+  getPurchaseBills(searchQuery?: string): Observable<PurchaseBill[]> {
+    let params = new HttpParams;
+    if (searchQuery) {
+      params = params.set('search', searchQuery)
+    }
+    return this.http.get<PurchaseBill[]>(`${this.apiUrl}purchase-bill/`, { params })
       .pipe(
         catchError(err => {
           this.handlePurchaseError(err);

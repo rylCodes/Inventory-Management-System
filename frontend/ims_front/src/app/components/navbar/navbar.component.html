@@ -5,77 +5,70 @@
         <p class="text-[10px] mt-1">Inventory Management System with POS</p>
     </div>
 
-    <!-- SEARCH -->
-    <form (ngSubmit)="onSearch()" class="flex justify-between pl-2 py-1 mx-4 mt-4 rounded-sm bg-neutral-200">
-        <input [(ngModel)]="searchQuery" name="searchQuery"
-            class="outline-none w-full bg-inherit border-r border-neutral-500" type="text" placeholder="Search...">
-        <button type="submit">
-            <fa-icon class="px-2" [ngStyle]="{color: 'rgb(115 115 115)'}" [icon]="faMagnifyingGlass"></fa-icon>
-        </button>
-    </form>
-
-    <div *ngIf="isFilter" class="flex mx-4 mt-2 items-center text-xs">
-        <p class="text-neutral-300">Filter:</p>
-        <div class="flex items-center mx-2 p-1 rounded-sm bg-neutral-300 w-fit">
-            <p class="text-neutral-900 mr-2">{{filterText}}</p>
-            <fa-icon (click)="clearSearch()" [icon]="faTimes"></fa-icon>
-        </div>
+    <!-- NAVIGATION -->
+    <div>
+        <h3 class="bg-neutral-950 text-[11px] text-neutral-500 px-4 py-2">NAVIGATION</h3>
     </div>
 
-    <!-- NAVIGATION -->
-    <hr class="border-t-2 border-neutral-300 mx-4 mt-4">
-    <div class="text-neutral-300 mt-2">
-        <a class="flex items-center px-4 py-2 hover:bg-neutral-900 transition-all duration-500" routerLink="/"
-            routerLinkActive="bg-neutral-950 text-neutral-200 font-semibold hover:bg-neutral-950"
+    <div class="text-neutral-300 font-medium">
+        <a class="flex items-center px-4 py-3 hover:bg-neutral-800 hover:text-white hover:font-semibold transition-all duration-300"
+            routerLink="/"
+            routerLinkActive="bg-neutral-800"
             [routerLinkActiveOptions]="{exact: true}">
-            <fa-icon class="scale-90" [icon]="faHouse"></fa-icon>
+            <fa-icon [icon]="faHouse"></fa-icon>
             <p class="ml-3">Dashboard</p>
         </a>
 
-        <a class="flex items-center px-4 py-2 hover:bg-neutral-900 transition-all duration-500" routerLink="/stocks"
-            routerLinkActive="bg-neutral-950 text-neutral-200 font-semibold hover:bg-neutral-950"
+        <a class="flex items-center px-4 py-3 hover:bg-neutral-800 hover:text-white hover:font-semibold transition-all duration-300"
+            routerLink="/stocks"
+            routerLinkActive="bg-neutral-800"
             [routerLinkActiveOptions]="{exact: true}">
-            <fa-icon class="scale-90" [icon]="faBoxesStacked"></fa-icon>
+            <fa-icon [icon]="faBoxesStacked"></fa-icon>
             <p class="ml-3">Inventory</p>
         </a>
 
-        <a class="flex items-center px-4 py-2 hover:bg-neutral-900 transition-all duration-500" routerLink="/products"
-            routerLinkActive="bg-neutral-950 text-neutral-200 font-semibold hover:bg-neutral-950"
+        <a class="flex items-center px-4 py-3 hover:bg-neutral-800 hover:text-white hover:font-semibold transition-all duration-300"
+            routerLink="/products"
+            routerLinkActive="bg-neutral-800"
             [routerLinkActiveOptions]="{exact: true}">
-            <fa-icon class="scale-90" [icon]="faList"></fa-icon>
+            <fa-icon [icon]="faList"></fa-icon>
             <p class="ml-3">Menu</p>
         </a>
 
-        <a class="flex items-center px-4 py-2 hover:bg-neutral-900 transition-all duration-500" routerLink="/pos"
-            routerLinkActive="bg-neutral-950 text-neutral-200 font-semibold hover:bg-neutral-950"
+        <a class="flex items-center px-4 py-3 hover:bg-neutral-800 hover:text-white hover:font-semibold transition-all duration-300"
+            routerLink="/pos"
+            routerLinkActive="bg-neutral-800"
             [routerLinkActiveOptions]="{exact: true}">
-            <fa-icon class="scale-90" [icon]="faDesktop"></fa-icon>
+            <fa-icon [icon]="faDesktop"></fa-icon>
             <p class="ml-3">POS</p>
         </a>
 
-        <a class="flex items-center px-4 py-2 hover:bg-neutral-900 transition-all duration-500" routerLink="/suppliers"
-            routerLinkActive="bg-neutral-950 text-neutral-200 font-semibold hover:bg-neutral-950"
+        <a class="flex items-center px-4 py-3 hover:bg-neutral-800 hover:text-white hover:font-semibold transition-all duration-300"
+            routerLink="/suppliers"
+            routerLinkActive="bg-neutral-800"
             [routerLinkActiveOptions]="{exact: true}">
-            <fa-icon class="scale-90" [icon]="faHandshake"></fa-icon>
+            <fa-icon [icon]="faBoxesPacking"></fa-icon>
             <p class="ml-3">Suppliers</p>
         </a>
 
-        <a class="flex items-center px-4 py-2 hover:bg-neutral-900 transition-all duration-500" routerLink="/purchases"
-            routerLinkActive="bg-neutral-950 text-neutral-200 font-semibold hover:bg-neutral-950"
+        <a class="flex items-center px-4 py-3 hover:bg-neutral-800 hover:text-white hover:font-semibold transition-all duration-300"
+            routerLink="/purchases"
+            routerLinkActive="bg-neutral-800"
             [routerLinkActiveOptions]="{exact: true}">
-            <fa-icon class="scale-90" [icon]="faCreditCard"></fa-icon>
+            <fa-icon [icon]="faCreditCard"></fa-icon>
             <p class="ml-3">Purchases</p>
         </a>
 
-        <a class="flex items-center px-4 py-2 hover:bg-neutral-900 transition-all duration-500" routerLink="/sales"
-            routerLinkActive="bg-neutral-950 text-neutral-200 font-semibold hover:bg-neutral-950"
+        <a class="flex items-center px-4 py-3 hover:bg-neutral-800 hover:text-white hover:font-semibold transition-all duration-300"
+            routerLink="/sales"
+            routerLinkActive="bg-neutral-800"
             [routerLinkActiveOptions]="{exact: true}">
-            <fa-icon class="scale-90" [icon]="faWallet"></fa-icon>
+            <fa-icon [icon]="faMoneyBillTrendUp"></fa-icon>
             <p class="ml-3">Sales</p>
         </a>
 
         <!-- Logout Button -->
-        <button class="flex items-center px-4 py-2 hover:bg-neutral-900 w-full" (click)="toggleLogOutActionModal()">
+        <button class="flex items-center px-4 py-3 hover:bg-neutral-800 hover:text-white hover:font-semibold w-full" (click)="toggleLogOutActionModal()">
             <fa-icon [icon]="logOutIcon"></fa-icon>
             <p class="ml-3">Logout</p>
             <hr>

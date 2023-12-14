@@ -14,7 +14,7 @@
   })
   export class StocksService {
     private apiUrl = 'http://localhost:8000/ims-api/stocks/';
-    searchQuery: string | null = null;
+    searchQuery: string = "SD";
 
     constructor(private http: HttpClient) { }
 
@@ -32,12 +32,12 @@
         );
     }
 
-    getStocks(): Observable<Stock[]> {
+    getStocks(searchQuery?: string): Observable<Stock[]> {
       let params = new HttpParams;
-      if (this.searchQuery) {
-        params = params.set('search', this.searchQuery)
+      if (searchQuery) {
+        params = params.set('search', searchQuery)
       }
-      return this.http.get<Stock[]>(this.apiUrl, { params: params})
+      return this.http.get<Stock[]>(this.apiUrl, { params})
         .pipe(
           catchError((err) => {
             this.handleStockError(err);

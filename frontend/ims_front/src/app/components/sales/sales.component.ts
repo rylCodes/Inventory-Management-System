@@ -4,13 +4,19 @@ import { Menu } from 'src/app/interface/Product';
 import { Stock } from 'src/app/interface/Stock';
 import { ProductsService } from 'src/app/services/products/products.service';
 import { UiService } from 'src/app/services/ui/ui.service';
-import { faPen, faTrashCan, faXmark, faRectangleList, faPlus, faMinus, faTimes, faPrint, faLocationDot, faPhone, faEnvelope } from '@fortawesome/free-solid-svg-icons';
+
+import {
+  faPen, faTrashCan, faXmark, faRectangleList, faPlus, faMinus, faTimes,
+  faPrint, faLocationDot, faPhone, faEnvelope, faEllipsisVertical,
+} from '@fortawesome/free-solid-svg-icons';
+
 import { Router } from '@angular/router';
 import { SalesService } from 'src/app/services/sales/sales.service';
 import { StocksService } from 'src/app/services/stocks/stocks.service';
 import { Owner } from 'src/app/interface/Owner';
 import { OwnerService } from 'src/app/services/owner/owner.service';
 import { ToastrService } from 'ngx-toastr';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-sales',
@@ -18,6 +24,12 @@ import { ToastrService } from 'ngx-toastr';
   styleUrls: ['./sales.component.css']
 })
 export class SalesComponent implements OnInit {
+  private query = new Subject<string>();
+  searchQuery: string = "";
+  filterText: string= "";
+  isFilter: boolean = false;
+  showSearchBar: boolean = false;
+
   deletingSaleBill?: SaleBill | null = null;
   deletingSaleItem?: SaleItem | null = null;
 
@@ -39,6 +51,7 @@ export class SalesComponent implements OnInit {
   faLocationDot = faLocationDot;
   faPhone = faPhone;
   faEnvelope = faEnvelope;
+  faEllipsisVertical = faEllipsisVertical;
 
   bills: SaleBill[] = [];
   allItems: SaleItem[] = [];
@@ -151,7 +164,7 @@ export class SalesComponent implements OnInit {
   loadBills() {
     this.isFetching = true;
     this.salesService
-      .getSaleBills()
+      .getSaleBills(this.filterText)
       .subscribe({
         next: bills => {
           this.isFetching = false;
@@ -280,5 +293,36 @@ export class SalesComponent implements OnInit {
 
   printReceipt(): void {
     window.print();
+  }
+
+  onSearch() {
+    if (this.searchQuery) {
+      this.filterText = this.searchQuery
+      this.isFilter = true;
+      this.searchQuery = "";
+      this.setQuery(this.filterText);
+      this.toggleShowSearchBar();
+      this.loadBills();
+    }
+  }
+
+  clearSearch() {
+    this.filterText = "";
+    this.searchQuery = "";
+    this.isFilter = false;
+    this.loadBills();
+  }
+
+  setQuery(query: string) {
+    this.query.next(query);
+  }
+
+  onSearchChanged(value: string): void {
+    console.log(value)
+    this.searchQuery = value;
+  }
+
+  toggleShowSearchBar() {
+    this.showSearchBar = !this.showSearchBar
   }
 }

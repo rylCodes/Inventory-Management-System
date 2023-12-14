@@ -34,12 +34,12 @@ export class SuppliersService {
       );
   }
 
-  getSuppliers(): Observable<Supplier[]> {
+  getSuppliers(searchQuery?: string): Observable<Supplier[]> {
     let params = new HttpParams;
-    if (this.searchQuery) {
-      params = params.set('search', this.searchQuery)
+    if (searchQuery) {
+      params = params.set('search', searchQuery)
     }
-    return this.http.get<Supplier[]>(this.apiUrl, { params: params})
+    return this.http.get<Supplier[]>(this.apiUrl, { params })
       .pipe(
         catchError((err) => {
           this.handleSupplierError(err);

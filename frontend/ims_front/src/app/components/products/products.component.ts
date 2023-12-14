@@ -4,12 +4,18 @@ import { Stock } from 'src/app/interface/Stock';
 import { ProductsService } from 'src/app/services/products/products.service';
 import { StocksService } from 'src/app/services/stocks/stocks.service';
 import { UiService } from 'src/app/services/ui/ui.service';
-import { faPen, faTrashCan, faXmark, faRectangleList, faPlus, faMinus, faTimes } from '@fortawesome/free-solid-svg-icons';
+
+import {
+  faPen, faTrashCan, faXmark, faRectangleList,
+  faPlus, faMinus, faTimes, faEllipsisVertical
+} from '@fortawesome/free-solid-svg-icons';
+
 import { Router } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
 import { SaleItem } from 'src/app/interface/Sale';
 import { SalesService } from 'src/app/services/sales/sales.service';
 import { ToastrService } from 'ngx-toastr';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-products',
@@ -17,6 +23,11 @@ import { ToastrService } from 'ngx-toastr';
   styleUrls: ['./products.component.css'],
 })
 export class ProductsComponent implements OnInit {
+  private query = new Subject<string>();
+  searchQuery: string = "";
+  filterText: string= "";
+  isFilter: boolean = false;
+
   deletingMenu?: Menu | null = null;
   deletingProduct?: Product | null = null;
 
@@ -42,6 +53,7 @@ export class ProductsComponent implements OnInit {
   faPlus = faPlus;
   faMinus = faMinus;
   faTimes = faTimes;
+  faEllipsisVertical = faEllipsisVertical;
 
   menus: Menu[] = [];
   products: Product[] = [];
@@ -190,7 +202,7 @@ export class ProductsComponent implements OnInit {
 
   loadMenus() {
     this.productService
-    .getMenus()
+    .getMenus(this.filterText)
     .subscribe({
       next: menus => {
         this.menus = menus;
@@ -562,6 +574,32 @@ export class ProductsComponent implements OnInit {
         this.saleService.deleteSaleItem(item).subscribe();
       });
     }
+  }
+
+  onSearch() {
+    if (this.searchQuery) {
+      this.filterText = this.searchQuery
+      this.isFilter = true;
+      this.searchQuery = "";
+      this.setQuery(this.filterText)
+      this.loadMenus();
+    }
+  }
+
+  clearSearch() {
+    this.filterText = "";
+    this.searchQuery = "";
+    this.isFilter = false;
+    this.loadMenus();
+  }
+
+  setQuery(query: string) {
+    this.query.next(query);
+  }
+
+  onSearchChanged(value: string): void {
+    console.log(value)
+    this.searchQuery = value;
   }
 
   // Class ends here.

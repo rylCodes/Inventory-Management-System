@@ -38,7 +38,8 @@ export class PosComponent implements OnInit, AfterContentChecked {
   showBillActionModal: boolean = false;
   showItemActionModal: boolean = false;
   showInvoice: boolean = false;
-  showModal: boolean = false;
+  showPermissionModal: boolean = false;
+  showGoToMenuModal: boolean = false;
 
   modalInputValue?: string;
 
@@ -178,8 +179,22 @@ export class PosComponent implements OnInit, AfterContentChecked {
     }
   }
 
-  toggleModal() {
-    this.showModal = !this.showModal;
+  togglePermissionModal() {
+    this.showPermissionModal = !this.showPermissionModal;
+  }
+
+  onSelectChange(event: Event) {
+    const target = event.target as HTMLSelectElement;
+    if (target.value === "addNewProduct") {
+      this.showGoToMenuModal = !this.showGoToMenuModal;
+    }
+  }
+
+  toggleGoToMenuModal() {
+    this.showGoToMenuModal = !this.showGoToMenuModal;
+    if (!this.showGoToMenuModal) {
+      this.saleItem.menu = undefined;
+    }
   }
 
   toggleBillActionModal() {
@@ -456,11 +471,9 @@ export class PosComponent implements OnInit, AfterContentChecked {
       ...this.saleItem,
     }
     
-    this.isLoading = true;
     this.salesService.addSaleItem(newSaleItem)
     .subscribe({
       next: async (saleItem) => {
-        this.isLoading = false;
         this.saleItems.push(saleItem);
         this.loadItems();
 
@@ -479,7 +492,6 @@ export class PosComponent implements OnInit, AfterContentChecked {
         this.resetItemForm();
       },
       error: (err) => {
-        this.isLoading = false;
         this.uiService.displayErrorMessage(err);
       }
     });
@@ -507,7 +519,7 @@ export class PosComponent implements OnInit, AfterContentChecked {
     const is_staff = sessionStorage.getItem("is_staff");
     if (is_staff === "false") {
       this.toastrService.warning("Request permission to proceed with these action.")
-      this.toggleModal();
+      this.togglePermissionModal();
     } else {
       this.modalInputValue = undefined;
       this.proceedUpdateBill();
@@ -535,7 +547,7 @@ export class PosComponent implements OnInit, AfterContentChecked {
         const index = this.activeBills.findIndex(saleBill => saleBill.id === saleBillData.id);
         this.activeBills[index] = saleBillData;
         this.modalInputValue = undefined;
-        this.showModal = false;
+        this.showPermissionModal = false;
         this.showBillForm = false;
 
         this.toastrService.success("Successfully saved changes to the customer details.");
@@ -602,11 +614,8 @@ export class PosComponent implements OnInit, AfterContentChecked {
     }
   }
 
-  onMenuSelectionChange(event: Event) {
-    const target = event?.target as HTMLSelectElement;
-    if (target.value === 'addNewProduct') {
-      this.router.navigate(['products/']);
-    }
+  proceedToMenu() {
+    this.router.navigate(['products/']);
   }
 
   // UPDATE SALE ITEM
@@ -644,14 +653,18 @@ export class PosComponent implements OnInit, AfterContentChecked {
   // DELETE SALE ITEM
   deleteSaleItem(saleItem: SaleItem) {
     this.deletingSaleItem = saleItem;
-    this.toggleItemActionModal();
+    if (!this.updatingOrder) {
+      this.onConfirmDeleteItem();
+    } else {
+      this.toggleItemActionModal();
+    }
   }
 
   onConfirmDeleteItem() {
     const is_staff = sessionStorage.getItem("is_staff");
     if (is_staff === "false") {
       this.toastrService.warning("Request permission to proceed with these action.")
-      this.toggleModal();
+      this.togglePermissionModal();
     } else {
       this.modalInputValue = undefined;
       this.proceedDeleteItem();
@@ -678,23 +691,20 @@ export class PosComponent implements OnInit, AfterContentChecked {
       });
     }
 
-    this.isLoading = true;
     this.salesService
     .deleteSaleItem(this.deletingSaleItem, this.modalInputValue)
     .subscribe({
       next: async () => {
-        this.isLoading = false;
         this.activeBills = this.activeBills.filter(bill => bill.id !== this.deletingSaleItem?.id);
         this.deletingSaleItem = null;
         this.modalInputValue = undefined;
-        this.showModal = false;
+        this.showPermissionModal = false;
         this.showItemActionModal = false;
         this.loadItems();
         this.toastrService.success("Item has been deleted successfully!");
       },
       error: (err) => {
         this.showBillActionModal = false;
-        this.isLoading = false;
         this.uiService.displayErrorMessage(err);
       }
     });

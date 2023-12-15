@@ -4,16 +4,40 @@
         <h1 class="font-bold text-2xl lg:text-3xl">MENU</h1>
         <!-- ADD BUTTON -->
         <app-button *ngIf="!updatingMenuItems" txtContent="{{showFormContainer? 'Cancel': 'Add'}}"
-            bgColor="{{showFormContainer? 'red': 'green'}}" (btnClick)="toggleFormContainer()"></app-button>
+            bgColor="{{showFormContainer? 'red': 'green'}}" (btnClick)="toggleFormContainer()">
+        </app-button>
     </div>
     <hr class="border-b-1 border-neutral-900 mt-4">
 
-    <div class="flex justify-end space-x-4 px-2 mt-2 items-center w-full lg:mt-4">
-        <app-search-bar
-            [filterText]="filterText" [isFilter]="isFilter" [searchQuery]="searchQuery"
-            (clear)="clearSearch()" (search)="onSearch()" (searchChanged)="onSearchChanged($event)">
+    <!-- Table Settings -->
+    <div id="tableSettings" *ngIf="showTableSettings" class="relative flex mt-1 items-center w-full lg:mt-2">
+        <app-search-bar class="w-full" [filterText]="filterText" [isFilter]="isFilter" [searchQuery]="searchQuery"
+            [showSearchBar]="showSearchBar" (removeFilter)="removeFilter()" (search)="onSearch()"
+            (clearText)="clearText()" (btnClick)="toggleShowSearchBar()" (searchChanged)="onSearchChanged($event)">
         </app-search-bar>
-        <fa-icon class="text-[18px] cursor-pointer" [icon]="faEllipsisVertical"></fa-icon>
+        <div class="px-2 lg:px-3 py-1 text-base lg:text-lg hover:bg-neutral-300 cursor-pointer rounded-md"
+            (click)="toggleSortOrDelItems()">
+            <fa-icon [icon]="faEllipsisVertical">
+            </fa-icon>
+        </div>
+        <div *ngIf="showSortOrDelItems"
+            class="flex flex-col absolute top-full right-0 w-52 bg-white shadow-xl rounded-md z-10">
+            <button
+                class="flex justify-between items-center px-4 py-2 hover:bg-neutral-100 hover:font-medium rounded-md w-full text-start"
+                (click)="sortItemsByDate()">
+                <span>Sort by date updated</span>
+                <span>↑↓</span>
+            </button>
+            <button
+                class="flex justify-between items-center px-4 py-2 hover:bg-neutral-100 hover:font-medium rounded-md w-full text-start"
+                (click)="sortItemsByName()">
+                <span>Sort by name</span>
+                <span>↑↓</span>
+            </button>
+            <button class="px-4 py-2 hover:bg-neutral-100 hover:font-medium rounded-md w-full text-start" (click)="deleteAllItems()">
+                <span class="text-[#ff0000]">Delete all products</span>
+            </button>
+        </div>
     </div>
 
     <!-- MENU FORM: Edit -->
@@ -230,7 +254,7 @@
     </div>
 
     <!-- MENU TABLE -->
-    <div *ngIf="showMenuTable" class="w-full text-center shadow-xl rounded-xl mt-3 lg:mt-4">
+    <div *ngIf="showMenuTable" class="w-full text-center shadow-xl rounded-xl mt-1 lg:mt-2">
         <table class="w-full table-fixed rounded-xl">
             <thead class="text-neutral-300 bg-neutral-900">
                 <th class="w-1/3 md:w-1/6">Code</th>
@@ -289,7 +313,7 @@
         </div>
     </div>
 
-    <!-- PRODUCT MODAL: Confirm to Delete Product -->
+    <!-- PRODUCT MODAL: Delete Each Item -->
     <div *ngIf="showProductActionModal"
         class="flex justify-center top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] fixed">
         <div class="relative flex flex-col items-center bg-white rounded-lg h-fit p-4 mt-32 w-1/2 lg:w-1/4 md:w-1/3">
@@ -303,7 +327,7 @@
         </div>
     </div>
 
-    <!-- MENU MODAL: Confirm to Delete Menu -->
+    <!-- MENU MODAL: Delete Each Product -->
     <div *ngIf="showMenuActionModal" class="flex justify-center top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] fixed">
         <div class="relative flex flex-col items-center bg-white rounded-lg h-fit p-4 mt-32 w-1/2 lg:w-1/4 md:w-1/3">
             <fa-icon class="place-self-end scale-125 hover:scale-110" [icon]="faXmark"
@@ -317,6 +341,12 @@
                 txtContent="Delete"></app-button>
         </div>
     </div>
+
+    <!-- MODAL: Delete All Products -->
+    <app-modal *ngIf="showModal" [title]="'Deleting all items!'"
+        [content]="'Are you sure you want to delete all products? This action cannot be undone!'"
+        (closeModal)="toggleModal()" (buttonClick)="onConfirmDeleteAll()" [btnText]="'Delete all'" [btnBgColor]="'red'">
+    </app-modal>
 
     <!-- CSS Loader -->
     <div *ngIf="isLoading" class="top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.3)] fixed">

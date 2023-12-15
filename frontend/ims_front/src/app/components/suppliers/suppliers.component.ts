@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, HostListener } from '@angular/core';
 import { Supplier } from 'src/app/interface/Supplier';
 import { SuppliersService } from 'src/app/services/suppliers/suppliers.service';
 import { UiService } from 'src/app/services/ui/ui.service';
-import { Subscription, Subject } from 'rxjs';
+import { Subscription, Subject, Observable, forkJoin } from 'rxjs';
 import { faPen, faTrashCan, faXmark, faEllipsisVertical } from '@fortawesome/free-solid-svg-icons';
 import { EmailValidator } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
@@ -13,17 +13,45 @@ import { ToastrService } from 'ngx-toastr';
   styleUrls: ['./suppliers.component.css']
 })
 export class SuppliersComponent implements OnInit {
+  @ViewChild('tableSettings', {static: true}) tableSettings: any;
+
+  @HostListener('document:click', ['$event'])
+  onClick(event: MouseEvent) {
+    if(!(event.target as HTMLElement).closest('#tableSettings')) {
+      this.showSortOrDelItems = false;
+    };
+  }
+
+  @HostListener('document:keyup.escape', ['$event'])
+  onKeyUp(event: KeyboardEvent) {
+    if (event.key === 'Escape') {
+      if (this.showActionModal) {
+        this.showActionModal = false;
+      } else if (this.showSearchBar) {
+        this.showSearchBar = false;
+      }
+    }
+  }
+
   private query = new Subject<string>();
   searchQuery: string = "";
   filterText: string= "";
   isFilter: boolean = false;
-  showSearchBar: boolean = false;
+  isAscending: boolean = true;
+  isSortedAToZ: boolean = true;
 
   deletingSupplier?: Supplier | null = null;
   proceedEdit: boolean = false;
 
-  isLoading = false;
-  isFetching = false;
+  isLoading: boolean = false;
+  isFetching: boolean = false;
+
+  showSearchBar: boolean = false;
+  showTableSettings: boolean = true;
+  showSortOrDelItems: boolean = false;
+  showForm: boolean = false;
+  showModal: boolean = false;
+  showActionModal: boolean = false;
 
   faXmark = faXmark;
   faPen = faPen;
@@ -43,9 +71,6 @@ export class SuppliersComponent implements OnInit {
     date_updated: undefined,
     status: true,
   }
-
-  showForm: boolean = false;
-  showActionModal: boolean = false;
 
   constructor(
     private supplierService: SuppliersService,
@@ -68,6 +93,7 @@ export class SuppliersComponent implements OnInit {
 
   toggleForm() {    
     this.showForm = !this.showForm;
+    this.toggleTableSettings();
     if (!this.showForm) {
       this.proceedEdit = false;
       this.resetForm();
@@ -247,13 +273,17 @@ saveUpdate() {
       this.filterText = this.searchQuery
       this.isFilter = true;
       this.searchQuery = "";
-      this.setQuery(this.filterText);
-      this.toggleShowSearchBar()
-      this.loadSuppliers();
+      this.setQuery(this.filterText)
+
+      if (!this.suppliers.length) {
+        return;
+      } else {
+        this.loadSuppliers();
+      }
     }
   }
 
-  clearSearch() {
+  removeFilter() {
     this.filterText = "";
     this.searchQuery = "";
     this.isFilter = false;
@@ -264,13 +294,100 @@ saveUpdate() {
     this.query.next(query);
   }
 
+  clearText() {
+    this.filterText = "";
+    this.searchQuery = "";
+  }
+
   onSearchChanged(value: string): void {
     console.log(value)
     this.searchQuery = value;
   }
 
   toggleShowSearchBar() {
-    this.showSearchBar = !this.showSearchBar
+    this.showSearchBar = !this.showSearchBar;
+  }
+
+  toggleModal() {
+    this.showModal = !this.showModal;
+  }
+
+  toggleTableSettings() {
+    this.showTableSettings = !this.showTableSettings;
+  }
+
+  toggleSortOrDelItems() {
+    this.showSortOrDelItems = !this.showSortOrDelItems
+  }
+
+  deleteAllItems() {
+    this.showSortOrDelItems = false;
+    this.toggleModal();
+    
+    if (this.suppliers.length) {
+      this.toastrService.warning('Caution: All suppliers will be deleted permanently!', undefined, { timeOut: 5000});
+    }
+  }
+
+  onConfirmDeleteAll() {
+    if (!this.suppliers.length) {
+      this.showModal = false;
+      return;
+    }
+    
+    let deletingSuppliers: Observable<Supplier>[] = [];
+
+    this.suppliers.forEach(stock => {
+      deletingSuppliers.push(this.supplierService.deleteSupplier(stock));
+    });
+
+    forkJoin(deletingSuppliers).subscribe({
+      next: () => {
+        this.loadSuppliers();
+        this.showModal = false;
+        this.toastrService.success("All suppliers has been deleted successfully.");
+      },
+      error: (err) => {
+        this.showModal = false;
+        this.uiService.displayErrorMessage(err);
+      }
+    })
+  }
+
+  sortItemsByDate() {
+    this.suppliers.sort((a, b): any => {
+      if (a.date_updated && b.date_updated) {
+        const dateA = Date.parse(a.date_updated);
+        const dateB = Date.parse(b.date_updated)
+        let comparison = dateA - dateB;
+
+        if (!this.isAscending) {
+          comparison *= -1;
+        }
+
+        return comparison;
+      }
+    });
+
+    this.toggleSortOrDelItems();
+    this.isAscending = !this.isAscending;
+  }
+
+  sortItemsByName() {
+    this.suppliers.sort((a, b): any => {
+      if (a.name && b.name) {
+        let comparison = a.name.localeCompare(b.name);
+  
+        if (!this.isSortedAToZ) {
+          comparison *= -1;
+        }
+  
+        return comparison;
+      }
+    });
+  
+    this.toggleSortOrDelItems();
+    this.isSortedAToZ = !this.isSortedAToZ;
   }
 
   // ** Class ends here. **

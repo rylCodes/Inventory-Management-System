@@ -83,7 +83,7 @@ class Supplier(models.Model):
     code = models.CharField(max_length=100, unique=True, blank=True)
     name = models.CharField(max_length=100, unique=True)
     phone = models.CharField(max_length=15, blank=True, null=True)
-    address = models.CharField(max_length=15, blank=True)
+    address = models.CharField(max_length=150, blank=True)
     email = models.EmailField(max_length=100, blank=True, null=True)
     date_added = models.DateTimeField(default=timezone.now)
     date_updated = models.DateTimeField(auto_now=True)

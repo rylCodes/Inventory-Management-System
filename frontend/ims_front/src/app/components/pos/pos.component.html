@@ -13,11 +13,11 @@
         <!-- ITEM FORM -->
         <form
             class="flex items-end text-start justify-between w-full bg-[#fff] h-fit mt-2 px-4 py-2 rounded-lg shadow-xl text-neutral-900 md:w-3/4"
-            (ngSubmit)="onSubmitItem()">
+            (ngSubmit)="onSubmitItem()" (change)="onSelectChange($event)">
             <div class="flex flex-col w-2/5">
                 <label for="name">Menu:</label>
                 <select class="border border-neutral-900 px-1 py-0.5 rounded-sm mt-1 w-full" name="name" id="name"
-                    [(ngModel)]="saleItem.menu" (change)="onMenuSelectionChange($event)">
+                    [(ngModel)]="saleItem.menu">
                     <option *ngFor="let menu of menus" selected value="{{menu.id}}">
                         {{menu.name}}</option>
                     <option class="text-neutral-500" value="addNewProduct">add new product ...</option>
@@ -396,8 +396,15 @@
             </div>
         </div>
 
-        <app-modal *ngIf="showModal" [inputType]="'password'" [inputField]="true" [placeHolder]="'Enter admin password.'"
-            (closeModal)="toggleModal()" (valueChanged)="onValueChanged($event)" (buttonClick)="onAdminPermission()">
+        <!-- MODAL: Admin Permission -->
+        <app-modal *ngIf="showPermissionModal" [inputType]="'password'" [inputField]="true" [placeHolder]="'Enter admin password.'"
+            (closeModal)="togglePermissionModal()" (valueChanged)="onValueChanged($event)" (buttonClick)="onAdminPermission()">
+        </app-modal>
+
+        <!-- MODAL: Redirect to Menu -->
+        <app-modal *ngIf="showGoToMenuModal" [title]="'Proceed to the Menu Page'"
+            [content]="'Make sure to save all changes before leaving.'"
+            (closeModal)="toggleGoToMenuModal()" (buttonClick)="proceedToMenu()" [btnText]="'Proceed'">
         </app-modal>
 
         <!-- CSS Loader -->

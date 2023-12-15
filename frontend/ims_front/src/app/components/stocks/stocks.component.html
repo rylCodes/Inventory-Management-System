@@ -8,6 +8,7 @@
     </div>
     <hr class="border-b-1 border-neutral-900 mt-4">
 
+    <!-- Table Settings -->
     <div id="tableSettings" *ngIf="showTableSettings" class="relative flex mt-1 items-center w-full lg:mt-2">
         <app-search-bar class="w-full" [filterText]="filterText" [isFilter]="isFilter" [searchQuery]="searchQuery"
             [showSearchBar]="showSearchBar" (removeFilter)="removeFilter()" (search)="onSearch()"
@@ -21,19 +22,19 @@
         <div *ngIf="showSortOrDelItems"
             class="flex flex-col absolute top-full right-0 w-52 bg-white shadow-xl rounded-md z-10">
             <button
-                class="flex justify-between items-center px-4 py-2 hover:bg-neutral-100 rounded-md w-full text-start"
+                class="flex justify-between items-center px-4 py-2 hover:bg-neutral-100 hover:font-medium rounded-md w-full text-start"
                 (click)="sortItemsByDate()">
                 <span>Sort by date updated</span>
                 <span>↑↓</span>
             </button>
             <button
-                class="flex justify-between items-center px-4 py-2 hover:bg-neutral-100 rounded-md w-full text-start"
+                class="flex justify-between items-center px-4 py-2 hover:bg-neutral-100 hover:font-medium rounded-md w-full text-start"
                 (click)="sortItemsByName()">
                 <span>Sort by name</span>
                 <span>↑↓</span>
             </button>
-            <button class="px-4 py-2 hover:bg-neutral-100 rounded-md w-full text-start" (click)="deleteAllItems()">
-                Delete all items
+            <button class="px-4 py-2 hover:bg-neutral-100 hover:font-medium rounded-md w-full text-start" (click)="deleteAllItems()">
+                <span class="text-[#ff0000]">Delete all suppliers</span>
             </button>
         </div>
     </div>
@@ -70,8 +71,8 @@
                 class="border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text" name="customUnit"
                 id="customUnit" [(ngModel)]="customUnit" placeholder="Please specify.">
 
-            <div class="flex justify-around mt-3">
-                <div class="flex items-center lg:mt-4">
+            <div class="flex justify-around mt-4 lg:mt-6">
+                <div class="flex items-center">
                     <label class="" for="stock.status">Status:</label>
                     <div class="flex items-center ml-6">
                         <input class="border border-neutral-900 px-2 py-1 rounded-sm w-[14px] h-[14px]" type="checkbox"
@@ -80,7 +81,7 @@
                     </div>
                 </div>
 
-                <div class="flex items-center lg:mt-4">
+                <div class="flex items-center">
                     <label class="" for="stock.status">Notification:</label>
                     <div class="flex items-center ml-6">
                         <input class="border border-neutral-900 px-2 py-1 rounded-sm w-[14px] h-[14px]" type="checkbox"
@@ -166,7 +167,7 @@
         </div>
     </div>
 
-    <!-- Confirm to Delete Stock Modal -->
+    <!-- MODAL: Delete Each Stock -->
     <div *ngIf="showActionModal" class="flex justify-center top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] fixed">
         <div class="relative flex flex-col items-center bg-white rounded-lg h-fit p-4 mt-32 w-1/2 lg:w-1/4 md:w-1/3">
             <fa-icon class="place-self-end scale-125 hover:scale-110" [icon]="faXmark"
@@ -179,6 +180,7 @@
         </div>
     </div>
 
+    <!-- MODAL: Delete All Stocks -->
     <app-modal *ngIf="showModal" [title]="'Deleting all items!'"
         [content]="'Are you sure you want to delete all items? This action cannot be undone!'"
         (closeModal)="toggleModal()" (buttonClick)="onConfirmDeleteAll()" [btnText]="'Delete all'" [btnBgColor]="'red'">

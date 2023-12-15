@@ -4,7 +4,7 @@ import { AuthService } from 'src/app/services/auth/auth.service';
 import {
   faRightFromBracket, faXmark, faUserCircle, faBell, faBars, faEllipsis,
   faMagnifyingGlass, faTimes, faHouse, faBoxesStacked, faList, faCheck,
-  faDesktop, faWallet, faCreditCard, faCircleInfo, faHandshake, faTrashCan
+  faDesktop, faMoneyBillTrendUp, faCreditCard, faCircleInfo, faBoxesPacking, faTrashCan
 } from '@fortawesome/free-solid-svg-icons';
 import { StocksService } from 'src/app/services/stocks/stocks.service';
 import { NotificationsService } from 'src/app/services/notifications/notifications.service';
@@ -63,8 +63,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
   faBoxesStacked = faBoxesStacked;
   faList = faList;
   faDesktop = faDesktop;
-  faWallet = faWallet;
-  faHandshake = faHandshake;
+  faMoneyBillTrendUp = faMoneyBillTrendUp;
+  faBoxesPacking = faBoxesPacking;
   faCreditCard = faCreditCard;
   faCircleInfo = faCircleInfo;
   faEllipsis = faEllipsis;

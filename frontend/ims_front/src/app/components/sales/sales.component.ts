@@ -1,4 +1,4 @@
-import { Component, OnInit, Renderer2, HostListener } from '@angular/core';
+import { Component, OnInit, Renderer2, HostListener, ViewChild } from '@angular/core';
 import { SaleBill, SaleItem } from 'src/app/interface/Sale';
 import { Menu } from 'src/app/interface/Product';
 import { Stock } from 'src/app/interface/Stock';
@@ -16,7 +16,7 @@ import { StocksService } from 'src/app/services/stocks/stocks.service';
 import { Owner } from 'src/app/interface/Owner';
 import { OwnerService } from 'src/app/services/owner/owner.service';
 import { ToastrService } from 'ngx-toastr';
-import { Subject } from 'rxjs';
+import { Subject, Observable, forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-sales',
@@ -24,19 +24,51 @@ import { Subject } from 'rxjs';
   styleUrls: ['./sales.component.css']
 })
 export class SalesComponent implements OnInit {
+  @ViewChild('tableSettings', {static: true}) tableSettings: any;
+
+  @HostListener('document:click', ['$event'])
+  onClick(event: MouseEvent) {
+    if(!(event.target as HTMLElement).closest('#tableSettings')) {
+      this.showSortOrDelItems = false;
+    };
+  }
+
+  @HostListener('document:keyup.escape', ['$event'])
+  onKeyUp(event: KeyboardEvent) {
+    if (event.key === 'Escape') {
+      if (this.showItemActionModal) {
+        this.showItemActionModal = false;
+      } else if (this.showBillActionModal) {
+        this.showBillActionModal = false;
+      } else if (this.showInvoice) {
+        this.showInvoice = false; 
+      } else if (this.showSearchBar) {
+        this.showSearchBar = false;
+      }
+    }
+  }
+
   private query = new Subject<string>();
   searchQuery: string = "";
   filterText: string= "";
   isFilter: boolean = false;
-  showSearchBar: boolean = false;
+  isAscending: boolean = true;
+  isSortedAToZ: boolean = true;
 
   deletingSaleBill?: SaleBill | null = null;
   deletingSaleItem?: SaleItem | null = null;
 
+  showModal: boolean = false;
+  showSaveBillModal: boolean = false;
   showBillActionModal: boolean = false;
   showItemActionModal: boolean = false;
-  showOrder: boolean = false;
   showInvoice: boolean = false;
+
+  showSearchBar: boolean = false;
+  showTableSettings: boolean = true;
+  showSortOrDelItems: boolean = false;
+  showForm: boolean = false;
+  showOrder: boolean = false;
   isFetching: boolean = false;
   isLoading: boolean = false;
 
@@ -139,19 +171,6 @@ export class SalesComponent implements OnInit {
     }
   }
 
-  @HostListener('document:keyup.escape', ['$event'])
-  onKeyUp(event: KeyboardEvent) {
-    if (event.key === 'Escape') {
-      if (this.showItemActionModal) {
-        this.showItemActionModal = false;
-      } else if (this.showBillActionModal) {
-        this.showBillActionModal = false;
-      } else if (this.showInvoice) {
-        this.showInvoice = false; 
-      }
-    }
-  }
-
   // SHOW BILLS
   ngOnInit(): void {
     this.loadBills();
@@ -179,13 +198,13 @@ export class SalesComponent implements OnInit {
 
   loadEachBillItems() {
     this.salesService
-      .getSaleItems()
-      .subscribe({
-        next: (items) => {
-          this.eachBillItems = items.filter(item => item.billno === this.bill.id);
-        },
-        error: (err) => console.log(err)
-      });
+    .getSaleItems()
+    .subscribe({
+      next: (items) => {
+        this.eachBillItems = items.filter(item => item.billno === this.bill.id);
+      },
+      error: (err) => console.log(err)
+    });
   }
 
   loadAllItems() {
@@ -300,13 +319,17 @@ export class SalesComponent implements OnInit {
       this.filterText = this.searchQuery
       this.isFilter = true;
       this.searchQuery = "";
-      this.setQuery(this.filterText);
-      this.toggleShowSearchBar();
-      this.loadBills();
+      this.setQuery(this.filterText)
+
+      if (!this.bills.length) {
+        return;
+      } else {
+        this.loadBills();
+      }
     }
   }
 
-  clearSearch() {
+  removeFilter() {
     this.filterText = "";
     this.searchQuery = "";
     this.isFilter = false;
@@ -317,12 +340,99 @@ export class SalesComponent implements OnInit {
     this.query.next(query);
   }
 
+  clearText() {
+    this.filterText = "";
+    this.searchQuery = "";
+  }
+
   onSearchChanged(value: string): void {
     console.log(value)
     this.searchQuery = value;
   }
 
+  toggleModal() {
+    this.showModal = !this.showModal;
+  }
+
   toggleShowSearchBar() {
-    this.showSearchBar = !this.showSearchBar
+    this.showSearchBar = !this.showSearchBar;
+  }
+
+  toggleTableSettings() {
+    this.showTableSettings = !this.showTableSettings;
+  }
+
+  toggleSortOrDelItems() {
+    this.showSortOrDelItems = !this.showSortOrDelItems
+  }
+
+  deleteAllItems() {
+    this.showSortOrDelItems = false;
+    this.toggleModal();
+    
+    if (this.bills.length) {
+      this.toastrService.warning('Caution: All sales history will be deleted permanently!', undefined, { timeOut: 5000});
+    }
+  }
+
+  onConfirmDeleteAll() {
+    if (!this.bills.length) {
+      this.showModal = false;
+      return;
+    }
+    
+    let deletingBills: Observable<SaleBill>[] = [];
+
+    this.bills.forEach(bill => {
+      deletingBills.push(this.salesService.deleteSaleBill(bill));
+    });
+
+    forkJoin(deletingBills).subscribe({
+      next: () => {
+        this.loadBills();
+        this.showModal = false;
+        this.toastrService.success("All sales history has been deleted successfully.");
+      },
+      error: (err) => {
+        this.showModal = false;
+        this.uiService.displayErrorMessage(err);
+      }
+    })
+  }
+
+  sortItemsByDate() {
+    this.bills.sort((a, b): any => {
+      if (a.time && b.time) {
+        const dateA = Date.parse(a.time);
+        const dateB = Date.parse(b.time)
+        let comparison = dateA - dateB;
+
+        if (!this.isAscending) {
+          comparison *= -1;
+        }
+
+        return comparison;
+      }
+    });
+
+    this.toggleSortOrDelItems();
+    this.isAscending = !this.isAscending;
+  }
+
+  sortItemsByName() {
+    this.bills.sort((a, b): any => {
+      if (a.customer_name && b.customer_name) {
+        let comparison = a.customer_name.localeCompare(b.customer_name);
+  
+        if (!this.isSortedAToZ) {
+          comparison *= -1;
+        }
+  
+        return comparison;
+      }
+    });
+
+    this.toggleSortOrDelItems();
+    this.isSortedAToZ = !this.isSortedAToZ;
   }
 }

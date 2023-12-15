@@ -1,7 +1,7 @@
 <div class="flex justify-end items-center space-x-2 w-full">
     <div *ngIf="isFilter" class="flex items-center text-xs lg:text-[14px]">
         <fa-icon class="text-neutral-500" [icon]="faFilter"></fa-icon>
-        <div class="flex items-center mx-2 px-2 py-1 rounded-sm bg-neutral-300 w-fit">
+        <div class="flex items-center mx-1 px-2 py-1 rounded-sm bg-neutral-300 w-fit">
             <p class="text-neutral-900 mr-2">{{filterText}}</p>
             <fa-icon class="text-xxs lg:text-[11px] text-neutral-700 hover:text-neutral-900" (click)="onRemoveFilter()"
                 [icon]="faTimes"></fa-icon>

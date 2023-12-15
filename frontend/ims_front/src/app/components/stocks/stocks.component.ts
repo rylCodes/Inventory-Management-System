@@ -39,7 +39,6 @@ export class StocksComponent implements OnInit {
   private query = new Subject<string>();
   searchQuery: string = "";
   filterText: string= "";
-  showSearchBar: boolean = false;
   isFilter: boolean = false;
   isAscending: boolean = true;
   isSortedAToZ: boolean = true;
@@ -48,6 +47,16 @@ export class StocksComponent implements OnInit {
   proceedEdit: boolean = false;
   isLoading: boolean = false;
   isFetching: boolean = false;
+
+  showSearchBar: boolean = false;
+  showTableSettings: boolean = true;
+  showSortOrDelItems: boolean = false;
+  showForm: boolean = false;
+  showModal: boolean = false;
+  showActionModal: boolean = false;
+
+  actionModalSubscription: Subscription = new Subscription;
+  formSubscription: Subscription = new Subscription;
 
   faXmark = faXmark;
   faPen = faPen;
@@ -94,15 +103,6 @@ export class StocksComponent implements OnInit {
     warning_type: ""
   }
 
-  showTableSettings: boolean = true;
-  showSortOrDelItems: boolean = false;
-  showForm: boolean = false;
-  formSubscription: Subscription = new Subscription;
-
-  showModal: boolean = false;
-  showActionModal: boolean = false;
-  actionModalSubscription: Subscription = new Subscription;
-
   constructor(
     private stockService: StocksService,
     private uiService: UiService,
@@ -145,10 +145,6 @@ export class StocksComponent implements OnInit {
       this.proceedEdit = false;
       this.resetForm();
     }
-  }
-
-  toggleModal() {
-    this.showModal = !this.showModal;
   }
 
   toggleActionModal() {
@@ -445,6 +441,10 @@ export class StocksComponent implements OnInit {
     this.searchQuery = value;
   }
 
+  toggleModal() {
+    this.showModal = !this.showModal;
+  }
+
   toggleShowSearchBar() {
     this.showSearchBar = !this.showSearchBar;
   }
@@ -460,7 +460,10 @@ export class StocksComponent implements OnInit {
   deleteAllItems() {
     this.showSortOrDelItems = false;
     this.toggleModal();
-    this.toastrService.warning('Caution: All items will be deleted permanently!', undefined, { timeOut: 5000});
+    
+    if (this.stocks.length) {
+      this.toastrService.warning('Caution: All items will be deleted permanently!', undefined, { timeOut: 5000});
+    }
   }
 
   onConfirmDeleteAll() {
@@ -503,6 +506,7 @@ export class StocksComponent implements OnInit {
       }
     });
 
+    this.toggleSortOrDelItems();
     this.isAscending = !this.isAscending;
   }
 
@@ -519,6 +523,7 @@ export class StocksComponent implements OnInit {
       }
     });
   
+    this.toggleSortOrDelItems();
     this.isSortedAToZ = !this.isSortedAToZ;
   }
 }

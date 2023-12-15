@@ -1,4 +1,8 @@
-import { Component, OnInit, Renderer2, HostListener, ChangeDetectorRef, AfterContentChecked } from '@angular/core';
+import {
+  Component, OnInit, Renderer2, HostListener,
+  ChangeDetectorRef, AfterContentChecked, ViewChild,
+} from '@angular/core';
+
 import { PurchaseBill, PurchaseItem } from 'src/app/interface/Purchase';
 import { Supplier } from 'src/app/interface/Supplier';
 import { Stock } from 'src/app/interface/Stock';
@@ -14,7 +18,7 @@ import { Router } from '@angular/router';
 import { PurchasesService } from 'src/app/services/purchases/purchases.service';
 import { StocksService } from 'src/app/services/stocks/stocks.service';
 import { ToastrService } from 'ngx-toastr';
-import { Subject } from 'rxjs';
+import { Subject, forkJoin, Observable } from 'rxjs';
 
 @Component({
   selector: 'app-purchases',
@@ -22,16 +26,47 @@ import { Subject } from 'rxjs';
   styleUrls: ['./purchases.component.css']
 })
 export class PurchasesComponent implements OnInit, AfterContentChecked {
+  @ViewChild('tableSettings', {static: true}) tableSettings: any;
+
+  @HostListener('document:click', ['$event'])
+  onClick(event: MouseEvent) {
+    if(!(event.target as HTMLElement).closest('#tableSettings')) {
+      this.showSortOrDelItems = false;
+    };
+  }
+
+  @HostListener('document:keyup.escape', ['$event'])
+  onKeyUp(event: KeyboardEvent) {
+    if (event.key === 'Escape') {
+      if (this.showItemActionModal) {
+        this.showItemActionModal = false;
+      } else if (this.showBillActionModal) {
+        this.showBillActionModal = false;
+      } else if (this.showInvoice) {
+        this.showInvoice = false; 
+      } else if (this.showSearchBar) {
+        this.showSearchBar = false;
+      } else if (this.showBillForm) {
+        this.showBillForm = false;
+      } else if (this.showSaveBillModal) {
+        this.showSaveBillModal = false;
+      }
+    }
+  }
+
   private query = new Subject<string>();
   searchQuery: string = "";
   filterText: string= "";
   isFilter: boolean = false;
+  isAscending: boolean = true;
+  isSortedAToZ: boolean = true;
 
   deletingBill?: PurchaseBill | null = null;
   deletingItem?: PurchaseItem | null = null;
 
-  isFetching: boolean = false;
-  isLoading: boolean = false;
+  showSearchBar: boolean = false;
+  showTableSettings: boolean = true;
+  showSortOrDelItems: boolean = false;
 
   proceedEditBill: boolean = false;
   proceedEditItem: boolean = false;
@@ -42,14 +77,18 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
   showBillTable: boolean = true;  
   showPurchaseBill: boolean = false;
 
-
-  modalInputValue?: string = "";
-
   showModal: boolean = false;
   showSaveBillModal: boolean = false;
   showBillActionModal: boolean = false;
   showItemActionModal: boolean = false;
   showInvoice: boolean = false;
+
+  showForm: boolean = false;
+  showOrder: boolean = false;
+  isFetching: boolean = false;
+  isLoading: boolean = false;
+
+  modalInputValue?: string = "";
 
   faXmark = faXmark;
   faPen = faPen;
@@ -152,10 +191,6 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
     this.showBillActionModal = !this.showBillActionModal;
   }
 
-  toggleModal() {
-    this.showModal = !this.showModal;
-  }
-
   toggleItemActionModal() {
     this.showItemActionModal = !this.showItemActionModal;
   }
@@ -166,6 +201,7 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
 
   toggleBillForm() {
     this.showBillForm = !this.showBillForm;
+    this.toggleTableSettings();
     if (!this.showBillForm) {
       this.resetBillForm();
       this.loadFilteredItems();
@@ -186,21 +222,6 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
     if (!this.showPurchaseBill) {
       this.resetBillForm();
       this.loadFilteredItems();
-    }
-  }
-
-  @HostListener('document:keyup.escape', ['$event'])
-  onKeyUp(event: KeyboardEvent) {
-    if (event.key === 'Escape') {
-      if (this.showItemActionModal) {
-        this.toggleItemActionModal();
-      } else if (this.showBillActionModal) {
-        this.toggleBillActionModal();
-      } else if (this.showBillForm) {
-        this.toggleBillForm();
-      } else if (this.showSaveBillModal) {
-        this.toggleSaveBillModal();
-      }
     }
   }
 
@@ -706,11 +727,16 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
       this.isFilter = true;
       this.searchQuery = "";
       this.setQuery(this.filterText)
-      this.loadBills();
+
+      if (!this.bills.length) {
+        return;
+      } else {
+        this.loadBills();
+      }
     }
   }
 
-  clearSearch() {
+  removeFilter() {
     this.filterText = "";
     this.searchQuery = "";
     this.isFilter = false;
@@ -721,8 +747,98 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
     this.query.next(query);
   }
 
+  clearText() {
+    this.filterText = "";
+    this.searchQuery = "";
+  }
+
   onSearchChanged(value: string): void {
     console.log(value)
     this.searchQuery = value;
   }
+
+  toggleModal() {
+    this.showModal = !this.showModal;
+  }
+
+  toggleShowSearchBar() {
+    this.showSearchBar = !this.showSearchBar;
+  }
+
+  toggleTableSettings() {
+    this.showTableSettings = !this.showTableSettings;
+  }
+
+  toggleSortOrDelItems() {
+    this.showSortOrDelItems = !this.showSortOrDelItems
+  }
+
+  deleteAllItems() {
+    this.showSortOrDelItems = false;
+    this.toggleModal();
+    
+    if (this.bills.length) {
+      this.toastrService.warning('Caution: All bills will be deleted permanently!', undefined, { timeOut: 5000});
+    }
+  }
+
+  onConfirmDeleteAll() {
+    if (!this.bills.length) {
+      this.showModal = false;
+      return;
+    }
+    
+    let deletingBills: Observable<PurchaseBill>[] = [];
+
+    this.bills.forEach(bill => {
+      deletingBills.push(this.purchaseService.deletePurchaseBill(bill));
+    });
+
+    forkJoin(deletingBills).subscribe({
+      next: () => {
+        this.loadBills();
+        this.showModal = false;
+        this.toastrService.success("All suppliers has been deleted successfully.");
+      },
+      error: (err) => {
+        this.showModal = false;
+        this.uiService.displayErrorMessage(err);
+      }
+    })
+  }
+
+  sortItemsByDate() {
+    this.bills.sort((a, b): any => {
+      if (a.time && b.time) {
+        const dateA = Date.parse(a.time);
+        const dateB = Date.parse(b.time)
+        let comparison = dateA - dateB;
+
+        if (!this.isAscending) {
+          comparison *= -1;
+        }
+
+        return comparison;
+      }
+    });
+    
+    this.toggleSortOrDelItems();
+    this.isAscending = !this.isAscending;
+  }
+
+  // sortItemsByName() {
+  //   this.bills.sort((a, b): any => {
+  //     if (a.supplier_id && b.supplier_id) {
+  //       let comparison = a.supplier_id.localeCompare(b.supplier_id);
+  
+  //       if (!this.isSortedAToZ) {
+  //         comparison *= -1;
+  //       }
+  
+  //       return comparison;
+  //     }
+  //   });
+  
+  //   this.isSortedAToZ = !this.isSortedAToZ;
+  // }
 }

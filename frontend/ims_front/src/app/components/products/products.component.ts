@@ -1,4 +1,4 @@
-import { Component, OnInit, Renderer2, HostListener } from '@angular/core';
+import { Component, OnInit, Renderer2, HostListener, ViewChild } from '@angular/core';
 import { Product, Menu } from 'src/app/interface/Product';
 import { Stock } from 'src/app/interface/Stock';
 import { ProductsService } from 'src/app/services/products/products.service';
@@ -15,7 +15,7 @@ import { DecimalPipe } from '@angular/common';
 import { SaleItem } from 'src/app/interface/Sale';
 import { SalesService } from 'src/app/services/sales/sales.service';
 import { ToastrService } from 'ngx-toastr';
-import { Subject } from 'rxjs';
+import { Subject, Observable, forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-products',
@@ -23,10 +23,36 @@ import { Subject } from 'rxjs';
   styleUrls: ['./products.component.css'],
 })
 export class ProductsComponent implements OnInit {
+  @ViewChild('tableSettings', {static: true}) tableSettings: any;
+
+  @HostListener('document:click', ['$event'])
+  onClick(event: MouseEvent) {
+    if(!(event.target as HTMLElement).closest('#tableSettings')) {
+      this.showSortOrDelItems = false;
+    };
+  }
+
+  @HostListener('document:keyup.escape', ['$event'])
+  onKeyUp(event: KeyboardEvent) {
+    if (event.key === 'Escape') {
+      if (this.showProductActionModal) {
+        this.toggleProductActionModal();
+      } else if (this.showMenuActionModal) {
+        this.toggleMenuActionModal();
+      } else if (this.showMenuForm) {
+        this.toggleMenuForm();
+      } else if (this.showSearchBar) {
+        this.showSearchBar = false;
+      }
+    }
+  }
+
   private query = new Subject<string>();
   searchQuery: string = "";
   filterText: string= "";
   isFilter: boolean = false;
+  isAscending: boolean = true;
+  isSortedAToZ: boolean = true;
 
   deletingMenu?: Menu | null = null;
   deletingProduct?: Product | null = null;
@@ -37,6 +63,12 @@ export class ProductsComponent implements OnInit {
   proceedEditMenu: boolean = false;
   proceedEditProduct: boolean = false;
   proceedPayment: boolean = false;
+
+  showSearchBar: boolean = false;
+  showTableSettings: boolean = true;
+  showSortOrDelItems: boolean = false;
+  showForm: boolean = false;
+  showModal: boolean = false;
 
   showMenuForm: boolean = false;
   showMenuTable: boolean = true; 
@@ -134,6 +166,7 @@ export class ProductsComponent implements OnInit {
 
   toggleFormContainer() {
     this.showFormContainer = !this.showFormContainer;
+    this.toggleTableSettings();
     this.toggleMenuTable();
   }
 
@@ -142,19 +175,6 @@ export class ProductsComponent implements OnInit {
     if (!this.showMenuForm) {
       this.proceedEditMenu = false;
       this.resetMenuForm();
-    }
-  }
-
-  @HostListener('document:keyup.escape', ['$event'])
-  onKeyUp(event: KeyboardEvent) {
-    if (event.key === 'Escape') {
-      if (this.showProductActionModal) {
-        this.toggleProductActionModal();
-      } else if (this.showMenuActionModal) {
-        this.toggleMenuActionModal();
-      } else if (this.showMenuForm) {
-        this.toggleMenuForm();
-      }
     }
   }
 
@@ -362,18 +382,15 @@ export class ProductsComponent implements OnInit {
       ...this.product,
     }
 
-    this.isLoading = true;
     this.productService.addProduct(newProduct)
       .subscribe({
         next: async (product) => {
-          this.isLoading = false;
           this.products.push(product);
           this.loadProducts();
           this.resetProductForm();
           await this.uiService.wait(100);
         },
         error: (err) => {
-          this.isLoading = false;
           this.uiService.displayErrorMessage(err);
         }
       });
@@ -539,7 +556,11 @@ export class ProductsComponent implements OnInit {
   // DELETE PRODUCT
   deleteProduct(product: Product) {
     this.deletingProduct = product;
-    this.toggleProductActionModal();
+    if (!this.updatingMenuItems) {
+      this.onConfirmDeleteProduct();
+    } else {
+      this.toggleProductActionModal();
+    }
   }
 
   onConfirmDeleteProduct() {
@@ -547,21 +568,18 @@ export class ProductsComponent implements OnInit {
       return;
     }
 
-    this.isLoading = true;
     this.productService
       .deleteProduct(this.deletingProduct)
       .subscribe({
         next: async () => {
-          this.isLoading = false;
           this.menus = this.menus.filter(s => s.id !== this.deletingProduct?.id);
           this.deletingProduct = null;
-          this.toggleProductActionModal()
+          this.showProductActionModal = false;
           this.loadProducts();
           await this.uiService.wait(100);
           this.toastrService.success("Item has been deleted successfully!");
         },
         error: (err) => {
-          this.isLoading = false;
           this.uiService.displayErrorMessage(err);
         }
       });
@@ -582,11 +600,16 @@ export class ProductsComponent implements OnInit {
       this.isFilter = true;
       this.searchQuery = "";
       this.setQuery(this.filterText)
-      this.loadMenus();
+
+      if (!this.stocks.length) {
+        return;
+      } else {
+        this.loadMenus();
+      }
     }
   }
 
-  clearSearch() {
+  removeFilter() {
     this.filterText = "";
     this.searchQuery = "";
     this.isFilter = false;
@@ -597,9 +620,100 @@ export class ProductsComponent implements OnInit {
     this.query.next(query);
   }
 
+  clearText() {
+    this.filterText = "";
+    this.searchQuery = "";
+  }
+
   onSearchChanged(value: string): void {
     console.log(value)
     this.searchQuery = value;
+  }
+
+  toggleModal() {
+    this.showModal = !this.showModal;
+  }
+
+  toggleShowSearchBar() {
+    this.showSearchBar = !this.showSearchBar;
+  }
+
+  toggleTableSettings() {
+    this.showTableSettings = !this.showTableSettings;
+  }
+
+  toggleSortOrDelItems() {
+    this.showSortOrDelItems = !this.showSortOrDelItems
+  }
+
+  deleteAllItems() {
+    this.showSortOrDelItems = false;
+    this.toggleModal();
+    
+    if (this.menus.length) {
+      this.toastrService.warning('Caution: All products will be deleted permanently!', undefined, { timeOut: 5000});
+    }
+  }
+
+  onConfirmDeleteAll() {
+    if (!this.menus.length) {
+      this.showModal = false;
+      return;
+    }
+    
+    let deletingMenus: Observable<Menu>[] = [];
+
+    this.menus.forEach(menu => {
+      deletingMenus.push(this.productService.deleteMenu(menu));
+    });
+
+    forkJoin(deletingMenus).subscribe({
+      next: () => {
+        this.loadMenus();
+        this.showModal = false;
+        this.toastrService.success("All products has been deleted successfully.");
+      },
+      error: (err) => {
+        this.showModal = false;
+        this.uiService.displayErrorMessage(err);
+      }
+    })
+  }
+
+  sortItemsByDate() {
+    this.menus.sort((a, b): any => {
+      if (a.date_updated && b.date_updated) {
+        const dateA = Date.parse(a.date_updated);
+        const dateB = Date.parse(b.date_updated)
+        let comparison = dateA - dateB;
+
+        if (!this.isAscending) {
+          comparison *= -1;
+        }
+
+        return comparison;
+      }
+    });
+
+    this.toggleSortOrDelItems();
+    this.isAscending = !this.isAscending;
+  }
+
+  sortItemsByName() {
+    this.menus.sort((a, b): any => {
+      if (a.name && b.name) {
+        let comparison = a.name.localeCompare(b.name);
+  
+        if (!this.isSortedAToZ) {
+          comparison *= -1;
+        }
+  
+        return comparison;
+      }
+    });
+  
+    this.toggleSortOrDelItems();
+    this.isSortedAToZ = !this.isSortedAToZ;
   }
 
   // Class ends here.

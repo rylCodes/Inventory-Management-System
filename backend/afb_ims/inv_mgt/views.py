@@ -4,6 +4,7 @@ from rest_framework.permissions import IsAdminUser
 from .models import *
 from .serializers import *
 from .permissions import DeleteWithAdminPasswordPermission
+from django.db.models.deletion import ProtectedError
 
 # Stock views
 class StockList(generics.ListCreateAPIView):
@@ -47,6 +48,13 @@ class MenuDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = MenuSerializer
     permission_classes = [IsAdminUser]
 
+    def delete(self, request, *args, **kwargs):
+        try:
+            return super().delete(request, *args, **kwargs)
+        except ProtectedError as e:
+            error_message = "Unable to delete! This product is linked to other records."
+            return Response({"error": error_message}, status=status.HTTP_400_BAD_REQUEST)
+
 # Products views
 class ProductList(generics.ListCreateAPIView):
     queryset = Product.objects.all()
@@ -77,6 +85,13 @@ class SupplierDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Supplier.objects.all()
     serializer_class = SupplierSerializer
     permission_classes = [IsAdminUser]
+
+    def delete(self, request, *args, **kwargs):
+        try:
+            return super().delete(request, *args, **kwargs)
+        except ProtectedError as e:
+            error_message = "Unable to delete! This supplier is linked to other records."
+            return Response({"error": error_message}, status=status.HTTP_400_BAD_REQUEST)
 
 # Purchase Bill views
 class PurchaseBillList(generics.ListCreateAPIView):

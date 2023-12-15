@@ -105,7 +105,7 @@ def update_supplier_code(sender, instance, created, **kwargs):
 class PurchaseBill(models.Model):
     billno = models.CharField(max_length=100)
     time = models.DateTimeField(default=timezone.now)
-    supplier_id = models.ForeignKey(Supplier, on_delete=models.CASCADE, related_name="bills")
+    supplier_id = models.ForeignKey(Supplier, on_delete=models.PROTECT, related_name="bills")
     grand_total = models.FloatField(validators=[MinValueValidator(0)], default=0)
     remarks = models.CharField(max_length=200, blank=True, null=True)
 
@@ -156,11 +156,12 @@ def update_billno(sender, instance, created, **kwargs):
 # SALES ITEM
 class SalesItem(models.Model):
     billno = models.ForeignKey(SalesBill, on_delete=models.CASCADE, related_name="sales_items", blank=True, null=True)
-    menu = models.ForeignKey(Menu, on_delete=models.CASCADE)
+    menu = models.ForeignKey(Menu, on_delete=models.PROTECT)
     quantity = models.FloatField(validators=[MinValueValidator(0)], default=0)
     price = models.FloatField(validators=[MinValueValidator(0)], default=0)
     sale_date = models.DateTimeField(auto_now_add=True)
     sub_total = models.FloatField(validators=[MinValueValidator(0)], default=0)
+    status = models.BooleanField(default=True)
     
     def __str__(self):
         return f"{self.quantity} of {self.menu.name} on {self.sale_date}"

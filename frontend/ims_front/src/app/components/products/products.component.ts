@@ -228,7 +228,7 @@ export class ProductsComponent implements OnInit {
         this.menus = menus;
         menus.forEach(menu => {
           if (!menu.status) {
-            this.deleteRelatedSaleItem(menu);
+            this.updateRelatedSaleItem(menu);
           }
         })
       },
@@ -443,7 +443,7 @@ export class ProductsComponent implements OnInit {
       .updateMenu(editingMenu)
       .subscribe({
         next: async (menuData) => {
-          this.deleteRelatedSaleItem(menuData);
+          this.updateRelatedSaleItem(menuData);
 
           this.isLoading = false;
           const index = this.menus.findIndex(menu => menu.id === menuData.id);
@@ -585,11 +585,17 @@ export class ProductsComponent implements OnInit {
       });
   }
 
-  deleteRelatedSaleItem(menuData: Menu) {
+  updateRelatedSaleItem(menuData: Menu) {
     const relatedSaleItems = this.saleItems.filter(item => item.menu === menuData.id);
     if (!menuData.status) {
       relatedSaleItems.forEach(item => {
-        this.saleService.deleteSaleItem(item).subscribe();
+        item.status = false;
+        this.saleService.editSaleItem(item).subscribe();
+      });
+    } else {
+      relatedSaleItems.forEach(item => {
+        item.status = true;
+        this.saleService.editSaleItem(item).subscribe();
       });
     }
   }

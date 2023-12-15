@@ -97,6 +97,7 @@ export class PosComponent implements OnInit, AfterContentChecked {
     price: 0,
     sale_date: "",
     sub_total: 0,
+    status: true,
   }
 
   notification: Notification = {
@@ -303,12 +304,12 @@ export class PosComponent implements OnInit, AfterContentChecked {
     .subscribe({
       next: (saleItems) => {
         this.isFetching = false;
-        this.allItems = saleItems;
+        this.allItems = saleItems.filter(item => item.status);
 
         if (this.updatingOrder) {
-          this.saleItems = saleItems.filter(item => item.billno === this.saleBill.id);
+          this.saleItems = saleItems.filter(item => item.billno === this.saleBill.id && item.status);
         } else {
-          this.saleItems = saleItems.filter(item => item.billno === null);
+          this.saleItems = saleItems.filter(item => item.billno === null && item.status);
           this.saleBill.grand_total = this.calculateGrandtotal(this.saleItems);
         }
       },
@@ -682,12 +683,8 @@ export class PosComponent implements OnInit, AfterContentChecked {
     if (this.updatingOrder) {
       this.salesService.editSaleBill(this.saleBill)
       .subscribe({
-        next: () => {
-          this.addNotification();
-        },
-        error: (err) => {
-          console.log(err);
-        }
+        next: () => {this.addNotification()},
+        error: (err) => {console.log(err)},
       });
     }
 
@@ -826,10 +823,13 @@ export class PosComponent implements OnInit, AfterContentChecked {
         }
 
         this.notifService.addNotification(newNotif)
-        .subscribe(() => {
-          this.resetNotification();
-          this.notifService.setServiceStatus(true);
-          console.log("New notification has been added successfully!");
+        .subscribe({
+          next: (notif) => {
+            this.resetNotification();
+            this.notifService.setServiceStatus(true);
+            console.log("New notification has been added successfully!", notif);
+          },
+          error: (err) => {console.log(err)},
         });
       });
     };
@@ -843,10 +843,13 @@ export class PosComponent implements OnInit, AfterContentChecked {
         }
 
         this.notifService.addNotification(newNotif)
-        .subscribe(() => {
-          this.resetNotification();
-          this.notifService.setServiceStatus(true);
-          console.log("New notification has been added successfully!");
+        .subscribe({
+          next: (notif) => {
+            this.resetNotification();
+            this.notifService.setServiceStatus(true);
+            console.log("New notification has been added successfully!", notif);
+          },
+          error: (err) => {console.log(err)},
         });
       });
     };

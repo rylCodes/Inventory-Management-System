@@ -33,7 +33,8 @@
                 <span>Sort by name</span>
                 <span>↑↓</span>
             </button> -->
-            <button class="px-4 py-2 hover:bg-neutral-100 hover:font-medium rounded-md w-full text-start" (click)="deleteAllItems()">
+            <button class="px-4 py-2 hover:bg-neutral-100 hover:font-medium rounded-md w-full text-start"
+                (click)="deleteAllItems()">
                 <span class="text-[#ff0000]">Delete all purchases</span>
             </button>
         </div>
@@ -75,145 +76,148 @@
         </div>
     </div>
 
-    <!-- HEADING: ITEM LIST -->
-    <div *ngIf="showFormContainer && !showPurchaseBill" class="flex justify-between mt-4">
-        <h1 class="font-bold text-xl lg:text-2xl">Add items:</h1>
-    </div>
-    <!-- ITEM FORM -->
-    <form *ngIf="showFormContainer"
-        class="flex items-end text-start justify-between w-full bg-[#fff] h-fit mt-2 px-4 py-2 rounded-lg shadow-xl text-neutral-900 md:w-3/4"
-        (ngSubmit)="onSubmitItem()">
-        <div class="flex flex-col w-1/4">
-            <label for="name">Item:</label>
-            <select class="border border-neutral-900 px-1 py-0.5 rounded-sm mt-1 w-full" name="name" id="name"
-                [(ngModel)]="item.stock_id" (change)="onStockSelectionChange($event)">
-                <option *ngFor="let stock of stocks" selected value="{{stock.id}}">
-                    {{stock.stock_name}}</option>
-                <option class="text-neutral-500" value="addNewItem">add new item ...</option>
-            </select>
+    <div class="relative w-full px-2 lg:px-4">
+        <!-- HEADING: ITEM LIST -->
+        <div *ngIf="showFormContainer" class="flex justify-between mt-4">
+            <h1 class="font-bold text-xl lg:text-2xl">Add items:</h1>
         </div>
-
-        <div class="flex flex-col w-1/4">
-            <label for="item_price">Price:</label>
-            <input appSelectAllText
-                class="text-center uppercase border border-neutral-900 px-1 py-0.5 rounded-sm mt-1 w-full" type="number"
-                name="item_price" id="item_price" [(ngModel)]="item.item_price">
-        </div>
-
-        <div class="flex flex-col w-1/4">
-            <label for="quantity_purchased">Quantity:</label>
-            <div class="flex items-center space-x-1">
-                <fa-icon [icon]="faMinus" (click)="decreaseQtyInput()"></fa-icon>
-                <input appSelectAllText
-                    class="text-center uppercase border border-neutral-900 px-1 py-0.5    rounded-sm mt-1 w-full"
-                    type="number" name="quantity_purchased" id="quantity_purchased"
-                    [(ngModel)]="item.quantity_purchased">
-                <fa-icon [icon]="faPlus" (click)="increaseQtyInput()"></fa-icon>
-            </div>
-        </div>
-
-        <!-- BUTTON: Add or Edit Item -->
-        <button class="flex px-1.5 py-1 h-fit items-center space-x-1 rounded-md bg-neutral-800" type="submit">
-            <fa-icon class="scale-75" [icon]="faPlus" [ngStyle]="{color: 'rgb(212 212 212)'}">
-            </fa-icon>
-            <p class="text-neutral-300 text-xs">{{ proceedEditItem? 'Update': 'Add' }}</p>
-        </button>
-    </form>
-
-    <!-- FORM CONTAINER: Add items and add new purchase -->
-    <div *ngIf="showFormContainer" class="flex flex-col justify-center space-x-0 w-full md:flex-row md:space-x-2">
-        <!-- ITEM TABLE -->
-        <div class="table-container w-full text-center shadow-xl mt-4 md:w-3/4">
-            <table class="w-full table-fixed">
-                <thead class="text-neutral-300 bg-neutral-900">
-                    <th class="w-1/4">Date Time</th>
-                    <th>Item</th>
-                    <th>Price</th>
-                    <th class="w-[10%]">Qty</th>
-                    <th>Sub Total</th>
-                </thead>
-                <tbody>
-                    <tr *ngFor="let item of items">
-                        <td class="p-2">
-                            <div class="flex items-center justify-center space-x-1 md:space-x-3">
-                                <button class="px-1.5 py-1 rounded-md bg-[#ff0000]" (click)="deleteItem(item)">
-                                    <fa-icon class="scale-75" [icon]="faTrashCan"
-                                        [ngStyle]="{color: 'rgb(212 212 212)'}">
-                                    </fa-icon>
-                                </button>
-                                <p>{{item.purchase_date | date: "MMM dd, hh:mm a"}}</p>
-                            </div>
-                        </td>
-                        <td class="p-2">{{getStockDetails(item.stock_id).stockName}}</td>
-                        <td class="p-2">&#8369;{{item.item_price | number: '1.2-2'}}</td>
-                        <td class="p-2">{{item.quantity_purchased}}</td>
-                        <td class="p-2">&#8369;{{item.sub_total | number: '1.2-2'}}</td>
-                    </tr>
-                </tbody>
-            </table>
-            <!-- When no items to show. -->
-            <div class="w-full h-[5vh]" *ngIf="!items.length && !isFetching">
-                <p class="text-center my-4">No items to show.</p>
-            </div>
-        </div>
-
-        <!-- BILL DIV -->
-        <div *ngIf="showPurchaseBill"
-            class="bg-[#fff] self-start w-full h-auto mx-auto p-4 rounded-lg shadow-xl text-neutral-900 mt-4 md:flex-1">
-            <form class="flex flex-col">
-                <h3 for="bill.customer_name">OR No.:</h3>
-                <p class="uppercase border border-neutral-900 px-1 py-0.5 rounded-sm mt-1 text-center">
-                    {{bill.billno}}
-                </p>
-
-                <h3 class="mt-2" for="bill.customer_name">Supplier:</h3>
-                <p class="uppercase border border-neutral-900 px-1 py-0.5 rounded-sm mt-1 text-center">
-                    {{getSupplierDetails(bill.supplier_id).supplierName}}
-                </p>
-
-                <h3 class="mt-2" for="remarks">Total Bill:</h3>
-                <p class="uppercase border border-neutral-900 px-1 py-0.5 rounded-sm mt-1 text-center">
-                    &#8369;{{bill.grand_total | number: '1.2-2'}}
-                </p>
-
-                <!-- Back Button -->
-                <button *ngIf="showPurchaseBill"
-                    class="bg-neutral-800 mt-6 text-neutral-300 font-bold px-4 py-2 rounded hover:bg-[rgb(48,48,48)]"
-                    type="button" (click)="viewOrder(bill)">
-                    Back
-                </button>
-            </form>
-        </div>
-
-        <!-- PURCHASE FORM: Add -->
-        <div *ngIf="!showPurchaseBill"
-            class="bg-white self-start w-full h-auto mx-auto p-4 rounded-lg shadow-xl text-neutral-900 mt-4 md:flex-1">
-            <h2 class="font-bold text-center text-base lg:text-xl md:lg">
-                {{ proceedEditBill? "Update bill details" : "Add new purchase" }}
-            </h2>
-            <form class="flex flex-col" (ngSubmit)="onSubmitBill()">
-                <label class="mt-2" for="bill.billno">OR No.:</label>
-                <input class="uppercase border border-neutral-900 px-1 py-0.5 rounded-sm mt-1" type="text"
-                    name="bill.billno" id="bill.billno" [(ngModel)]="bill.billno">
-
-                <label class="mt-2" for="name">Supplier:</label>
-                <select class="border border-neutral-900 px-1 py-0.5 rounded-sm mt-1 w-full" name="bill.supplier_id"
-                    id="bill.supplier_id" [(ngModel)]="bill.supplier_id" (change)="onSupplierSelectionChange($event)">
-                    <option *ngFor="let supplier of suppliers" selected value="{{supplier.id}}">
-                        {{supplier.name}}</option>
-                    <option class="text-neutral-500" value="addNewSupplier">add new supplier ...</option>
+        <!-- ITEM FORM -->
+        <form *ngIf="showFormContainer"
+            class="flex items-end text-start justify-between w-full bg-[#fff] h-fit mt-2 px-4 py-2 rounded-lg shadow-xl text-neutral-900 md:w-3/4"
+            (ngSubmit)="onSubmitItem()">
+            <div class="flex flex-col w-1/4">
+                <label for="name">Item:</label>
+                <select class="border border-neutral-900 px-1 py-0.5 rounded-sm mt-1 w-full" name="name" id="name"
+                    [(ngModel)]="item.stock_id" (change)="onStockSelectionChange($event)">
+                    <option *ngFor="let stock of stocks" selected value="{{stock.id}}">
+                        {{stock.stock_name}}</option>
+                    <option class="text-neutral-500" value="addNewItem">add new item ...</option>
                 </select>
+            </div>
 
-                <h3 class="mt-2">Total:</h3>
-                <p class="uppercase border border-neutral-900 bg-blue-50 px-1 py-0.5 rounded-sm mt-1 text-center">
-                    &#8369;{{bill.grand_total | number: '1.2-2'}}
-                </p>
+            <div class="flex flex-col w-1/4">
+                <label for="item_price">Price:</label>
+                <input appSelectAllText
+                    class="text-center uppercase border border-neutral-900 px-1 py-0.5 rounded-sm mt-1 w-full"
+                    type="number" name="item_price" id="item_price" [(ngModel)]="item.item_price">
+            </div>
 
-                <!-- Submit Button -->
-                <button class="mt-6 bg-[#008000] text-white font-bold p-2 rounded hover:bg-[#009000]" type="button"
-                    (click)="toggleSaveBillModal()">
-                    Save</button>
-            </form>
+            <div class="flex flex-col w-1/4">
+                <label for="quantity_purchased">Quantity:</label>
+                <div class="flex items-center space-x-1">
+                    <fa-icon [icon]="faMinus" (click)="decreaseQtyInput()"></fa-icon>
+                    <input appSelectAllText
+                        class="text-center uppercase border border-neutral-900 px-1 py-0.5    rounded-sm mt-1 w-full"
+                        type="number" name="quantity_purchased" id="quantity_purchased"
+                        [(ngModel)]="item.quantity_purchased">
+                    <fa-icon [icon]="faPlus" (click)="increaseQtyInput()"></fa-icon>
+                </div>
+            </div>
+
+            <!-- BUTTON: Add or Edit Item -->
+            <button class="flex px-1.5 py-1 h-fit items-center space-x-1 rounded-md bg-neutral-800" type="submit">
+                <fa-icon class="scale-75" [icon]="faPlus" [ngStyle]="{color: 'rgb(212 212 212)'}">
+                </fa-icon>
+                <p class="text-neutral-300 text-xs">{{ proceedEditItem? 'Update': 'Add' }}</p>
+            </button>
+        </form>
+
+        <!-- FORM CONTAINER: Add items and add new purchase -->
+        <div *ngIf="showFormContainer" class="flex flex-col justify-center space-x-0 w-full md:flex-row md:space-x-2">
+            <!-- ITEM TABLE -->
+            <div class="table-container w-full text-center shadow-xl mt-4 md:w-3/4">
+                <table class="w-full table-fixed">
+                    <thead class="text-neutral-300 bg-neutral-900">
+                        <th class="w-1/4">Date Time</th>
+                        <th>Item</th>
+                        <th>Price</th>
+                        <th class="w-[10%]">Qty</th>
+                        <th>Sub Total</th>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let item of items">
+                            <td class="p-2">
+                                <div class="flex items-center justify-center space-x-1 md:space-x-3">
+                                    <button class="px-1.5 py-1 rounded-md bg-[#ff0000]" (click)="deleteItem(item)">
+                                        <fa-icon class="scale-75" [icon]="faTrashCan"
+                                            [ngStyle]="{color: 'rgb(212 212 212)'}">
+                                        </fa-icon>
+                                    </button>
+                                    <p>{{item.purchase_date | date: "MMM dd, hh:mm a"}}</p>
+                                </div>
+                            </td>
+                            <td class="p-2">{{getStockDetails(item.stock_id).stockName}}</td>
+                            <td class="p-2">&#8369;{{item.item_price | number: '1.2-2'}}</td>
+                            <td class="p-2">{{item.quantity_purchased}}</td>
+                            <td class="p-2">&#8369;{{item.sub_total | number: '1.2-2'}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <!-- When no items to show. -->
+                <div class="w-full h-[5vh]" *ngIf="!items.length && !isFetching">
+                    <p class="text-center my-4">No items to show.</p>
+                </div>
+            </div>
+
+            <!-- BILL DIV -->
+            <div *ngIf="showPurchaseBill"
+                class="bg-[#fff] self-start w-full h-auto mx-auto p-4 rounded-lg shadow-xl text-neutral-900 mt-4 md:flex-1">
+                <form class="flex flex-col">
+                    <h3 for="bill.customer_name">OR No.:</h3>
+                    <p class="uppercase border border-neutral-900 px-1 py-0.5 rounded-sm mt-1 text-center">
+                        {{bill.billno}}
+                    </p>
+
+                    <h3 class="mt-2" for="bill.customer_name">Supplier:</h3>
+                    <p class="uppercase border border-neutral-900 px-1 py-0.5 rounded-sm mt-1 text-center">
+                        {{getSupplierDetails(bill.supplier_id).supplierName}}
+                    </p>
+
+                    <h3 class="mt-2" for="remarks">Total Bill:</h3>
+                    <p class="uppercase border border-neutral-900 px-1 py-0.5 rounded-sm mt-1 text-center">
+                        &#8369;{{bill.grand_total | number: '1.2-2'}}
+                    </p>
+
+                    <!-- Back Button -->
+                    <button *ngIf="showPurchaseBill"
+                        class="bg-neutral-800 mt-6 text-neutral-300 font-bold px-4 py-2 rounded hover:bg-[rgb(48,48,48)]"
+                        type="button" (click)="viewOrder(bill)">
+                        Back
+                    </button>
+                </form>
+            </div>
+
+            <!-- PURCHASE FORM: Add -->
+            <div *ngIf="!showPurchaseBill"
+                class="bg-white self-start w-full h-auto mx-auto p-4 rounded-lg shadow-xl text-neutral-900 mt-4 md:flex-1">
+                <h2 class="font-bold text-center text-base lg:text-xl md:lg">
+                    {{ proceedEditBill? "Update bill details" : "Add new purchase" }}
+                </h2>
+                <form class="flex flex-col" (ngSubmit)="onSubmitBill()">
+                    <label class="mt-2" for="bill.billno">OR No.:</label>
+                    <input class="uppercase border border-neutral-900 px-1 py-0.5 rounded-sm mt-1" type="text"
+                        name="bill.billno" id="bill.billno" [(ngModel)]="bill.billno">
+
+                    <label class="mt-2" for="name">Supplier:</label>
+                    <select class="border border-neutral-900 px-1 py-0.5 rounded-sm mt-1 w-full" name="bill.supplier_id"
+                        id="bill.supplier_id" [(ngModel)]="bill.supplier_id"
+                        (change)="onSupplierSelectionChange($event)">
+                        <option *ngFor="let supplier of suppliers" selected value="{{supplier.id}}">
+                            {{supplier.name}}</option>
+                        <option class="text-neutral-500" value="addNewSupplier">add new supplier ...</option>
+                    </select>
+
+                    <h3 class="mt-2">Total:</h3>
+                    <p class="uppercase border border-neutral-900 bg-blue-50 px-1 py-0.5 rounded-sm mt-1 text-center">
+                        &#8369;{{bill.grand_total | number: '1.2-2'}}
+                    </p>
+
+                    <!-- Submit Button -->
+                    <button class="mt-6 bg-[#008000] text-white font-bold p-2 rounded hover:bg-[#009000]" type="button"
+                        (click)="toggleSaveBillModal()">
+                        Save</button>
+                </form>
+            </div>
         </div>
     </div>
 

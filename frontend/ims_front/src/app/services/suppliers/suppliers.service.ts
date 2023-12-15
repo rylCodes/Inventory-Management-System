@@ -66,7 +66,11 @@ export class SuppliersService {
     .pipe(
       catchError((err) => {
         this.handleSupplierError(err);
-        return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to delete supplier!`)
+        if (err.error.error) {
+          return throwError(() => err.error.error? err.error.error : 'Unable to delete this supplier!');
+        } else {
+          return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to delete supplier!`)
+        }
       })
     );
   }

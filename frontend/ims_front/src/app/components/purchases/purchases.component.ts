@@ -211,6 +211,7 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
   toggleFormContainer() {
     this.showFormContainer = !this.showFormContainer;
     this.toggleBillTable();
+    this.toggleTableSettings();
   }
 
   viewOrder(bill: PurchaseBill) {
@@ -473,42 +474,50 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
       ...this.item,
     }
 
-    this.isLoading = true;
     this.purchaseService.addPurchaseItem(newSaleItem)
-      .subscribe({
-        next: async (item) => {
-          this.isLoading = false
-          this.items.push(item);
-          this.loadFilteredItems();
-          this.resetItemForm();
+    .subscribe({
+      next: async (item) => {
+        this.items.push(item);
+        this.loadFilteredItems();
+        this.resetItemForm();
 
-          // Update total bill upon adding an item
-          if (this.showPurchaseBill) {
-            this.bill.grand_total += item.sub_total;
+        if (this.showPurchaseBill) {
+          const foundStock = this.stocks.find(stock => stock.id === item.stock_id);
+          if (foundStock) {
+            foundStock.quantity += item.quantity_purchased;
+            this.stockService.editStock(foundStock).subscribe({
+              next: (stock) => console.log('stock quantity has been updated', stock),
+              error: (err) => console.log('Failed to update stock quantity', err),
+            });
           }
-      
-          this.purchaseService.editPurchaseBill(this.bill)
-          .subscribe({
-            next: bill => {
-              this.bill = bill;
-              this.loadBills();
-            },
-            error: err => console.log(err) 
-          });
-  
-          if (!item || item.item_price < 1) {
-            this.toastrService.warning(
-              "You have added an item without a price. Make sure it is correct.",
-              "Zero Price!",
-              {timeOut: 5000}
-            );
-          }
-        },
-        error: (err) => {
-          this.isLoading = false;
-          this.uiService.displayErrorMessage(err)
-        },
-      });
+        };
+
+        // Update total bill upon adding an item
+        if (this.showPurchaseBill) {
+          this.bill.grand_total += item.sub_total;
+        }
+    
+        this.purchaseService.editPurchaseBill(this.bill)
+        .subscribe({
+          next: bill => {
+            this.bill = bill;
+            this.loadBills();
+          },
+          error: err => console.log(err) 
+        });
+
+        if (!item || item.item_price < 1) {
+          this.toastrService.warning(
+            "You have added an item without a price. Make sure it is correct.",
+            "Zero Price!",
+            {timeOut: 5000}
+          );
+        }
+      },
+      error: (err) => {
+        this.uiService.displayErrorMessage(err)
+      },
+    });
   }
 
   // UPDATE BILLS AND ITEMS
@@ -664,7 +673,12 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
   // Delete Item
   deleteItem(item: PurchaseItem) {
     this.deletingItem = item;
-    this.toggleItemActionModal();
+
+    if (!this.showPurchaseBill) {
+      this.onConfirmDeleteItem();
+    } else {
+      this.toggleItemActionModal();
+    }
   }
 
   onConfirmDeleteItem() {
@@ -683,35 +697,40 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
       return;
     }
 
-    // Reduce bill total upon deleting an item
     this.bill.grand_total -= this.deletingItem.sub_total;
 
-    this.purchaseService.editPurchaseBill(this.bill)
-    .subscribe({
-      next: data => {
-        this.bill = data;
-      },
-      error: (err) => {
-        console.log(err);
-      }
-    });
-
-    this.isLoading = true;
     this.purchaseService
     .deletePurchaseItem(this.deletingItem, this.modalInputValue)
     .subscribe({
       next: async () => {
-        this.isLoading = false;
+        // Reduce bill total amount upon deleting an item
+        this.purchaseService.editPurchaseBill(this.bill)
+        .subscribe({
+          next: data => {this.bill = data},
+          error: (err) => {console.log(err)},
+        });
+
+        // Update stock quantity upon deleting an item
+        const foundStock = this.stocks.find(stock => stock.id === this.deletingItem?.stock_id);
+        if (this.showPurchaseBill) {
+          if (foundStock && this.deletingItem) {
+            foundStock.quantity -= this.deletingItem.quantity_purchased;
+            this.stockService.editStock(foundStock).subscribe({
+              next: (stock) => console.log('Stock quantity has been updated', stock),
+              error: (err) => console.log(err),
+            });
+          }
+        };
+
         this.bills = this.bills.filter(s => s.id !== this.deletingItem?.id);
         this.deletingItem = null;
         this.modalInputValue = undefined;
         this.showModal = false;
         this.showItemActionModal = false;
         this.loadFilteredItems();
-        this.toastrService.error("Item has been deleted successfully!");
+        this.toastrService.success("Item has been deleted successfully!");
       },
       error: (err) => {
-        this.isLoading = false;
         this.uiService.displayErrorMessage(err);
       }
     });
@@ -753,7 +772,6 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
   }
 
   onSearchChanged(value: string): void {
-    console.log(value)
     this.searchQuery = value;
   }
 

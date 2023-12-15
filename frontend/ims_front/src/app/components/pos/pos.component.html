@@ -214,7 +214,8 @@
                     </p>
                     <label class="mt-4" for="saleBill.customer_name">Customer:</label>
                     <input class="uppercase border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text"
-                        name="saleBill.customer_name" id="saleBill.customer_name-edit" [(ngModel)]="saleBill.customer_name">
+                        name="saleBill.customer_name" id="saleBill.customer_name-edit"
+                        [(ngModel)]="saleBill.customer_name">
 
                     <label class="mt-4" for="remarks">Remarks:</label>
                     <input class="uppercase border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text"
@@ -397,14 +398,15 @@
         </div>
 
         <!-- MODAL: Admin Permission -->
-        <app-modal *ngIf="showPermissionModal" [inputType]="'password'" [inputField]="true" [placeHolder]="'Enter admin password.'"
-            (closeModal)="togglePermissionModal()" (valueChanged)="onValueChanged($event)" (buttonClick)="onAdminPermission()">
+        <app-modal *ngIf="showPermissionModal" [inputType]="'password'" [inputField]="true"
+            [placeHolder]="'Enter admin password.'" (closeModal)="togglePermissionModal()"
+            (valueChanged)="onValueChanged($event)" (buttonClick)="onAdminPermission()">
         </app-modal>
 
         <!-- MODAL: Redirect to Menu -->
         <app-modal *ngIf="showGoToMenuModal" [title]="'Proceed to the Menu Page'"
-            [content]="'Make sure to save all changes before leaving.'"
-            (closeModal)="toggleGoToMenuModal()" (buttonClick)="proceedToMenu()" [btnText]="'Proceed'">
+            [content]="'Make sure to save all changes before leaving.'" (closeModal)="toggleGoToMenuModal()"
+            (buttonClick)="proceedToMenu()" [btnText]="'Proceed'">
         </app-modal>
 
         <!-- CSS Loader -->

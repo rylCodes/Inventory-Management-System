@@ -31,7 +31,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   saleItems: SaleItem[] = [];
   todaySaleBills: SaleBill[] = [];
   yesterdaySaleBills: SaleBill[] = [];
-  lastWeekSaleBills: SaleBill[] = [];
+  thisWeekSaleBills: SaleBill[] = [];
   purchaseBills: PurchaseBill[] = [];
   purchaseItems: PurchaseItem[] = [];
   suppliers: Supplier[] = [];
@@ -157,26 +157,28 @@ export class DashboardComponent implements OnInit, OnDestroy {
     return total;
   }
 
-  getLastWeekSales(): number {
+  getThisWeekSales(): number {
     let total = 0;
-    this.lastWeekSaleBills = this.saleBills.filter(bill => {
+    this.thisWeekSaleBills = this.saleBills.filter(bill => {
       const currentDate = new Date();
       const currentDay = currentDate.getDay();
-      const daysToSubtract = currentDay === 0 ? 6 : currentDay -1;
+      const daysToSubtract = currentDay === 0 ? 6 : currentDay - 1;
 
-      const previousMonday = new Date(currentDate);
-      previousMonday.setDate(currentDate.getDate() - daysToSubtract);
+      const monday = new Date(currentDate);
+      monday.setDate(currentDate.getDate() - daysToSubtract);
 
-      const previousSunday = new Date(previousMonday);
-      previousSunday.setDate(previousMonday.getDate() + 6);
+      const sunday = new Date(monday);
+      sunday.setDate(monday.getDate() + 6);
+
       const saleDate = new Date(bill.time);
-      return saleDate >= previousMonday && saleDate <= previousSunday && bill.status;
+      return saleDate >= monday && saleDate <= sunday && bill.status;
     })
 
-    if (!this.lastWeekSaleBills || this.lastWeekSaleBills.length === 0) {
+    if (!this.thisWeekSaleBills || this.thisWeekSaleBills.length === 0) {
       return 0;
     }
-    this.lastWeekSaleBills.forEach(bill => {
+
+    this.thisWeekSaleBills.forEach(bill => {
       if (bill && bill.grand_total) {
         total += bill.grand_total;
       }

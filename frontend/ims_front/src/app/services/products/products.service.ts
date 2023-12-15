@@ -64,6 +64,9 @@ export class ProductsService {
       .pipe(
         catchError((err) => {
           this.handleError(err);
+          if (err.error.error) {  
+            return throwError(() => err.error.error? err.error.error : 'Unable to delete product!');
+          }
           return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to delete product!`);
         })
       );

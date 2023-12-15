@@ -19,7 +19,7 @@ export class AuthService {
   constructor(private http: HttpClient, private toastrService: ToastrService) { }
 
   handleLoginError(error: any): void {
-    if (error.error.error === "Invalid username or password!") {
+    if (error.error.error) {
       console.log("Error here →", error.error.error);
       this.toastrService
       .error(`${error.error.error? error.error.error: "Invalid username or password!"}`);

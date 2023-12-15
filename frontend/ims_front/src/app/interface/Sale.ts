@@ -18,4 +18,5 @@ export interface SaleItem {
     price: number,
     sale_date: string,
     sub_total: number,
+    status: boolean;
 }

@@ -21,7 +21,7 @@
             <button
                 class="flex justify-between items-center px-4 py-2 hover:bg-neutral-100 hover:font-medium rounded-md w-full text-start"
                 (click)="sortItemsByDate()">
-                <span>Sort by date updated</span>
+                <span>Sort by date</span>
                 <span>↑↓</span>
             </button>
             <button
@@ -30,7 +30,8 @@
                 <span>Sort by name</span>
                 <span>↑↓</span>
             </button>
-            <button class="px-4 py-2 hover:bg-neutral-100 hover:font-medium rounded-md w-full text-start" (click)="deleteAllItems()">
+            <button class="px-4 py-2 hover:bg-neutral-100 hover:font-medium rounded-md w-full text-start"
+                (click)="deleteAllItems()">
                 <span class="text-[#ff0000]">Delete all sales history</span>
             </button>
         </div>
@@ -154,7 +155,7 @@
                 </thead>
                 <tbody>
                     <tr *ngFor="let bill of bills">
-                        <td class="p-2">{{bill.time | date: "MM/dd/yyyy"}}</td>
+                        <td class="p-2">{{bill.time | date: "MMM dd, hh:mm a"}}</td>
                         <td class="p-2">{{bill.billno}}</td>
                         <td class="p-2">{{bill.customer_name}}</td>
                         <td class="p-2 hidden md:table-cell">{{bill.remarks}}</td>
@@ -203,7 +204,8 @@
         <!-- MODAL: Delete All Sales History -->
         <app-modal *ngIf="showModal" [title]="'Deleting all sales history!'"
             [content]="'Are you sure you want to delete all sales history? This action cannot be undone!'"
-            (closeModal)="toggleModal()" (buttonClick)="onConfirmDeleteAll()" [btnText]="'Delete all'" [btnBgColor]="'red'">
+            (closeModal)="toggleModal()" (buttonClick)="onConfirmDeleteAll()" [btnText]="'Delete all'"
+            [btnBgColor]="'red'">
         </app-modal>
     </div>
 </div>

@@ -113,6 +113,7 @@ export class SalesComponent implements OnInit {
     price: 0,
     sale_date: "",
     sub_total: 0,
+    status: true,
   }
 
   owner: Owner = {
@@ -183,17 +184,17 @@ export class SalesComponent implements OnInit {
   loadBills() {
     this.isFetching = true;
     this.salesService
-      .getSaleBills(this.filterText)
-      .subscribe({
-        next: bills => {
-          this.isFetching = false;
-          this.bills = bills.filter(bill => bill.status)
-        },
-        error: (error) => {
-          this.isFetching = false;
-          this.uiService.displayErrorMessage(error);
-        }
-      });
+    .getSaleBills(this.filterText)
+    .subscribe({
+      next: bills => {
+        this.isFetching = false;
+        this.bills = bills.filter(bill => bill.status)
+      },
+      error: (error) => {
+        this.isFetching = false;
+        this.uiService.displayErrorMessage(error);
+      }
+    });
   }
 
   loadEachBillItems() {

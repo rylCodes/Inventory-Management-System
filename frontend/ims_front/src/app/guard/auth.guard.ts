@@ -9,22 +9,18 @@ export const authGuard: CanActivateFn = (route, state) => {
   const toastrService = inject(ToastrService);
   const router = inject(Router);
 
-  const currentRoute = state?.url || '';
+  const currentRoute = state.url || '';
 
-  if (currentRoute === '/login') {
-    if (authService.isAuthenticated()) {
-      router.navigate(['/']);
-      return false;
-    } else {
-      return true;
-    }
-  } else {
-    if (authService.isAuthenticated()) {
-      return true;
-    } else {
-      toastrService.error("Login required!");
-      router.navigate(['/login']);
-      return false;
-    }
+  if (authService.isAuthenticated()) {
+    return true;
   }
+
+  if (currentRoute === '/login' || currentRoute === '/') {
+    router.navigate(["login"]);
+    return false;
+  }
+
+  toastrService.error("Login required!");
+  router.navigate(["login"]);
+  return false;
 };

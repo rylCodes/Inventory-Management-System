@@ -154,7 +154,7 @@
                     <th>Action</th>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let bill of bills">
+                    <tr *ngFor="let bill of bills | paginate: { itemsPerPage: itemsPerPage, currentPage: p }">
                         <td class="p-2">{{bill.time | date: "MMM dd, hh:mm a"}}</td>
                         <td class="p-2">{{bill.billno}}</td>
                         <td class="p-2">{{bill.customer_name}}</td>
@@ -183,6 +183,13 @@
             <div *ngIf="isFetching" class="h-[10vh]">
                 <app-loader></app-loader>
             </div>
+        </div>
+
+        <div class="flex justify-center items-center mt-6 md:mt-8">
+            <pagination-controls
+                (pageChange)="p = $event"
+                [autoHide]="true">
+            </pagination-controls>
         </div>
 
         <!-- BILL MODAL: Confirm to Delete Bill -->

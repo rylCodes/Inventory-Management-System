@@ -40,8 +40,23 @@
     background-color: #ffa500 !important;
 }
 
+/* PAGINATION */
+.ngx-pagination .current {
+    background-color: rgb(82 82 82) !important;
+    border-radius: 10% !important;
+}
 
-/* FONT SIZE */
+.ngx-pagination a, .ngx-pagination button {
+    color: rgb(23 23 23) !important;
+}
+
+.ngx-pagination a:hover,
+.ngx-pagination button:hover {
+  background-color: rgb(212 212 212) !important;
+  border-radius: 10% !important;
+}
+
+/* GLOBAL FONT SIZE */
 .text-xxs {
     font-size: 10px;
     line-height: 12px;

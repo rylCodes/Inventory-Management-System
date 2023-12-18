@@ -5,11 +5,12 @@ import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http'
 import { AppRoutingModule } from './app-routing.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-// import { ToastrModule } from 'ngx-toastr';
 import { ToastrModule } from 'ngx-toastr';
 import { NgxPrintModule } from 'ngx-print';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-
+import { NgxPaginationModule } from 'ngx-pagination';
+import { ChartModule } from 'angular-highcharts';
+import { HighchartsChartModule } from 'highcharts-angular';
 import { DatePipe } from '@angular/common';
 
 import { authGuard } from './guard/auth.guard';
@@ -36,6 +37,7 @@ import { AboutComponent } from './components/about/about.component';
 import { LoaderComponent } from './components/loader/loader.component';
 import { ModalComponent } from './components/modal/modal.component';
 import { SearchBarComponent } from './components/search-bar/search-bar.component';
+import { ChartsComponent } from './components/charts/charts.component';
 
 const appRoutes: Routes = [
   {path: 'login', component: LoginComponent},
@@ -70,6 +72,7 @@ const appRoutes: Routes = [
     LoaderComponent,
     ModalComponent,
     SearchBarComponent,
+    ChartsComponent,
   ],
   imports: [
     BrowserModule,
@@ -81,6 +84,9 @@ const appRoutes: Routes = [
     FontAwesomeModule,
     NgxPrintModule,
     BrowserAnimationsModule,
+    NgxPaginationModule,
+    ChartModule,
+    HighchartsChartModule,
     ToastrModule.forRoot({
       positionClass: 'toast-top-center',
       closeButton: true,

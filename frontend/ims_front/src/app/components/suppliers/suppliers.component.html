@@ -87,8 +87,8 @@
                 <th>Address</th>
                 <th>Phone</th>
                 <th>Email</th>
-                <th class="hidden md:table-cell">Status</th>
-                <th class="w-[15%] md:auto">Action</th>
+                <th class="hidden md:table-cell w-[10%]">Status</th>
+                <th class="w-[15%]">Action</th>
             </thead>
             <tbody>
                 <tr [ngClass]="supplier.status ? 'active' : 'inactive'" *ngFor="let supplier of suppliers">

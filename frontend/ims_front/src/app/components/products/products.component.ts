@@ -54,6 +54,10 @@ export class ProductsComponent implements OnInit {
   isAscending: boolean = true;
   isSortedAToZ: boolean = true;
 
+  p: number = 1;
+  itemsPerPage: number = 10;
+  totalItems: number = 0;
+
   deletingMenu?: Menu | null = null;
   deletingProduct?: Product | null = null;
 

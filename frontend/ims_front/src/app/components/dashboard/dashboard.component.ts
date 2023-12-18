@@ -91,15 +91,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
       }
     });
 
-    // this.productService.getMenus()
-    // .subscribe({
-    //   next: (products) => {
-    //     this.products = products;
-    //   },
-    //   error: (err) => {
-    //     console.log(err);
-    //   }
-    // });
+    this.productService.getMenus()
+    .subscribe({
+      next: (products) => {
+        this.products = products;
+      },
+      error: (err) => {
+        console.log(err);
+      }
+    });
 
     // this.saleService.getSaleItems()
     // .subscribe({

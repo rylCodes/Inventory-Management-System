@@ -267,7 +267,8 @@
                 <th class="w-[15%] md:w-auto">Action</th>
             </thead>
             <tbody>
-                <tr class="{{menu.status? 'active' : 'inactive'}}" *ngFor="let menu of menus">
+                <tr class="{{menu.status? 'active' : 'inactive'}}"
+                    *ngFor="let menu of menus | paginate: { itemsPerPage: itemsPerPage, currentPage: p, totalItems: totalItems }">
                     <td class="p-2">
                         <!-- View Order List -->
                         <div class="flex items-center space-x-1 md:space-x-2">
@@ -311,6 +312,13 @@
         <div *ngIf="!menus.length && isFetching" class="h-[10vh]">
             <app-loader></app-loader>
         </div>
+    </div>
+
+    <div class="flex justify-center items-center mt-4">
+        <pagination-controls
+            (pageChange)="p = $event"
+            [autoHide]="true">
+        </pagination-controls>
     </div>
 
     <!-- PRODUCT MODAL: Delete Each Item -->

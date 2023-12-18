@@ -126,6 +126,10 @@ export class SalesComponent implements OnInit {
     email: "",
   };
 
+  p: number = 1;
+  itemsPerPage: number = 10;
+  totalItems: number = 0;
+
   constructor(
       private salesService: SalesService,
       private productService: ProductsService,
@@ -188,7 +192,8 @@ export class SalesComponent implements OnInit {
     .subscribe({
       next: bills => {
         this.isFetching = false;
-        this.bills = bills.filter(bill => bill.status)
+        this.bills = bills.filter(bill => bill.status);
+        this.totalItems = this.bills.length;
       },
       error: (error) => {
         this.isFetching = false;

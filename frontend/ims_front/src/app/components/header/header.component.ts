@@ -81,6 +81,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   isNotificationClicked: boolean = false;
   isNotifServiceInUse: boolean = false;
   isHidden: boolean = true;
+  isLoading: boolean = false;
 
   notificationSubscription: Subscription = new Subscription();
   notifServiceSubscription: Subscription;
@@ -272,13 +273,16 @@ export class HeaderComponent implements OnInit, OnDestroy {
       deletingNotifs.push(this.notificationService.deleteNotification(notif));
     });
 
+    this.isLoading = true;
     forkJoin(deletingNotifs).subscribe({
       next: () => {
         this.showDelAllNotifModal = false;
+        this.isLoading = false;
         this.loadNotifications();
         this.toastrService.success("Success: All notifications are now deleted.");  
       },
       error: err => {
+        this.isLoading = false;
         this.showDelAllNotifModal = false;
         this.uiService.displayErrorMessage(err)
       },

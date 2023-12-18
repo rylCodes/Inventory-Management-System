@@ -41,7 +41,7 @@ export class UiService {
     ); 
   }
   
-  adminPermission(err: any) {
-    
+  getAppVersion() {
+
   }
 }

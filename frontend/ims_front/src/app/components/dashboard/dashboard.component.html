@@ -7,29 +7,29 @@
 
     <!-- Flex container: Dashboard Items -->
     <div
-        class="bg-white p-2 rounded-md flex flex-col w-full space-y-2 space-x-0 md:space-y-0 md:space-x-2 mt-6 lg:mt-8 md:p-4 md:flex-row">
+        class="bg-white p-2 rounded-md flex flex-col w-full shadow-xl space-y-2 space-x-0 md:space-y-0 md:space-x-2 mt-6 lg:mt-8 md:p-4 md:flex-row">
+        <!-- Flex Container: Right Items -->
         <div class="flex w-full space-x-2 md:flex-row md:w-1/2">
             <!-- Inventory -->
-            <div
-                class="flex flex-col justify-between text-neutral-50 h-auto w-1/2 rounded-sm md:rounded-md bg-gradient-to-r from-green-700 to-green-500">
+            <div class="flex flex-col justify-between text-neutral-50 h-auto w-1/2 rounded-sm md:rounded-md bg-gradient-to-r from-green-700 to-green-500">
                 <div class="flex justify-around items-center mt-6 lg:mt-8">
                     <div>
                         <h3 class="font-semibold text-lg lg:text-xl">Inventory</h3>
-                        <p class="text-base lg:text-lg">{{stocks.length}} {{stocks.length>1? 'items': 'item'}}</p>
+                        <p class="text-base lg:text-lg">{{stocks.length}} {{stocks.length > 1 ? 'items' : 'item'}}</p>
                     </div>
                     <div class="text-5xl lg:text-7xl">
                         <fa-icon [icon]="faBoxesStacked"></fa-icon>
                     </div>
                 </div>
-                <div class="flex flex-col justify-around p-3 sm:flex-row">
-                    <p class="text-xxs sm:text-xs">Lowest stock: {{sortStockByQty[0].stock_name}}</p>
-                    <p class="text-xxs sm:text-xs">
-                        Quantity: {{sortStockByQty[0].quantity}} {{sortStockByQty[0].unit}}
-                    </p>
+                <div *ngIf="sortStockByQty && sortStockByQty.length > 0" class="flex flex-col justify-around p-3 sm:flex-row">
+                    <p class="text-xxs sm:text-xs">Lowest stock: {{sortStockByQty[0]?.stock_name}}</p>
+                    <p class="text-xxs sm:text-xs">Quantity: {{sortStockByQty[0]?.quantity}} {{sortStockByQty[0]?.unit}}</p>
                 </div>
-                <a routerLink="/stocks"
-                    class="flex justify-center items-center px-2 py-1 space-x-1 w-full bg-[rgba(0,0,0,0.2)] lg:py-1.5">
-                    <p>Procced</p>
+                <div *ngIf="!sortStockByQty || sortStockByQty.length === 0" class="flex flex-col justify-around p-3 sm:flex-row">
+                    <p>No stock available</p>
+                </div>
+                <a routerLink="/stocks" class="flex justify-center items-center px-2 py-1 space-x-1 w-full bg-[rgba(0,0,0,0.2)] lg:py-1.5">
+                    <p>Proceed</p>
                     <fa-icon [icon]="faCircleArrowRight"></fa-icon>
                 </a>
             </div>
@@ -53,7 +53,7 @@
                 </a>
             </div>
         </div>
-
+        <!-- Flex Container: Right Items -->
         <div class="flex w-full space-x-2 md:flex-row md:w-1/2">
             <!-- Supplier -->
             <div
@@ -75,8 +75,7 @@
                 </a>
             </div>
             <!-- Sales -->
-            <div
-                class="flex flex-col justify-between text-neutral-50 h-auto w-1/2 rounded-sm md:rounded-md bg-gradient-to-r from-yellow-700 to-yellow-500">
+            <div class="flex flex-col justify-between text-neutral-50 h-auto w-1/2 rounded-sm md:rounded-md bg-gradient-to-r from-yellow-700 to-yellow-500">
                 <div class="flex justify-around items-center mt-6 lg:mt-8">
                     <div>
                         <h3 class="font-semibold text-lg lg:text-xl">Today's Sales</h3>
@@ -90,12 +89,15 @@
                     <p class="text-xxs sm:text-xs">Yesterday: &#8369;{{getYesterdaySales() | number: '1.2-2'}}</p>
                     <p class="text-xxs sm:text-xs">This week: &#8369;{{getThisWeekSales() | number: '1.2-2'}}</p>
                 </div>
-                <a routerLink="/sales"
-                    class="flex justify-center items-center px-2 py-1 space-x-1 w-full bg-[rgba(0,0,0,0.2)] lg:py-1.5">
-                    <span>Procced</span>
+                <a routerLink="/sales" class="flex justify-center items-center px-2 py-1 space-x-1 w-full bg-[rgba(0,0,0,0.2)] lg:py-1.5">
+                    <span>Proceed</span>
                     <fa-icon [icon]="faCircleArrowRight"></fa-icon>
                 </a>
             </div>
         </div>
+    </div>
+
+    <div class="mt-4 shadow-xl max-w-full text-neutral-300">
+        <app-charts></app-charts>
     </div>
 </div>

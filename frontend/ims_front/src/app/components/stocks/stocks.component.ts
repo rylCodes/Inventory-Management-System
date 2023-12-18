@@ -70,6 +70,9 @@ export class StocksComponent implements OnInit {
   stocksToCheck: Stock[] = [];
   menus: Menu[] = [];
   products: Product[] = [];
+  notifications: Notification[] = [];
+
+  currentDate = new Date();
 
   stock: Stock = {
     id: undefined,
@@ -153,9 +156,17 @@ export class StocksComponent implements OnInit {
 
   // SHOW STOCKS
   ngOnInit(): void {
+    this.loadNotifications();
     this.loadProducts();
     this.loadMenus();
     this.loadStocks();
+  }
+
+  loadNotifications(): void {
+    this.notifService.getNotifications().subscribe({
+      next: notifs => this.notifications = notifs,
+      error: err => console.log("Failed to fetch notifications", err),
+    })
   }
 
   loadStocks(): void {
@@ -291,10 +302,6 @@ export class StocksComponent implements OnInit {
             this.stocks[index] = stockData;
             this.loadStocks();
             this.toggleForm();
-            
-            if (stockData.show_notification) {
-              this.addNotification();
-            }
 
             await this.uiService.wait(100);
             if (stockData.quantity < 0) {
@@ -347,44 +354,7 @@ export class StocksComponent implements OnInit {
         }
       });
   }
-
-  addNotification() {
-    const critStocks = this.stocksToCheck.filter(stock => stock.quantity <= 5);
-    const lowStocks = this.stocksToCheck.filter(stock => stock.quantity <= 20 && stock.quantity > 5);
-    if (critStocks.length) {
-      critStocks.forEach(stock => {
-        this.notification.content = `${stock.quantity} ${stock.unit}/s of ${stock.stock_name} remaining. vjh hkigbkjh`;
-        this.notification.warning_type = "Critical stock level";
-        const newNotif = {
-          ...this.notification
-        }
-
-        this.notifService.addNotification(newNotif)
-        .subscribe(() => {
-          this.resetNotification();
-          this.notifService.setServiceStatus(true);
-          console.log("New notification has been added successfully!");
-        });
-      });
-    };
-    
-    if (lowStocks.length) {
-      lowStocks.forEach(stock => {
-        this.notification.content = `${stock.quantity} ${stock.unit}/s of ${stock.stock_name} remaining.`;
-        this.notification.warning_type = "Low stock level";
-        const newNotif = {
-          ...this.notification
-        }
-
-        this.notifService.addNotification(newNotif)
-        .subscribe(() => {
-          this.resetNotification();
-          this.notifService.setServiceStatus(true);
-          console.log("New notification has been added successfully!");
-        });
-      });
-    };
-  }
+  
 
   updateRelatedMenu(stock: Stock) {
     const relatedProducts = this.products.filter(product => product.stock_id === stock.id);

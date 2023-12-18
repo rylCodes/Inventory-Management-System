@@ -197,3 +197,8 @@
         <app-button (btnClick)="logOut()" bgColor="red" txtColor="bg-white" txtContent="Logout"></app-button>
     </div>
 </div>
+
+<!-- CSS Loader -->
+<div *ngIf="isLoading" class="top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.3)] fixed z-[9999]">
+    <app-loader></app-loader>
+</div>

@@ -55,6 +55,7 @@ export class PosComponent implements OnInit, AfterContentChecked {
   faLocationDot = faLocationDot;
   faEnvelope = faEnvelope;
 
+  notifications: Notification[] = [];
   activeBills: SaleBill[] = [];
   allBills: SaleBill[] = [];
   saleItems: SaleItem[] = [];
@@ -268,6 +269,7 @@ export class PosComponent implements OnInit, AfterContentChecked {
 
   // SHOW BILLS
   ngOnInit(): void {
+    this.loadNotifications();
     this.loadMenus();
     this.loadStocks();
     this.loadProducts();
@@ -278,6 +280,13 @@ export class PosComponent implements OnInit, AfterContentChecked {
   
   ngAfterContentChecked() {
     this.cdr.detectChanges();
+  }
+
+  loadNotifications() {
+    this.notifService.getNotifications().subscribe({
+      next: notifs => this.notifications = notifs,
+      error: err => console.log("Failed to fetch notifications", err),
+    })
   }
 
   loadBills() {
@@ -812,47 +821,53 @@ export class PosComponent implements OnInit, AfterContentChecked {
   }
 
   addNotification() {
+    const currentDate = new Date();
+    const currentDay = currentDate.getDay();
     const critStocks = this.stocksToCheck.filter(stock => stock.quantity <= 5);
     const lowStocks = this.stocksToCheck.filter(stock => stock.quantity <= 20 && stock.quantity > 5);
-    if (critStocks.length) {
-      critStocks.forEach(stock => {
-        this.notification.content = `${stock.quantity} ${stock.unit}/s of ${stock.stock_name} remaining.`;
-        this.notification.warning_type = "Critical stock level";
-        const newNotif = {
-          ...this.notification
-        }
-
-        this.notifService.addNotification(newNotif)
-        .subscribe({
-          next: (notif) => {
-            this.resetNotification();
-            this.notifService.setServiceStatus(true);
-            console.log("New notification has been added successfully!", notif);
-          },
-          error: (err) => {console.log(err)},
-        });
+  
+    const createAndAddNotification = (content: string, warningType:string) => {
+      const notifExists = this.notifications.some(notif => {
+        const newNotifDate = new Date(notif.timestamp);
+        const newNotifDay = newNotifDate.getDay();
+        return notif.content === content && notif.warning_type === warningType && newNotifDay === currentDay;
       });
-    };
-    
-    if (lowStocks.length) {
-      lowStocks.forEach(stock => {
-        this.notification.content = `${stock.quantity} ${stock.unit}/s of ${stock.stock_name} remaining.`;
-        this.notification.warning_type = "Low stock level";
+  
+      if (!notifExists) {
         const newNotif = {
-          ...this.notification
-        }
-
+          id: this.notification.id,
+          timestamp: this.notification.timestamp,
+          is_read: this.notification.is_read,
+          content: content,
+          warning_type: warningType
+        };
+  
         this.notifService.addNotification(newNotif)
-        .subscribe({
-          next: (notif) => {
-            this.resetNotification();
-            this.notifService.setServiceStatus(true);
-            console.log("New notification has been added successfully!", notif);
-          },
-          error: (err) => {console.log(err)},
-        });
-      });
+          .subscribe({
+            next: (notif) => {
+              this.notifService.setServiceStatus(true);
+              this.resetNotification();
+              this.loadNotifications();
+              console.log("New notification has been added successfully!", notif);
+            },
+            error: (err) => {
+              console.log("Failed to add new notification", err);
+            },
+          });
+      }
     };
+  
+    critStocks.forEach(stock => {
+      const content = `${stock.quantity} ${stock.unit}/s of ${stock.stock_name} remaining.`;
+      const warningType = "Critical stock level";
+      createAndAddNotification(content, warningType);
+    });
+  
+    lowStocks.forEach(stock => {
+      const content = `${stock.quantity} ${stock.unit}/s of ${stock.stock_name} remaining.`;
+      const warningType = "Low stock level";
+      createAndAddNotification(content, warningType);
+    });
   }
   
   onValueChanged(value: string): void {

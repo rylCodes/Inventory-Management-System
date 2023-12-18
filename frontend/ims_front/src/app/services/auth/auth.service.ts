@@ -59,6 +59,8 @@ export class AuthService {
 
   clearToken(): void {
     sessionStorage.removeItem("authToken");
+    sessionStorage.removeItem("user");
+    sessionStorage.removeItem("is_staff");
   }
 
   setToken(token: string): void {

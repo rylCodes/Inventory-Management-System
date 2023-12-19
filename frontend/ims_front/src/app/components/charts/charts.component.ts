@@ -27,6 +27,9 @@ export class ChartsComponent implements OnInit, OnDestroy {
   stocks: Stock[] = [];
   pieChart?: Chart;
 
+  currentDate = new Date();
+  currentMonth = this.currentDate.getMonth();
+
   constructor(
     private saleService: SalesService,
     private purchasesService: PurchasesService,
@@ -50,21 +53,15 @@ export class ChartsComponent implements OnInit, OnDestroy {
       next: sales => {
         this.sales = sales.filter(sale => sale.status);
 
-        this.accumulatedSales = sales.reduce((accSales: SaleBill[], objSale: SaleBill) => {
-          const existingObjSale = accSales.find(sale => {
-            const saleDate = this.datePipe.transform(sale.time, "dd");
-            const objSaleDate = this.datePipe.transform(objSale.time, "dd");
-            return saleDate === objSaleDate;
-          })
+        if (!sales || sales.length === 0) {
+          this.accumulatedSales = this.calculateAccumulatedSales(this.mockSales());
+        } else {
+          this.accumulatedSales = this.calculateAccumulatedSales(sales);
+        }
 
-          if (existingObjSale) {
-            existingObjSale.grand_total += objSale.grand_total;
-          } else {
-            accSales.push({ ...objSale });
-          }
-
-          return accSales;
-        }, []);
+        if (this.accumulatedSales.length > 0 && this.accumulatedPurchases.length > 0) {
+          this.initializeBarChart();
+        };
       },
       error: err => console.log("Failed to display sales", err),
     });
@@ -75,7 +72,15 @@ export class ChartsComponent implements OnInit, OnDestroy {
       next: purchases => {
         this.purchases = purchases;
         
-        this.accumulatedPurchases = this.calculateAccumulatedPurchases(purchases);
+        if (!purchases || purchases.length === 0) {
+          this.accumulatedPurchases = this.calculateAccumulatedPurchases(this.mockPurchase());
+        } else {
+          this.accumulatedPurchases = this.calculateAccumulatedPurchases(purchases);
+        }
+
+        if (this.accumulatedSales.length > 0 && this.accumulatedPurchases.length > 0) {
+          this.initializeBarChart();
+        };
       },
       error: err => console.log("Failed to fetch purchases", err),
     });
@@ -84,11 +89,11 @@ export class ChartsComponent implements OnInit, OnDestroy {
   loadStocks() {
     this.stockService.getStocks().subscribe({
       next: (stocks) => {
-        this.stocks = stocks;
-
-        if (this.sales.length > 0 && this.purchases.length > 0) {
-          this.initializeBarChart();
-        };
+        if (!stocks || stocks.length === 0) {
+          this.stocks = this.mockStocks();
+        } else {
+          this.stocks = stocks;
+        }
 
         if (this.stocks.length > 0) {
           this.initializePieChart();
@@ -113,6 +118,24 @@ export class ChartsComponent implements OnInit, OnDestroy {
       }
   
       return accPurchases;
+    }, []);
+  }
+
+  calculateAccumulatedSales(sales: SaleBill[]): SaleBill[] {
+    return sales.reduce((accSales: SaleBill[], objSale: SaleBill) => {
+      const existingObjSale = accSales.find(sale => {
+        const saleDate = this.datePipe.transform(sale.time, "dd");
+        const objSaleDate = this.datePipe.transform(objSale.time, "dd");
+        return saleDate === objSaleDate;
+      });
+  
+      if (existingObjSale) {
+        existingObjSale.grand_total += objSale.grand_total;
+      } else {
+        accSales.push({ ...objSale });
+      }
+  
+      return accSales;
     }, []);
   }
 
@@ -244,4 +267,108 @@ export class ChartsComponent implements OnInit, OnDestroy {
     });
   }
 
+  /* MOCK ARRAYS FOR CHARTS */
+  // Mock Sales
+  mockSales(): SaleBill[] {
+    const saleBills: SaleBill[] = [
+      {
+          time: `2023-${this.currentMonth + 1}-10T12:30:00`,
+          customer_name: 'Alice Johnson',
+          remarks: 'Regular customer',
+          amount_tendered: 150.50,
+          grand_total: 200.00,
+          mode_of_payment: 'Credit Card',
+          status: true,
+      },
+      {
+          time: `2023-${this.currentMonth + 1}-15T15:45:00`,
+          customer_name: 'Bob Smith',
+          remarks: 'New customer',
+          amount_tendered: 80.00,
+          grand_total: 80.00,
+          mode_of_payment: 'Cash',
+          status: true,
+      },
+      {
+          time: `2023-${this.currentMonth + 1}-20T10:00:00`,
+          customer_name: 'Eve Rodriguez',
+          remarks: 'VIP customer',
+          amount_tendered: 300.00,
+          grand_total: 350.00,
+          mode_of_payment: 'Debit Card',
+          status: false,
+      },
+    ];
+
+    return saleBills;
+  }
+
+  // Mock Purchases
+  mockPurchase(): PurchaseBill[] {
+    const purchaseBills: PurchaseBill[] = [
+      {
+          billno: 'PB2023001',
+          time: `2023-${this.currentMonth + 1}-05T14:15:00`,
+          supplier_id: 101,
+          grand_total: 1200.50,
+          remarks: 'Received raw materials for production',
+      },
+      {
+          billno: 'PB2023002',
+          time: `2023-${this.currentMonth + 1}-10T09:30:00`,
+          supplier_id: 102,
+          grand_total: 800.00,
+          remarks: 'Restocking office supplies',
+      },
+      {
+          billno: 'PB2023003',
+          time: `2023-${this.currentMonth + 1}-15T11:45:00`,
+          supplier_id: 103,
+          grand_total: 2500.00,
+          remarks: 'New machinery for production line',
+      },
+    ];
+
+    return purchaseBills;
+  }
+
+  // Mock Stocks
+  mockStocks(): Stock[] {
+    const stocks: Stock[] = [
+      {
+          code: 'STK001',
+          stock_name: 'Widget A',
+          description: 'High-quality widgets for various uses',
+          quantity: 100,
+          unit: 'pieces',
+          date_added: `2023-${this.currentMonth + 1}-01T08:00:00`,
+          status: true,
+          show_notification: false,
+      },
+      {
+          code: 'STK002',
+          stock_name: 'Gadget B',
+          description: 'Advanced gadgets with multiple features',
+          quantity: 50,
+          unit: 'units',
+          date_added: `2023-${this.currentMonth + 1}-05T12:30:00`,
+          status: true,
+          show_notification: true,
+      },
+      {
+          code: 'STK003',
+          stock_name: 'Accessory C',
+          description: 'Essential accessories for electronic devices',
+          quantity: 200,
+          unit: 'pieces',
+          date_added: `2023-${this.currentMonth + 1}-10T10:15:00`,
+          status: true,
+          show_notification: false,
+      },
+    ];
+
+    return stocks;
+  }
+
+  // This class ends here
 }

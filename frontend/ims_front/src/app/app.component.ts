@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -7,7 +8,8 @@ import { Router } from '@angular/router';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title: string = "RylCodes-IMS";
+  title: string = "Ryl-Invenia+";
+  version = environment.version;
 
   constructor(private router: Router) {}
 

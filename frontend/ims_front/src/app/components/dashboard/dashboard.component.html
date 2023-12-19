@@ -21,11 +21,11 @@
                         <fa-icon [icon]="faBoxesStacked"></fa-icon>
                     </div>
                 </div>
-                <div *ngIf="sortStockByQty && sortStockByQty.length > 0" class="flex flex-col justify-around p-3 sm:flex-row">
-                    <p class="text-xxs sm:text-xs">Lowest stock: {{sortStockByQty[0]?.stock_name}}</p>
-                    <p class="text-xxs sm:text-xs">Quantity: {{sortStockByQty[0]?.quantity}} {{sortStockByQty[0]?.unit}}</p>
+                <div *ngIf="stockWithLowestQuantity" class="flex flex-col justify-around p-3 sm:flex-row">
+                    <p class="text-xxs sm:text-xs">Lowest stock: {{stockWithLowestQuantity.stock_name}}</p>
+                    <p class="text-xxs sm:text-xs">Quantity: {{stockWithLowestQuantity.quantity}} {{stockWithLowestQuantity.unit}}</p>
                 </div>
-                <div *ngIf="!sortStockByQty || sortStockByQty.length === 0" class="flex flex-col justify-around p-3 sm:flex-row">
+                <div *ngIf="!stockWithLowestQuantity" class="flex flex-col justify-around p-3 sm:flex-row">
                     <p>No stock available</p>
                 </div>
                 <a routerLink="/stocks" class="flex justify-center items-center px-2 py-1 space-x-1 w-full bg-[rgba(0,0,0,0.2)] lg:py-1.5">

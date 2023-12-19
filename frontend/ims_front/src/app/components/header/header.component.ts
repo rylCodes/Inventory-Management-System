@@ -13,6 +13,7 @@ import { Notification } from 'src/app/interface/Notification';
 import { Observable, Subscription, forkJoin } from 'rxjs';
 import { UiService } from 'src/app/services/ui/ui.service';
 import { ToastrService } from 'ngx-toastr';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-header',
@@ -50,7 +51,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
     };
   }
 
-  title = 'RylCodes-IMS';
+  title = 'Ryl-Invenia+';
+  version = environment.version;
 
   logOutIcon = faRightFromBracket;
   faXmark = faXmark;

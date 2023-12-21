@@ -495,17 +495,17 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
         // Update total bill upon adding an item
         if (this.showPurchaseBill) {
           this.bill.grand_total += item.sub_total;
+
+          this.purchaseService.editPurchaseBill(this.bill)
+          .subscribe({
+            next: bill => {
+              this.bill = bill;
+              this.loadBills();
+            },
+            error: err => console.log(err) 
+          });
         }
     
-        this.purchaseService.editPurchaseBill(this.bill)
-        .subscribe({
-          next: bill => {
-            this.bill = bill;
-            this.loadBills();
-          },
-          error: err => console.log(err) 
-        });
-
         if (!item || item.item_price < 1) {
           this.toastrService.warning(
             "You have added an item without a price. Make sure it is correct.",
@@ -704,11 +704,13 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
     .subscribe({
       next: async () => {
         // Reduce bill total amount upon deleting an item
-        this.purchaseService.editPurchaseBill(this.bill)
-        .subscribe({
-          next: data => {this.bill = data},
-          error: (err) => {console.log(err)},
-        });
+        if (this.showPurchaseBill) {
+          this.purchaseService.editPurchaseBill(this.bill)
+          .subscribe({
+            next: data => {this.bill = data},
+            error: (err) => {console.log(err)},
+          });
+        };
 
         // Update stock quantity upon deleting an item
         const foundStock = this.stocks.find(stock => stock.id === this.deletingItem?.stock_id);

@@ -35,7 +35,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   purchaseBills: PurchaseBill[] = [];
   purchaseItems: PurchaseItem[] = [];
   suppliers: Supplier[] = [];
-  sortStockByQty: any;
+  stockWithLowestQuantity?: Stock;
 
   saleBillsSubscription: Subscription = new Subscription();
 
@@ -82,9 +82,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
       next: (stocks) => {
         this.stocks = stocks;
         this.stocksToCheck = stocks.filter(stock => stock.unit !== 'ml' && stock.unit !== 'gram');
-        this.sortStockByQty = this.stocks.sort((a, b) => {
-          return a.quantity - b.quantity;
-        })
+        this.stockWithLowestQuantity  = stocks.reduce((minStock, currentStock) => {
+          return currentStock.quantity < minStock.quantity ? currentStock : minStock;
+        }, stocks[0]);
       },
       error: (err) => {
         console.log(err);

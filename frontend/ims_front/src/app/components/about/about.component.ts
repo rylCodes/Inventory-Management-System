@@ -6,6 +6,6 @@ import { Component } from '@angular/core';
   styleUrls: ['./about.component.css']
 })
 export class AboutComponent {
-  title: string = "RylCodes-IMS";
+  title: string = "Ryl-Invenia+";
   owner: string = "Daryl Andres";
 }

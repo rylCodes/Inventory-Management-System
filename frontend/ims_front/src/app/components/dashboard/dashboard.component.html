@@ -28,7 +28,7 @@
                 <div *ngIf="!stockWithLowestQuantity" class="flex flex-col justify-around p-3 sm:flex-row">
                     <p>No stock available</p>
                 </div>
-                <a routerLink="/stocks" class="flex justify-center items-center px-2 py-1 space-x-1 w-full bg-[rgba(0,0,0,0.2)] lg:py-1.5">
+                <a routerLink="/stocks" class="flex justify-center items-center px-2 py-1 space-x-1 w-full bg-[rgba(0,0,0,0.2)] lg:py-1.5 hover:bg-[rgba(0,0,0,0.3)] hover:font-medium">
                     <p>Proceed</p>
                     <fa-icon [icon]="faCircleArrowRight"></fa-icon>
                 </a>
@@ -47,7 +47,7 @@
                     </div>
                 </div>
                 <a routerLink="/products"
-                    class="flex justify-center items-center px-2 py-1 space-x-1 w-full bg-[rgba(0,0,0,0.2)] lg:py-1.5">
+                    class="flex justify-center items-center px-2 py-1 space-x-1 w-full bg-[rgba(0,0,0,0.2)] lg:py-1.5 hover:bg-[rgba(0,0,0,0.3)] hover:font-medium">
                     <p>Procced</p>
                     <fa-icon [icon]="faCircleArrowRight"></fa-icon>
                 </a>
@@ -69,7 +69,7 @@
                     </div>
                 </div>
                 <a routerLink="/suppliers"
-                    class="flex justify-center items-center px-2 py-1 space-x-1 w-full bg-[rgba(0,0,0,0.2)] lg:py-1.5">
+                    class="flex justify-center items-center px-2 py-1 space-x-1 w-full bg-[rgba(0,0,0,0.2)] lg:py-1.5 hover:bg-[rgba(0,0,0,0.3)] hover:font-medium">
                     <p>Procced</p>
                     <fa-icon [icon]="faCircleArrowRight"></fa-icon>
                 </a>
@@ -89,7 +89,7 @@
                     <p class="text-xxs sm:text-xs">Yesterday: &#8369;{{getYesterdaySales() | number: '1.2-2'}}</p>
                     <p class="text-xxs sm:text-xs">This week: &#8369;{{getThisWeekSales() | number: '1.2-2'}}</p>
                 </div>
-                <a routerLink="/sales" class="flex justify-center items-center px-2 py-1 space-x-1 w-full bg-[rgba(0,0,0,0.2)] lg:py-1.5">
+                <a routerLink="/sales" class="flex justify-center items-center px-2 py-1 space-x-1 w-full bg-[rgba(0,0,0,0.2)] lg:py-1.5 hover:bg-[rgba(0,0,0,0.3)] hover:font-medium">
                     <span>Proceed</span>
                     <fa-icon [icon]="faCircleArrowRight"></fa-icon>
                 </a>

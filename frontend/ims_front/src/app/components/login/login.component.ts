@@ -12,6 +12,7 @@ import { ToastrService } from 'ngx-toastr';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent implements OnInit {
+  title = 'Ryl-Invenia+';
   loginForm!: FormGroup;
   errorMessage: string | null = null;
   isLoading: boolean = false;

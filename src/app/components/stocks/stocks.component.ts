@@ -76,7 +76,7 @@ export class StocksComponent implements OnInit {
 
   stock: Stock = {
     id: undefined,
-    code: "",
+    code: undefined,
     stock_name: "",
     description: "",
     quantity: 0,
@@ -87,7 +87,7 @@ export class StocksComponent implements OnInit {
 
   originalStock: Stock = {
     id: undefined,
-    code: "",
+    code: undefined,
     stock_name: "",
     description: "",
     quantity: 0,

@@ -1,0 +1,23 @@
+<div class="flex justify-end items-center space-x-2 w-full">
+    <div *ngIf="isFilter" class="flex items-center text-xs lg:text-[14px]">
+        <fa-icon class="text-neutral-500" [icon]="faFilter"></fa-icon>
+        <div class="flex items-center mx-1 px-2 py-1 rounded-sm bg-neutral-300 w-fit">
+            <p class="text-neutral-900 mr-2">{{filterText}}</p>
+            <fa-icon class="text-xxs lg:text-[11px] text-neutral-700 hover:text-neutral-900" (click)="onRemoveFilter()"
+                [icon]="faTimes"></fa-icon>
+        </div>
+    </div>
+
+    <form *ngIf="showSearchBar" class="flex py-1 rounded-sm bg-white shadow-md w-1/2 lg:w-1/4">
+        <fa-icon class="px-2 text-neutral-400" [icon]="faMagnifyingGlass">
+        </fa-icon>
+        <input class="px-1 outline-none bg-inherit border-neutral-500 w-full" appFocusOnShow [(ngModel)]="searchQuery"
+            name="searchQuery" (input)="onInputChange()" (keyup.enter)="onSearch()" type="text" placeholder="Search...">
+        <fa-icon *ngIf="searchQuery" class="px-2 text-neutral-400" [icon]="faXmark" (click)="onClearText()">
+        </fa-icon>
+    </form>
+    <fa-icon class="" (click)="onClick()" *ngIf="!showSearchBar"
+        class="px-2 py-1 text-base lg:text-lg hover:bg-neutral-300 cursor-pointer rounded-md"
+        [icon]="faMagnifyingGlass">
+    </fa-icon>
+</div>

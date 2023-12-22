@@ -1,0 +1,108 @@
+/* You can add global styles to this file, and also import other style files */
+@import 'ngx-toastr/toastr';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* TOASTR STYLE */
+.toast-top-center {
+    top: 20px !important;
+}
+
+.toast-success,
+.toast-warning,
+.toast-info,
+.toast-error {
+    color: #ffff;
+    box-shadow: none !important;
+}
+
+.toast-close-button {
+    color: #000000;
+    text-shadow: 0 1px 0 #000000;
+    opacity: 0.6;
+}
+
+.toast-success {
+    background-color: #008000 !important;
+}
+
+.toast-error {
+    background-color: #ff0000 !important;
+}
+
+.toast-info {
+    background-color: #0000ff !important;
+}
+
+.toast-warning {
+    background-color: #ffa500 !important;
+}
+
+/* PAGINATION */
+.ngx-pagination .current {
+    background-color: rgb(82 82 82) !important;
+    border-radius: 10% !important;
+}
+
+.ngx-pagination a, .ngx-pagination button {
+    color: rgb(23 23 23) !important;
+}
+
+.ngx-pagination a:hover,
+.ngx-pagination button:hover {
+  background-color: rgb(212 212 212) !important;
+  border-radius: 10% !important;
+}
+
+/* GLOBAL FONT SIZE */
+.text-xxs {
+    font-size: 10px;
+    line-height: 12px;
+}
+
+.text-mb {
+    font-size: 13px;
+    line-height: 18px;
+}
+
+
+/* TABLE STYLE */
+table {
+    border-radius: 10px;
+}
+
+table tbody tr {
+    background-color: #fff;
+}
+
+table tbody tr:nth-child(even) {
+    background-color: #ebebeb;
+}
+
+table th {
+    padding: 10px;
+}
+
+@media (max-width: 768px) {
+
+    table thead th,
+    table tbody td {
+        white-space: pre-wrap;
+        text-overflow: clip;
+        overflow-x: hidden;
+    }
+
+    .active {
+        border-left: 5px solid #008000;
+        margin: 0;
+        padding: 0;
+    }
+
+    .inactive {
+        border-left: 5px solid darkorange;
+        margin: 0;
+        padding: 0;
+    }
+}

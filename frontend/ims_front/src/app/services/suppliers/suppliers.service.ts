@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, catchError, throwError } from 'rxjs';
 import { Supplier } from 'src/app/interface/Supplier';
 import { ToastrService } from 'ngx-toastr';
+import { environment } from 'src/environments/environment';
 
 const httpOptions = {
   headers: new HttpHeaders({
@@ -17,7 +18,7 @@ export class SuppliersService {
 
   constructor(private http: HttpClient, private toastrService: ToastrService) { }
 
-  private apiUrl = 'http://localhost:8000/ims-api/suppliers/';
+  private apiUrl = environment.baseUrl;
   searchQuery: string | null = null;
 
   handleSupplierError(error:any) {
@@ -25,7 +26,7 @@ export class SuppliersService {
   }
 
   addSupplier(supplier: Supplier) {
-    return this.http.post<Supplier>(this.apiUrl, supplier, httpOptions)
+    return this.http.post<Supplier>(`${this.apiUrl}ims-api/suppliers/`, supplier, httpOptions)
       .pipe(
         catchError((err) => {
           this.handleSupplierError(err);
@@ -39,7 +40,7 @@ export class SuppliersService {
     if (searchQuery) {
       params = params.set('search', searchQuery)
     }
-    return this.http.get<Supplier[]>(this.apiUrl, { params })
+    return this.http.get<Supplier[]>(`${this.apiUrl}ims-api/suppliers/`, { params })
       .pipe(
         catchError((err) => {
           this.handleSupplierError(err);
@@ -49,7 +50,7 @@ export class SuppliersService {
   }
 
   editSupplier(supplier: Supplier) {
-    const url = this.apiUrl + `${supplier.id}/`;
+    const url = `${this.apiUrl}ims-api/suppliers/` + `${supplier.id}/`;
     return this.http.put<Supplier>(url, supplier, httpOptions)
     .pipe(
       catchError((err) => {
@@ -60,7 +61,7 @@ export class SuppliersService {
   }
 
   deleteSupplier(supplier: Supplier, adminPassword?: string) {
-    const url = this.apiUrl + `${supplier.id}`;
+    const url = `${this.apiUrl}ims-api/suppliers/` + `${supplier.id}`;
     const body = { admin_password: adminPassword };
     return this.http.delete<Supplier>(url, { body })
     .pipe(

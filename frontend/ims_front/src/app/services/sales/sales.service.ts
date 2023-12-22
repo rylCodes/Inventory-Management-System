@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, catchError, throwError, BehaviorSubject } from 'rxjs';
 import { SaleBill, SaleItem } from 'src/app/interface/Sale';
+import { environment } from 'src/environments/environment';
+
 const httpOptions = {
   headers: new HttpHeaders({
     "Content-type": 'application/json',
@@ -12,7 +14,7 @@ const httpOptions = {
   providedIn: 'root'
 })
 export class SalesService {
-  private apiUrl = 'http://localhost:8000/ims-api/';
+  private apiUrl = environment.baseUrl;
   private saleBills = new BehaviorSubject<SaleBill[]>([]);
 
   constructor(private http: HttpClient) { }
@@ -23,7 +25,7 @@ export class SalesService {
 
   // SALE BILL
   addSaleBill(saleBill: SaleBill) {
-    return this.http.post<SaleBill>(`${this.apiUrl}sales-bill/`, saleBill, httpOptions)
+    return this.http.post<SaleBill>(`${this.apiUrl}ims-api/sales-bill/`, saleBill, httpOptions)
       .pipe(
         catchError((err) => {
           this.handleSaleError(err);
@@ -38,7 +40,7 @@ export class SalesService {
       params = params.set('search', searchQuery)
     }
     
-    return this.http.get<SaleBill[]>(`${this.apiUrl}sales-bill/`, { params }).pipe(
+    return this.http.get<SaleBill[]>(`${this.apiUrl}ims-api/sales-bill/`, { params }).pipe(
       catchError((err) => {
         this.handleSaleError(err);
         return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to display transactions!`)
@@ -47,14 +49,14 @@ export class SalesService {
   }
 
   fetchSaleBills(): BehaviorSubject<SaleBill[]> {
-    this.http.get<SaleBill[]>(`${this.apiUrl}sales-bill/`).subscribe(
+    this.http.get<SaleBill[]>(`${this.apiUrl}ims-api/sales-bill/`).subscribe(
       (saleBills: SaleBill[]) => {this.saleBills.next(saleBills)}
     )
     return this.saleBills;
   }
 
   editSaleBill(saleBill: SaleBill, adminPassword?: string) {
-    const url = `${this.apiUrl}sales-bill/` + `${saleBill.id}/`;
+    const url = `${this.apiUrl}ims-api/sales-bill/` + `${saleBill.id}/`;
     const body = adminPassword? { admin_password: adminPassword, ...saleBill } : saleBill;
     return this.http.put<SaleBill>(url, body, httpOptions)
     .pipe(
@@ -66,7 +68,7 @@ export class SalesService {
   }
 
   deleteSaleBill(saleBill: SaleBill) {
-    const url = `${this.apiUrl}sales-bill/` + `${saleBill.id}`;
+    const url = `${this.apiUrl}ims-api/sales-bill/` + `${saleBill.id}`;
     return this.http.delete<SaleBill>(url)
       .pipe(
         catchError((err) => {
@@ -78,7 +80,7 @@ export class SalesService {
 
   // SALE ITEM
   addSaleItem(saleItem: SaleItem) {
-    return this.http.post<SaleItem>(`${this.apiUrl}sales-item/`, saleItem, httpOptions)
+    return this.http.post<SaleItem>(`${this.apiUrl}ims-api/sales-item/`, saleItem, httpOptions)
       .pipe(
         catchError((err) => {
           this.handleSaleError(err);
@@ -88,7 +90,7 @@ export class SalesService {
   }
 
   getSaleItems(): Observable<SaleItem[]> {
-    return this.http.get<SaleItem[]>(`${this.apiUrl}sales-item/`)
+    return this.http.get<SaleItem[]>(`${this.apiUrl}ims-api/sales-item/`)
       .pipe(
         catchError((err) => {
           this.handleSaleError(err);
@@ -98,7 +100,7 @@ export class SalesService {
   }
 
   editSaleItem(saleItem: SaleItem) {
-    const url = `${this.apiUrl}sales-item/` + `${saleItem.id}/`;
+    const url = `${this.apiUrl}ims-api/sales-item/` + `${saleItem.id}/`;
     return this.http.put<SaleItem>(url, saleItem, httpOptions)
     .pipe(
       catchError((err) => {
@@ -109,7 +111,7 @@ export class SalesService {
   }
 
   deleteSaleItem(saleItem: SaleItem, adminPassword?: string) {
-    const url = `${this.apiUrl}sales-item/` + `${saleItem.id}`;
+    const url = `${this.apiUrl}ims-api/sales-item/` + `${saleItem.id}`;
     const body = { admin_password: adminPassword }
     return this.http.delete<SaleItem>(url, { body })
       .pipe(

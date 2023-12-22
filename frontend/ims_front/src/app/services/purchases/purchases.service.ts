@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, catchError, throwError } from 'rxjs';
 import { PurchaseBill, PurchaseItem } from 'src/app/interface/Purchase';
+import { environment } from 'src/environments/environment';
 
 const httpOptions = {
   headers: new HttpHeaders({
@@ -13,7 +14,7 @@ const httpOptions = {
   providedIn: 'root'
 })
 export class PurchasesService {
-  private apiUrl = 'http://localhost:8000/ims-api/';
+  private apiUrl = environment.baseUrl;
 
   constructor(private http: HttpClient) { }
   
@@ -23,7 +24,7 @@ export class PurchasesService {
 
   // SALE BILL
   addPurchaseBill(purchaseBill: PurchaseBill) {
-    return this.http.post<PurchaseBill>(`${this.apiUrl}purchase-bill/`, purchaseBill, httpOptions)
+    return this.http.post<PurchaseBill>(`${this.apiUrl}ims-api/purchase-bill/`, purchaseBill, httpOptions)
       .pipe(
         catchError((err) => {
           this.handlePurchaseError(err);
@@ -37,7 +38,7 @@ export class PurchasesService {
     if (searchQuery) {
       params = params.set('search', searchQuery)
     }
-    return this.http.get<PurchaseBill[]>(`${this.apiUrl}purchase-bill/`, { params })
+    return this.http.get<PurchaseBill[]>(`${this.apiUrl}ims-api/purchase-bill/`, { params })
       .pipe(
         catchError(err => {
           this.handlePurchaseError(err);
@@ -47,7 +48,7 @@ export class PurchasesService {
   }
 
   editPurchaseBill(purchaseBill: PurchaseBill, adminPassword?: string) {
-    const url = `${this.apiUrl}purchase-bill/` + `${purchaseBill.id}/`;
+    const url = `${this.apiUrl}ims-api/purchase-bill/` + `${purchaseBill.id}/`;
     const body = adminPassword? { admin_password: adminPassword, ...purchaseBill } : purchaseBill;
     return this.http.put<PurchaseBill>(url, body, httpOptions)
     .pipe(
@@ -59,7 +60,7 @@ export class PurchasesService {
   }
 
   deletePurchaseBill(purchaseBill: PurchaseBill) {
-    const url = `${this.apiUrl}purchase-bill/` + `${purchaseBill.id}`;
+    const url = `${this.apiUrl}ims-api/purchase-bill/` + `${purchaseBill.id}`;
     return this.http.delete<PurchaseBill>(url)
     .pipe(
       catchError((err) => {
@@ -71,7 +72,7 @@ export class PurchasesService {
 
   // SALE ITEM
   addPurchaseItem(purchaseItem: PurchaseItem) {
-    return this.http.post<PurchaseItem>(`${this.apiUrl}purchase-item/`, purchaseItem, httpOptions)
+    return this.http.post<PurchaseItem>(`${this.apiUrl}ims-api/purchase-item/`, purchaseItem, httpOptions)
       .pipe(
         catchError((err) => {
           this.handlePurchaseError(err);
@@ -81,7 +82,7 @@ export class PurchasesService {
   }
 
   getPurchaseItems(): Observable<PurchaseItem[]> {
-    return this.http.get<PurchaseItem[]>(`${this.apiUrl}purchase-item/`)
+    return this.http.get<PurchaseItem[]>(`${this.apiUrl}ims-api/purchase-item/`)
       .pipe(
         catchError((err) => {
           this.handlePurchaseError(err);
@@ -91,7 +92,7 @@ export class PurchasesService {
   }
 
   editPurchaseItem(purchaseItem: PurchaseItem) {
-    const url = `${this.apiUrl}purchase-item/` + `${purchaseItem.id}/`;
+    const url = `${this.apiUrl}ims-api/purchase-item/` + `${purchaseItem.id}/`;
     return this.http.put<PurchaseItem>(url, purchaseItem, httpOptions)
     .pipe(
       catchError((err) => {
@@ -102,7 +103,7 @@ export class PurchasesService {
   }
 
   deletePurchaseItem(purchaseItem: PurchaseItem, adminPassword?: string) {
-    const url = `${this.apiUrl}purchase-item/` + `${purchaseItem.id}`;
+    const url = `${this.apiUrl}ims-api/purchase-item/` + `${purchaseItem.id}`;
     const body = { admin_password: adminPassword };
     return this.http.delete<PurchaseItem>(url, { body })
       .pipe(

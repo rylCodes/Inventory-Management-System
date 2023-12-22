@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, catchError, throwError } from 'rxjs';
 import { Owner } from 'src/app/interface/Owner';
+import { environment } from 'src/environments/environment';
 
 const httpOptions = {
   headers: new HttpHeaders({
@@ -16,7 +17,7 @@ export class OwnerService {
 
   constructor(private http: HttpClient) { }
 
-  private apiUrl = 'http://localhost:8000/ims-api/owners/';
+  private apiUrl = environment.baseUrl;
   searchQuery: string | null = null;
 
   handleOwnerError(error:any) {
@@ -24,7 +25,7 @@ export class OwnerService {
   }
 
   addOwner(owner: Owner) {
-    return this.http.post<Owner>(this.apiUrl, owner, httpOptions)
+    return this.http.post<Owner>(`${this.apiUrl}ims-api/owners/`, owner, httpOptions)
       .pipe(
         catchError((err) => {
           this.handleOwnerError(err);
@@ -38,7 +39,7 @@ export class OwnerService {
     if (this.searchQuery) {
       params = params.set('search', this.searchQuery)
     }
-    return this.http.get<Owner[]>(this.apiUrl, { params: params})
+    return this.http.get<Owner[]>(`${this.apiUrl}ims-api/owners/`, { params: params})
       .pipe(
         catchError((err) => {
           this.handleOwnerError(err);
@@ -48,7 +49,7 @@ export class OwnerService {
   }
 
   editOwner(owner: Owner) {
-    const url = this.apiUrl + `${owner.id}/`;
+    const url = `${this.apiUrl}ims-api/owners/` + `${owner.id}/`;
     return this.http.put<Owner>(url, owner, httpOptions)
     .pipe(
       catchError((err) => {
@@ -59,7 +60,7 @@ export class OwnerService {
   }
 
   deleteOwner(owner: Owner) {
-    const url = this.apiUrl + `${owner.id}`;
+    const url = `${this.apiUrl}ims-api/owners/` + `${owner.id}`;
     return this.http.delete<Owner>(url)
       .pipe(
         catchError((err) => {

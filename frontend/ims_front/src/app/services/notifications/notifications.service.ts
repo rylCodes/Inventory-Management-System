@@ -4,6 +4,7 @@ import { Observable, catchError, throwError, BehaviorSubject, Subject } from 'rx
 import { Notification } from 'src/app/interface/Notification';
 import { Stock } from 'src/app/interface/Stock';
 import { ToastrService } from 'ngx-toastr';
+import { environment } from 'src/environments/environment';
 
 const httpOptions = {
   headers: new HttpHeaders({
@@ -15,7 +16,7 @@ const httpOptions = {
   providedIn: 'root'
 })
 export class NotificationsService {
-  private apiUrl = 'http://localhost:8000/ims-api/notifications/'
+  private apiUrl = environment.baseUrl
   private notifications = new BehaviorSubject<Notification[]>([]);
   private notifServiceStatusSubject = new Subject<boolean>();
 
@@ -30,7 +31,7 @@ export class NotificationsService {
   }
 
   addNotification(notification: Notification) {
-    return this.http.post<Notification>(this.apiUrl, notification, httpOptions)
+    return this.http.post<Notification>(`${this.apiUrl}ims-api/notifications/`, notification, httpOptions)
     .pipe(
       catchError((err) => {
         this.handleError(err);
@@ -40,7 +41,7 @@ export class NotificationsService {
   }
 
   getNotifications(): Observable<Notification[]> {
-    return this.http.get<Notification[]>(this.apiUrl)
+    return this.http.get<Notification[]>(`${this.apiUrl}ims-api/notifications/`)
     .pipe(
       catchError((err) => {
         this.handleError(err);
@@ -50,14 +51,14 @@ export class NotificationsService {
   }
 
   fetchNotifications(): BehaviorSubject<Notification[]> {
-    this.http.get<Notification[]>(this.apiUrl).subscribe(
+    this.http.get<Notification[]>(`${this.apiUrl}ims-api/notifications/`).subscribe(
       (notifications: Notification[]) => {this.notifications.next(notifications)}
     )
     return this.notifications;
   }
 
   deleteNotification(notification: Notification) {
-    const url = this.apiUrl + `${notification.id}`;
+    const url = `${this.apiUrl}ims-api/notifications/` + `${notification.id}`;
     return this.http.delete<Notification>(url)
     .pipe(
       catchError((err) => {
@@ -68,7 +69,7 @@ export class NotificationsService {
   }
 
   updateNotification(notif: Notification) {
-    const url = this.apiUrl + `${notif.id}/`;
+    const url = `${this.apiUrl}ims-api/notifications/` + `${notif.id}/`;
     return this.http.put<Notification>(url, notif, httpOptions);
   }
 

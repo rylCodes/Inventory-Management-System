@@ -2,6 +2,7 @@
   import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
   import { Observable, catchError, throwError } from 'rxjs';
   import { Stock } from 'src/app/interface/Stock';
+  import { environment } from 'src/environments/environment';
 
   const httpOptions = {
     headers: new HttpHeaders({
@@ -13,7 +14,7 @@
     providedIn: 'root'
   })
   export class StocksService {
-    private apiUrl = 'http://localhost:8000/ims-api/stocks/';
+    private apiUrl = environment.baseUrl;
     searchQuery: string = "SD";
 
     constructor(private http: HttpClient) { }
@@ -23,7 +24,7 @@
     }
 
     addStock(stock: Stock) {
-      return this.http.post<Stock>(this.apiUrl, stock, httpOptions)
+      return this.http.post<Stock>(`${this.apiUrl}ims-api/stocks/`, stock, httpOptions)
         .pipe(
           catchError((err) => {
             this.handleStockError(err);
@@ -37,7 +38,7 @@
       if (searchQuery) {
         params = params.set('search', searchQuery)
       }
-      return this.http.get<Stock[]>(this.apiUrl, { params})
+      return this.http.get<Stock[]>(`${this.apiUrl}ims-api/stocks/`, { params})
         .pipe(
           catchError((err) => {
             this.handleStockError(err);
@@ -47,7 +48,7 @@
     }
 
     editStock(stock: Stock) {
-      const url = this.apiUrl + `${stock.id}/`;
+      const url = `${this.apiUrl}ims-api/stocks/` + `${stock.id}/`;
       return this.http.put<Stock>(url, stock, httpOptions)
       .pipe(
         catchError((err) => {
@@ -58,7 +59,7 @@
     }
 
     deleteStock(stock: Stock) {
-      const url = this.apiUrl + `${stock.id}`;
+      const url = `${this.apiUrl}ims-api/stocks/` + `${stock.id}`;
       return this.http.delete<Stock>(url)
         .pipe(
           catchError((err) => {

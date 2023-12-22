@@ -10,7 +10,6 @@ import { NgxPrintModule } from 'ngx-print';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { ChartModule } from 'angular-highcharts';
-import { HighchartsChartModule } from 'highcharts-angular';
 import { DatePipe } from '@angular/common';
 
 import { authGuard } from './guard/auth.guard';
@@ -77,7 +76,7 @@ const appRoutes: Routes = [
   imports: [
     BrowserModule,
     AppRoutingModule,
-    RouterModule.forRoot(appRoutes),
+    RouterModule.forRoot(appRoutes, { useHash: true }),
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
@@ -86,7 +85,6 @@ const appRoutes: Routes = [
     BrowserAnimationsModule,
     NgxPaginationModule,
     ChartModule,
-    HighchartsChartModule,
     ToastrModule.forRoot({
       positionClass: 'toast-top-center',
       closeButton: true,

@@ -1,6 +1,6 @@
 export interface Stock {
     id?: number,
-    code: string,
+    code?: string,
     stock_name: string,
     description: string,
     quantity: number,

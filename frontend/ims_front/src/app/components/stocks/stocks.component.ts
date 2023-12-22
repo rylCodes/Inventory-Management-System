@@ -76,7 +76,7 @@ export class StocksComponent implements OnInit {
 
   stock: Stock = {
     id: undefined,
-    code: "",
+    code: undefined,
     stock_name: "",
     description: "",
     quantity: 0,
@@ -87,7 +87,7 @@ export class StocksComponent implements OnInit {
 
   originalStock: Stock = {
     id: undefined,
-    code: "",
+    code: undefined,
     stock_name: "",
     description: "",
     quantity: 0,
@@ -219,16 +219,9 @@ export class StocksComponent implements OnInit {
     }
 
     const newStock = {
-      id: this.stock.id,
-      code: this.stock.code,
+      ...this.stock,
       stock_name: this.stock.stock_name.toUpperCase(),
       description: this.stock.description.toUpperCase(),
-      quantity: this.stock.quantity,
-      unit: this.stock.unit,
-      date_added: this.stock.date_added,
-      date_updated: this.stock.date_updated,
-      status: this.stock.status,
-      show_notification: this.stock.show_notification,
     }
 
     const isStockNameExist = this.stocks.some(stock => stock.stock_name === newStock.stock_name);

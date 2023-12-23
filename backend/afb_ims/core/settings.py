@@ -23,9 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-zopye3c7_!x5$(^!z-y0kz#qck3v%gvb9**&39kk))3)!_5)th'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['inveniaplus-api.azurewebsites.net']
 
 
 # Application definition
@@ -145,7 +145,7 @@ CORS_ALLOW_ALL_ORIGIN = False
 CORS_ALLOWED_ORIGINS = [
     # 'http://localhost:4200',
     # 'http://127.0.0.1:4200',
-    'https://proud-wave-091e94800.4.azurestaticapps.net',
+    'https://icy-water-07fda8f00.4.azurestaticapps.net',
 ]
 
 CORS_ALLOW_METHOD = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']

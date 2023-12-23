@@ -8,7 +8,7 @@ import { environment } from 'src/environments/environment';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title: string = "Ryl-Invenia+";
+  title: string = "Invenia+";
   version = environment.version;
 
   constructor(private router: Router) {}

@@ -1,4 +1,4 @@
-<div class="relative w-full px-4 md:px-8">
+<div class="relative w-full px-2 sm:px-4 md:px-6 lg:px-8">
     <!-- HEADING: POS PAGE -->
     <div class="flex justify-between mt-8">
         <h1 class="font-bold text-2xl md:text-3xl">PURCHASES</h1>
@@ -42,7 +42,7 @@
 
     <!-- PURCHASE FORM: Edit -->
     <div *ngIf="showBillForm" class="flex justify-center top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] fixed">
-        <div class="relative flex flex-col items-center bg-white rounded-lg h-fit p-4 mt-32 w-1/2 lg:w-1/4 md:w-1/3">
+        <div class="relative flex flex-col items-center bg-white rounded-lg h-fit p-4 mt-32 w-2/3 lg:w-1/4 md:w-1/3">
             <fa-icon class="place-self-end scale-125 hover:scale-110" [icon]="faXmark"
                 [ngStyle]="{color: 'rgb(64 64 64 )'}" (click)="toggleBillForm()">
             </fa-icon>
@@ -136,7 +136,7 @@
                     </thead>
                     <tbody>
                         <tr *ngFor="let item of items">
-                            <td class="p-2">
+                            <td class="p-0.5 md:p-2">
                                 <div class="flex items-center justify-center space-x-1 md:space-x-3">
                                     <button class="px-1.5 py-1 rounded-md bg-[#ff0000]" (click)="deleteItem(item)">
                                         <fa-icon class="scale-75" [icon]="faTrashCan"
@@ -146,10 +146,10 @@
                                     <p>{{item.purchase_date | date: "MMM dd, hh:mm a"}}</p>
                                 </div>
                             </td>
-                            <td class="p-2">{{getStockDetails(item.stock_id).stockName}}</td>
-                            <td class="p-2">&#8369;{{item.item_price | number: '1.2-2'}}</td>
-                            <td class="p-2">{{item.quantity_purchased}}</td>
-                            <td class="p-2">&#8369;{{item.sub_total | number: '1.2-2'}}</td>
+                            <td class="p-0.5 md:p-2">{{getStockDetails(item.stock_id).stockName}}</td>
+                            <td class="p-0.5 md:p-2">&#8369;{{item.item_price | number: '1.2-2'}}</td>
+                            <td class="p-0.5 md:p-2">{{item.quantity_purchased}}</td>
+                            <td class="p-0.5 md:p-2">&#8369;{{item.sub_total | number: '1.2-2'}}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -245,12 +245,12 @@
                             <span>{{bill.billno}}</span>
                         </div>
                     </td>
-                    <td class="p-2">{{getSupplierDetails(bill.supplier_id).supplierName}}</td>
-                    <td class="p-2">{{getItemLength(bill)}}</td>
-                    <td class="p-2">&#8369;{{bill.grand_total | number: '1.2-2'}}</td>
-                    <td class="p-2 hidden md:table-cell">{{bill.remarks}}</td>
-                    <td class="p-2 hidden md:table-cell">{{bill.time | date: "MMM dd 'at' hh:mm a"}}</td>
-                    <td class="p-2">
+                    <td class="p-0.5 md:p-2">{{getSupplierDetails(bill.supplier_id).supplierName}}</td>
+                    <td class="p-0.5 md:p-2">{{getItemLength(bill)}}</td>
+                    <td class="p-0.5 md:p-2">&#8369;{{bill.grand_total | number: '1.2-2'}}</td>
+                    <td class="p-0.5 md:p-2 hidden md:table-cell">{{bill.remarks}}</td>
+                    <td class="p-0.5 md:p-2 hidden md:table-cell">{{bill.time | date: "MMM dd 'at' hh:mm a"}}</td>
+                    <td class="p-0.5 md:p-2">
                         <div class="flex justify-center items-start-center space-x-3 md:space-x-4">
                             <!-- Edit bill -->
                             <fa-icon class="hover:scale-110" [ngStyle]="{color: 'green'}" [icon]="faPen"
@@ -277,7 +277,7 @@
 
     <!-- PRODUCT MODAL: Confirm to Delete Product -->
     <div *ngIf="showItemActionModal" class="flex justify-center top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] fixed">
-        <div class="relative flex flex-col items-center bg-white rounded-lg h-fit p-4 mt-32 w-1/2 lg:w-1/4 md:w-1/3">
+        <div class="relative flex flex-col items-center bg-white rounded-lg h-fit p-4 mt-32 w-2/3 lg:w-1/4 md:w-1/3">
             <fa-icon class="place-self-end scale-125 hover:scale-110" [icon]="faXmark"
                 [ngStyle]="{color: 'rgb(64 64 64 )'}" (click)="toggleItemActionModal()">
             </fa-icon>
@@ -290,7 +290,7 @@
 
     <!-- PURCHASE MODAL: Confirm to Save Purchase -->
     <div *ngIf="showSaveBillModal" class="flex justify-center top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] fixed">
-        <div class="relative flex flex-col items-center bg-white rounded-lg h-fit p-4 mt-32 w-1/2 lg:w-1/4 md:w-1/3">
+        <div class="relative flex flex-col items-center bg-white rounded-lg h-fit p-4 mt-32 w-2/3 lg:w-1/4 md:w-1/3">
             <fa-icon class="place-self-end scale-125 hover:scale-110" [icon]="faXmark"
                 [ngStyle]="{color: 'rgb(64 64 64 )'}" (click)="toggleSaveBillModal()">
             </fa-icon>
@@ -308,7 +308,7 @@
 
     <!-- PURCHASE MODAL: Confirm to Delete Purchase -->
     <div *ngIf="showBillActionModal" class="flex justify-center top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] fixed">
-        <div class="relative flex flex-col items-center bg-white rounded-lg h-fit p-4 mt-32 w-1/2 lg:w-1/4 md:w-1/3">
+        <div class="relative flex flex-col items-center bg-white rounded-lg h-fit p-4 mt-32 w-2/3 lg:w-1/4 md:w-1/3">
             <fa-icon class="place-self-end scale-125 hover:scale-110" [icon]="faXmark"
                 [ngStyle]="{color: 'rgb(64 64 64 )'}" (click)="toggleBillActionModal()">
             </fa-icon>

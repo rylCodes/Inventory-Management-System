@@ -1,4 +1,4 @@
-<div class="relative w-full px-4 md:px-8">
+<div class="relative w-full px-2 sm:px-4 md:px-6 lg:px-8">
     <!-- HEADING -->
     <div class="flex justify-between mt-8">
         <h1 class="font-bold text-2xl lg:text-3xl">SUPPLIERS</h1>
@@ -92,18 +92,18 @@
             </thead>
             <tbody>
                 <tr [ngClass]="supplier.status ? 'active' : 'inactive'" *ngFor="let supplier of suppliers">
-                    <td class="p-2">{{supplier.code}}</td>
-                    <td class="p-2">{{supplier.name}}</td>
-                    <td class="p-2">{{supplier.address}}</td>
-                    <td class="p-2 break-words">{{supplier.phone }}</td>
-                    <td class="p-2 break-words">{{supplier.email }}</td>
-                    <td class="p-2 hidden md:table-cell">
+                    <td class="p-0.5 md:p-2">{{supplier.code}}</td>
+                    <td class="p-0.5 md:p-2">{{supplier.name}}</td>
+                    <td class="p-0.5 md:p-2">{{supplier.address}}</td>
+                    <td class="p-0.5 md:p-2 break-words">{{supplier.phone }}</td>
+                    <td class="p-0.5 md:p-2 break-words">{{supplier.email }}</td>
+                    <td class="p-0.5 md:p-2 hidden md:table-cell">
                         <span class="text-white text-xs px-2 py-1 rounded-md"
                             [ngClass]="supplier.status? 'bg-[#008000]' : 'bg-[#ffa500]'">
                             {{supplier.status? 'active' : 'inactive'}}
                         </span>
                     </td>
-                    <td class="p-2">
+                    <td class="p-0.5 md:p-2">
                         <div class="flex justify-center items-center space-x-2 md:space-x-4">
                             <!-- Edit supplier -->
                             <fa-icon class="hover:scale-110" [ngStyle]="{color: 'green'}" [icon]="faPen"

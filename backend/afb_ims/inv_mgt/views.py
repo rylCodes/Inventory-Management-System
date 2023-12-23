@@ -21,6 +21,13 @@ class StockList(generics.ListCreateAPIView):
 
         serializer = StockSerializer(queryset, many=True)
         return Response(serializer.data)
+    
+    def delete(self, request, *args, **kwargs):
+        try:
+            return super().delete(request, *args, **kwargs)
+        except ProtectedError as e:
+            error_message = "Unable to delete! This item is linked to other records."
+            return Response({"error": error_message}, status=status.HTTP_400_BAD_REQUEST)
 
 class StockDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Stock.objects.all()
@@ -64,6 +71,13 @@ class ProductDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     permission_classes = [IsAdminUser]
+
+    def delete(self, request, *args, **kwargs):
+        try:
+            return super().delete(request, *args, **kwargs)
+        except ProtectedError as e:
+            error_message = "Unable to delete! This item is linked to other records."
+            return Response({"error": error_message}, status=status.HTTP_400_BAD_REQUEST)
 
 # Supplier Views
 class SupplierList(generics.ListCreateAPIView):
@@ -114,6 +128,13 @@ class PurchaseBillDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = PurchaseBillSerializer
     permission_classes = [DeleteWithAdminPasswordPermission]
 
+    def delete(self, request, *args, **kwargs):
+        try:
+            return super().delete(request, *args, **kwargs)
+        except ProtectedError as e:
+            error_message = "Unable to delete! This purchase is linked to other records."
+            return Response({"error": error_message}, status=status.HTTP_400_BAD_REQUEST)
+
 # Purchase Item views
 class PurchaseItemList(generics.ListCreateAPIView):
     queryset = PurchaseItem.objects.all()
@@ -123,6 +144,13 @@ class PurchaseItemDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = PurchaseItem.objects.all()
     serializer_class = PurchaseItemSerializer
     permission_classes = [DeleteWithAdminPasswordPermission]
+
+    def delete(self, request, *args, **kwargs):
+        try:
+            return super().delete(request, *args, **kwargs)
+        except ProtectedError as e:
+            error_message = "Unable to delete! This item is linked to other records."
+            return Response({"error": error_message}, status=status.HTTP_400_BAD_REQUEST)
 
 # Sale Bill views
 class SalesBillList(generics.ListCreateAPIView):
@@ -145,6 +173,13 @@ class SalesBillDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = SalesBillSerializer
     permission_classes = [DeleteWithAdminPasswordPermission]
 
+    def delete(self, request, *args, **kwargs):
+        try:
+            return super().delete(request, *args, **kwargs)
+        except ProtectedError as e:
+            error_message = "Unable to delete! This is linked to other records."
+            return Response({"error": error_message}, status=status.HTTP_400_BAD_REQUEST)
+
 # Sales Item views
 class SalesItemList(generics.ListCreateAPIView):
     queryset = SalesItem.objects.all()
@@ -154,6 +189,13 @@ class SalesItemDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = SalesItem.objects.all()
     serializer_class = SalesItemSerializer
     permission_classes = [DeleteWithAdminPasswordPermission]
+
+    def delete(self, request, *args, **kwargs):
+        try:
+            return super().delete(request, *args, **kwargs)
+        except ProtectedError as e:
+            error_message = "Unable to delete! This item is linked to other records."
+            return Response({"error": error_message}, status=status.HTTP_400_BAD_REQUEST)
 
 # Notification views
 class NotificationList(generics.ListCreateAPIView):
@@ -173,3 +215,10 @@ class OwnerDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Owner.objects.all()
     serializer_class = OwnerSerializer
     permission_classes = [IsAdminUser]
+
+    def delete(self, request, *args, **kwargs):
+        try:
+            return super().delete(request, *args, **kwargs)
+        except ProtectedError as e:
+            error_message = "Unable to delete! This is linked to other records."
+            return Response({"error": error_message}, status=status.HTTP_400_BAD_REQUEST)

@@ -60,7 +60,7 @@ class Menu(models.Model):
         ordering = ['-date_added']
     
 @receiver(post_save, sender=Menu)
-def update_stock_code(sender, instance, created, **kwargs):
+def update_menu_code(sender, instance, created, **kwargs):
     if created and not instance.code:
         instance.code = f'MNU-0{year_last_digits()}-{get_padded_pk(instance, 4)}'
         instance.save()
@@ -68,7 +68,7 @@ def update_stock_code(sender, instance, created, **kwargs):
 # PRODUCT    
 class Product(models.Model):
     menu = models.ForeignKey(Menu, on_delete=models.CASCADE, blank=True, null=True)
-    stock_id = models.ForeignKey(Stock, on_delete=models.CASCADE)
+    stock_id = models.ForeignKey(Stock, on_delete=models.PROTECT)
     qty_per_order = models.FloatField(validators=[MinValueValidator(0)], default=0)
     date_added = models.DateTimeField(default=timezone.now)
 
@@ -117,7 +117,7 @@ class PurchaseBill(models.Model):
 
 # PURCHASE ITEM
 class PurchaseItem(models.Model):
-    stock_id = models.ForeignKey(Stock, on_delete=models.CASCADE, related_name="purchase_items")
+    stock_id = models.ForeignKey(Stock, on_delete=models.PROTECT, related_name="purchase_items")
     purchaseBill_id = models.ForeignKey(PurchaseBill, on_delete=models.CASCADE, blank=True, null=True)
     purchase_date = models.DateTimeField(auto_now_add=True)
     quantity_purchased = models.FloatField(validators=[MinValueValidator(0)], default=0)

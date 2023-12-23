@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, catchError, throwError } from 'rxjs';
 import { Product } from 'src/app/interface/Product';
 import { Menu } from 'src/app/interface/Product';
+import { environment } from 'src/environments/environment';
 
 const httpOptions = {
   headers: new HttpHeaders({
@@ -14,7 +15,7 @@ const httpOptions = {
   providedIn: 'root'
 })
 export class ProductsService {
-  private apiUrl = 'http://localhost:8000/ims-api/';
+  private apiUrl = environment.baseUrl;
 
   constructor(private http: HttpClient) { }
   
@@ -24,13 +25,12 @@ export class ProductsService {
 
   // SALE BILL
   addMenu(menu: Menu) {
-    return this.http.post<Menu>(`${this.apiUrl}menus/`, menu, httpOptions)
-      .pipe(
-        catchError((err) => {
-          this.handleError(err);
-          return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to add new product!`);
-        })
-      );
+    return this.http.post<Menu>(`${this.apiUrl}ims-api/menus/`, menu, httpOptions).pipe(
+      catchError((err) => {
+        this.handleError(err);
+        return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to add new product!`);
+      })
+    );
   }
 
   getMenus(searchQuery?: string): Observable<Menu[]> {
@@ -38,17 +38,16 @@ export class ProductsService {
     if (searchQuery) {
       params = params.set('search', searchQuery)
     }
-    return this.http.get<Menu[]>(`${this.apiUrl}menus/`, { params })
-      .pipe(
-        catchError((err) => {
-          this.handleError(err);
-          return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to display menu!`)
-        })
-      );
+    return this.http.get<Menu[]>(`${this.apiUrl}ims-api/menus/`, { params }).pipe(
+      catchError((err) => {
+        this.handleError(err);
+        return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to display menu!`)
+      })
+    );
   }
 
   updateMenu(menu: Menu) {
-    const url = `${this.apiUrl}menus/` + `${menu.id}/`;
+    const url = `${this.apiUrl}ims-api/menus/` + `${menu.id}/`;
     return this.http.put<Menu>(url, menu, httpOptions)
     .pipe(
       catchError((err) => { 
@@ -59,42 +58,39 @@ export class ProductsService {
   }
 
   deleteMenu(menu: Menu) {
-    const url = `${this.apiUrl}menus/` + `${menu.id}`;
-    return this.http.delete<Menu>(url)
-      .pipe(
-        catchError((err) => {
-          this.handleError(err);
-          if (err.error.error) {  
-            return throwError(() => err.error.error? err.error.error : 'Unable to delete product!');
-          }
-          return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to delete product!`);
-        })
-      );
+    const url = `${this.apiUrl}ims-api/menus/` + `${menu.id}`;
+    return this.http.delete<Menu>(url).pipe(
+      catchError((err) => {
+        this.handleError(err);
+        if (err.error.error) {  
+          return throwError(() => err.error.error? err.error.error : 'Unable to delete product!');
+        }
+        return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to delete product!`);
+      })
+    );
   }
 
   // SALE ITEM
   addProduct(product: Product) {
-    return this.http.post<Product>(`${this.apiUrl}products/`, product, httpOptions)
-      .pipe(
-        catchError((err) => {
-          this.handleError(err);
-          return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to add new item!`);
-        })
-      );
+    return this.http.post<Product>(`${this.apiUrl}ims-api/products/`, product, httpOptions).pipe(
+      catchError((err) => {
+        this.handleError(err);
+        return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to add new item!`);
+      })
+    );
   }
 
   getProducts(): Observable<Product[]> {
-    return this.http.get<Product[]>(`${this.apiUrl}products/`)
-      .pipe(
-        catchError((err) => {
-          this.handleError(err);
-          return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to display items!`);
-        })
-      );
+    return this.http.get<Product[]>(`${this.apiUrl}ims-api/products/`).pipe(
+      catchError((err) => {
+        this.handleError(err);
+        return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to display items!`);
+      })
+    );
   }
 
   updateProduct(product: Product) {
-    const url = `${this.apiUrl}products/` + `${product.id}/`;
+    const url = `${this.apiUrl}ims-api/products/` + `${product.id}/`;
     return this.http.put<Product>(url, product, httpOptions)
     .pipe(
       catchError((err) => {
@@ -105,14 +101,13 @@ export class ProductsService {
   }
 
   deleteProduct(product: Product) {
-    const url = `${this.apiUrl}products/` + `${product.id}`;
-    return this.http.delete<Product>(url)
-      .pipe(
-        catchError((err) => {
-          this.handleError(err);
-          return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to delete item!`);
-        })
-      );
+    const url = `${this.apiUrl}ims-api/products/` + `${product.id}`;
+    return this.http.delete<Product>(url).pipe(
+      catchError((err) => {
+        this.handleError(err);
+        return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to delete item!`);
+      })
+    );
   }
 
 }

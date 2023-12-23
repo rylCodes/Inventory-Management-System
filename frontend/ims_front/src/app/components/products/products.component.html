@@ -1,4 +1,4 @@
-<div class="relative w-full px-4 md:px-8">
+<div class="relative w-full px-2 sm:px-4 md:px-6 lg:px-8">
     <!-- HEADING: POS PAGE -->
     <div class="flex justify-between mt-8">
         <h1 class="font-bold text-2xl lg:text-3xl">MENU</h1>
@@ -42,7 +42,7 @@
 
     <!-- MENU FORM: Edit -->
     <div *ngIf="showMenuForm" class="flex justify-center top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] fixed">
-        <div class="relative flex flex-col items-center bg-white rounded-lg h-fit p-4 mt-24 w-1/2 lg:w-1/4 md:w-1/3">
+        <div class="relative flex flex-col items-center bg-white rounded-lg h-fit p-4 mt-24 w-2/3 lg:w-1/4 md:w-1/3">
             <fa-icon class="place-self-end scale-125 hover:scale-110" [icon]="faXmark"
                 [ngStyle]="{color: 'rgb(64 64 64 )'}" (click)="toggleMenuForm()">
             </fa-icon>
@@ -89,7 +89,7 @@
                 </div>
 
                 <!-- Submit Button -->
-                <button class="mt-6 bg-neutral-800 text-neutral-300 font-bold p-2 rounded hover:bg-[rgb(48,48,48)]"
+                <button class="mt-6 bg-neutral-800 text-neutral-300 font-bold p-0.5 md:p-2 rounded hover:bg-[rgb(48,48,48)]"
                     type="submit">
                     Update
                 </button>
@@ -147,7 +147,7 @@
                     </thead>
                     <tbody>
                         <tr *ngFor="let product of products">
-                            <td class="p-2">
+                            <td class="p-0.5 md:p-2">
                                 <div class="flex justify-center items-center space-x-2 md:space-x-4">
                                     <button class="px-1.5 py-1 rounded-md bg-[#ff0000]"
                                         (click)="deleteProduct(product)">
@@ -158,8 +158,8 @@
                                     <p>{{product.date_added | date: 'MM-dd-yyyy'}}</p>
                                 </div>
                             </td>
-                            <td class="p-2">{{getStockDetails(product.stock_id).stock_name}}</td>
-                            <td class="p-2">{{product.qty_per_order}}</td>
+                            <td class="p-0.5 md:p-2">{{getStockDetails(product.stock_id).stock_name}}</td>
+                            <td class="p-0.5 md:p-2">{{product.qty_per_order}}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -243,7 +243,7 @@
                     </div>
 
                     <!-- Submit Button -->
-                    <button class="mt-6 bg-[#008000] text-white font-bold p-2 rounded hover:bg-[#009000]" type="submit">
+                    <button class="mt-6 bg-[#008000] text-white font-bold p-0.5 md:p-2 rounded hover:bg-[#009000]" type="submit">
                         Save
                     </button>
                 </form>
@@ -269,7 +269,7 @@
             <tbody>
                 <tr class="{{menu.status? 'active' : 'inactive'}}"
                     *ngFor="let menu of menus | paginate: { itemsPerPage: itemsPerPage, currentPage: p, totalItems: totalItems }">
-                    <td class="p-2">
+                    <td class="p-0.5 md:p-2">
                         <!-- View Order List -->
                         <div class="flex items-center space-x-1 md:space-x-2">
                             <button class="px-1.5 py-0.5 rounded-md bg-neutral-800 ml-2"
@@ -280,18 +280,18 @@
                             <p>{{menu.code}}</p>
                         </div>
                     </td>
-                    <td class="p-2">{{menu.name}}</td>
-                    <td class="p-2">{{menu.category}}</td>
-                    <td class="p-2 hidden md:table-cell">{{menu.description}}</td>
-                    <td class="p-2">&#8369;{{menu.price | number: '1.2-2'}}</td>
-                    <td class="p-2 hidden md:table-cell">
+                    <td class="p-0.5 md:p-2">{{menu.name}}</td>
+                    <td class="p-0.5 md:p-2">{{menu.category}}</td>
+                    <td class="p-0.5 md:p-2 hidden md:table-cell">{{menu.description}}</td>
+                    <td class="p-0.5 md:p-2">&#8369;{{menu.price | number: '1.2-2'}}</td>
+                    <td class="p-0.5 md:p-2 hidden md:table-cell">
                         <span class="text-white text-xs px-2 py-1 rounded-md"
                             [ngClass]="menu.status? 'bg-[#008000]' : 'bg-[#ffa500]'">
                             {{menu.status? 'active' : 'inactive'}}
                         </span>
                     </td>
-                    <td class="p-2 hidden md:table-cell">{{menu.date_added | date: 'MM-dd-yyyy'}}</td>
-                    <td class="p-2">
+                    <td class="p-0.5 md:p-2 hidden md:table-cell">{{menu.date_added | date: 'MM-dd-yyyy'}}</td>
+                    <td class="p-0.5 md:p-2">
                         <div class="flex justify-center space-x-2 md:space-x-4">
                             <!-- Edit Menu -->
                             <fa-icon class="hover:scale-110" [ngStyle]="{color: 'green'}" [icon]="faPen"
@@ -324,7 +324,7 @@
     <!-- PRODUCT MODAL: Delete Each Item -->
     <div *ngIf="showProductActionModal"
         class="flex justify-center top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] fixed">
-        <div class="relative flex flex-col items-center bg-white rounded-lg h-fit p-4 mt-32 w-1/2 lg:w-1/4 md:w-1/3">
+        <div class="relative flex flex-col items-center bg-white rounded-lg h-fit p-4 mt-32 w-2/3 lg:w-1/4 md:w-1/3">
             <fa-icon class="place-self-end scale-125 hover:scale-110" [icon]="faXmark"
                 [ngStyle]="{color: 'rgb(64 64 64 )'}" (click)="toggleProductActionModal()">
             </fa-icon>
@@ -337,7 +337,7 @@
 
     <!-- MENU MODAL: Delete Each Product -->
     <div *ngIf="showMenuActionModal" class="flex justify-center top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] fixed">
-        <div class="relative flex flex-col items-center bg-white rounded-lg h-fit p-4 mt-32 w-1/2 lg:w-1/4 md:w-1/3">
+        <div class="relative flex flex-col items-center bg-white rounded-lg h-fit p-4 mt-32 w-2/3 lg:w-1/4 md:w-1/3">
             <fa-icon class="place-self-end scale-125 hover:scale-110" [icon]="faXmark"
                 [ngStyle]="{color: 'rgb(64 64 64 )'}" (click)="toggleMenuActionModal()">
             </fa-icon>

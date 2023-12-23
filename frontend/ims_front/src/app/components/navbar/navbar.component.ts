@@ -18,7 +18,7 @@ import { UiService } from 'src/app/services/ui/ui.service';
   styleUrls: ['./navbar.component.css']
 })
 export class NavbarComponent {
-  title: string = "Ryl-Invenia+";
+  title: string = "Invenia+";
 
   showLogOutActionModal: boolean = false;
 

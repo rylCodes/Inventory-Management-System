@@ -51,7 +51,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     };
   }
 
-  title = 'Ryl-Invenia+';
+  title = 'Invenia+';
   version = environment.version;
 
   logOutIcon = faRightFromBracket;

@@ -23,10 +23,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-zopye3c7_!x5$(^!z-y0kz#qck3v%gvb9**&39kk))3)!_5)th'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['inveniaplus-api.azurewebsites.net']
 # ALLOWED_HOSTS = []
+CSRF_TRUSTED_ORIGINS = ['https://inveniaplus-api.azurewebsites.net']
 
 
 # Application definition
@@ -101,7 +102,7 @@ DATABASES = {
         "PASSWORD": os.getenv("DB_PASSWORD"),
         "HOST": "invenia-postgresql.postgres.database.azure.com",
         "PORT": "5432",
-        "OPTIONS": {"sslmode": "require"},
+        # "OPTIONS": {"sslmode": "require"},
     }
 }
 
@@ -162,6 +163,8 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 CORS_ALLOW_METHOD = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']
+
+# CSRF_COOKIE_SECURE = True
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [

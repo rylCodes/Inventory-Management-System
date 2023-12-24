@@ -23,9 +23,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-zopye3c7_!x5$(^!z-y0kz#qck3v%gvb9**&39kk))3)!_5)th'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['inveniaplus-api.azurewebsites.net']
+# ALLOWED_HOSTS = []
 
 
 # Application definition

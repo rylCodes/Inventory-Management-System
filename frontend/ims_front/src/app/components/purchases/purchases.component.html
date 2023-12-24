@@ -1,6 +1,6 @@
 <div class="relative w-full px-2 sm:px-4 md:px-6 lg:px-8">
     <!-- HEADING: POS PAGE -->
-    <div class="flex justify-between mt-8">
+    <div class="flex justify-between mt-4 lg:mt-8">
         <h1 class="font-bold text-2xl md:text-3xl">PURCHASES</h1>
         <!-- ADD BUTTON -->
         <app-button *ngIf="!showPurchaseBill" txtContent="{{showFormContainer? 'Cancel': 'Add'}}"
@@ -136,7 +136,7 @@
                     </thead>
                     <tbody>
                         <tr *ngFor="let item of items">
-                            <td class="p-0.5 md:p-2">
+                            <td class="py-1 p-0.5 md:p-2">
                                 <div class="flex items-center justify-center space-x-1 md:space-x-3">
                                     <button class="px-1.5 py-1 rounded-md bg-[#ff0000]" (click)="deleteItem(item)">
                                         <fa-icon class="scale-75" [icon]="faTrashCan"
@@ -146,10 +146,10 @@
                                     <p>{{item.purchase_date | date: "MMM dd, hh:mm a"}}</p>
                                 </div>
                             </td>
-                            <td class="p-0.5 md:p-2">{{getStockDetails(item.stock_id).stockName}}</td>
-                            <td class="p-0.5 md:p-2">&#8369;{{item.item_price | number: '1.2-2'}}</td>
-                            <td class="p-0.5 md:p-2">{{item.quantity_purchased}}</td>
-                            <td class="p-0.5 md:p-2">&#8369;{{item.sub_total | number: '1.2-2'}}</td>
+                            <td class="py-1 p-0.5 md:p-2">{{getStockDetails(item.stock_id).stockName}}</td>
+                            <td class="py-1 p-0.5 md:p-2">&#8369;{{item.item_price | number: '1.2-2'}}</td>
+                            <td class="py-1 p-0.5 md:p-2">{{item.quantity_purchased}}</td>
+                            <td class="py-1 p-0.5 md:p-2">&#8369;{{item.sub_total | number: '1.2-2'}}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -245,12 +245,12 @@
                             <span>{{bill.billno}}</span>
                         </div>
                     </td>
-                    <td class="p-0.5 md:p-2">{{getSupplierDetails(bill.supplier_id).supplierName}}</td>
-                    <td class="p-0.5 md:p-2">{{getItemLength(bill)}}</td>
-                    <td class="p-0.5 md:p-2">&#8369;{{bill.grand_total | number: '1.2-2'}}</td>
-                    <td class="p-0.5 md:p-2 hidden md:table-cell">{{bill.remarks}}</td>
-                    <td class="p-0.5 md:p-2 hidden md:table-cell">{{bill.time | date: "MMM dd 'at' hh:mm a"}}</td>
-                    <td class="p-0.5 md:p-2">
+                    <td class="py-1 p-0.5 md:p-2">{{getSupplierDetails(bill.supplier_id).supplierName}}</td>
+                    <td class="py-1 p-0.5 md:p-2">{{getItemLength(bill)}}</td>
+                    <td class="py-1 p-0.5 md:p-2">&#8369;{{bill.grand_total | number: '1.2-2'}}</td>
+                    <td class="py-1 p-0.5 md:p-2 hidden md:table-cell">{{bill.remarks}}</td>
+                    <td class="py-1 p-0.5 md:p-2 hidden md:table-cell">{{bill.time | date: "MMM dd 'at' hh:mm a"}}</td>
+                    <td class="py-1 p-0.5 md:p-2">
                         <div class="flex justify-center items-start-center space-x-3 md:space-x-4">
                             <!-- Edit bill -->
                             <fa-icon class="hover:scale-110" [ngStyle]="{color: 'green'}" [icon]="faPen"

@@ -1,6 +1,6 @@
 <div class="relative w-full px-2 sm:px-4 md:px-6 lg:px-8">
     <!-- HEADING: POS PAGE -->
-    <div class="flex justify-between mt-8">
+    <div class="flex justify-between mt-4 lg:mt-8">
         <h1 class="font-bold text-2xl lg:text-3xl">POINT OF SALES</h1>
     </div>
     <hr class="border-b-1 border-neutral-900 mt-4">
@@ -57,7 +57,7 @@
                     </thead>
                     <tbody class="relative">
                         <tr *ngFor="let item of saleItems">
-                            <td class="flex items-center justify-center p-0.5 md:p-2 space-x-2 lg:space-x-4">
+                            <td class="flex items-center justify-center py-1 p-0.5 md:p-2 space-x-2 lg:space-x-4">
                                 <button class="px-1.5 py-1 rounded-md bg-[#ff0000]" (click)="deleteSaleItem(item)">
                                     <fa-icon class="scale-75" [icon]="faTrashCan"
                                         [ngStyle]="{color: 'rgb(212 212 212)'}">
@@ -65,12 +65,12 @@
                                 </button>
                                 <p>{{item.sale_date | date: 'hh:mm a'}}</p>
                             </td>
-                            <td class="p-0.5 md:p-2">{{getMenuDetails(item.menu).name}}</td>
-                            <td class="p-0.5 md:p-2">{{item.quantity}}</td>
-                            <td class="p-0.5 md:p-2">
+                            <td class="py-1 p-0.5 md:p-2">{{getMenuDetails(item.menu).name}}</td>
+                            <td class="py-1 p-0.5 md:p-2">{{item.quantity}}</td>
+                            <td class="py-1 p-0.5 md:p-2">
                                 <p>{{item.price| number: '1.2-2'}}</p>
                             </td>
-                            <td class="p-0.5 md:p-2">{{item.sub_total | number: '1.2-2'}}</td>
+                            <td class="py-1 p-0.5 md:p-2">{{item.sub_total | number: '1.2-2'}}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -166,7 +166,7 @@
                 </thead>
                 <tbody>
                     <tr *ngFor="let bill of activeBills">
-                        <td class="flex justify-center items-center space-x-2 p-0.5 md:p-2 md:space-x-4">
+                        <td class="flex justify-center items-center space-x-2 py-1 p-0.5 md:p-2 md:space-x-4">
                             <!-- View Order List -->
                             <button class="px-1.5 py-0.5 rounded-md bg-neutral-800 ml-2" (click)="viewOrder(bill)">
                                 <fa-icon [icon]="faRectangleList" [ngStyle]="{color: 'rgb(212 212 212)'}">
@@ -174,12 +174,12 @@
                             </button>
                             <p>{{bill.time | date: 'hh:mm a'}}</p>
                         </td>
-                        <td class="p-0.5 md:p-2">{{bill.billno}}</td>
-                        <td class="p-0.5 md:p-2">{{bill.customer_name}}</td>
-                        <td class="p-0.5 md:p-2 hidden md:table-cell">{{bill.remarks}}</td>
-                        <td class="p-0.5 md:p-2">{{getItemLength(bill)}}</td>
-                        <td class="p-0.5 md:p-2">&#8369;{{bill.grand_total | number: '1.2-2'}}</td>
-                        <td class="flex justify-center p-0.5 md:p-2 space-x-2 md:space-x-4">
+                        <td class="py-1 p-0.5 md:p-2">{{bill.billno}}</td>
+                        <td class="py-1 p-0.5 md:p-2">{{bill.customer_name}}</td>
+                        <td class="py-1 p-0.5 md:p-2 hidden md:table-cell">{{bill.remarks}}</td>
+                        <td class="py-1 p-0.5 md:p-2">{{getItemLength(bill)}}</td>
+                        <td class="py-1 p-0.5 md:p-2">&#8369;{{bill.grand_total | number: '1.2-2'}}</td>
+                        <td class="flex justify-center py-1 p-0.5 md:p-2 space-x-2 md:space-x-4">
                             <!-- Edit Sale Bill -->
                             <fa-icon class="hover:scale-110" [ngStyle]="{color: 'green'}" [icon]="faPen"
                                 (click)="updateSaleBill(bill)">

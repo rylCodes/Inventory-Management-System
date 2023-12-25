@@ -133,7 +133,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    // this.loadStocks();
     this.loadNotifications();
   }
 
@@ -143,8 +142,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   loadNotifications() {
-    this.notificationSubscription = this.notificationService.fetchNotifications()
-    .subscribe((notifications: Notification[]) => {
+    this.notificationSubscription = this.notificationService.getNotifications()
+    .subscribe((notifications) => {
       this.notifications = notifications;
       this.unreadNotifications = notifications.filter(notif => !notif.is_read);
     });

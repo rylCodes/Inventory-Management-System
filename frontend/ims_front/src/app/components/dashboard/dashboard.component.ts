@@ -56,7 +56,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.saleBillsSubscription = this.saleService.fetchSaleBills()
+    this.saleBillsSubscription = this.saleService.getSaleBills()
     .subscribe({
       next: (saleBills) => {
         this.saleBills = saleBills;

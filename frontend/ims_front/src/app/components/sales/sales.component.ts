@@ -85,7 +85,7 @@ export class SalesComponent implements OnInit {
   faEnvelope = faEnvelope;
   faEllipsisVertical = faEllipsisVertical;
 
-  bills: SaleBill[] = [];
+  saleBills: SaleBill[] = [];
   allItems: SaleItem[] = [];
   eachBillItems: SaleItem[] = [];
   menus: Menu[] = [];
@@ -192,8 +192,8 @@ export class SalesComponent implements OnInit {
     .subscribe({
       next: bills => {
         this.isFetching = false;
-        this.bills = bills.filter(bill => bill.status);
-        this.totalItems = this.bills.length;
+        this.saleBills = bills.filter(bill => bill.status);
+        this.totalItems = this.saleBills.length;
       },
       error: (error) => {
         this.isFetching = false;
@@ -279,7 +279,7 @@ export class SalesComponent implements OnInit {
       .subscribe({
         next: async () => {
           this.isLoading = false
-          this.bills = this.bills.filter(s => s.id !== this.deletingSaleBill?.id);
+          this.saleBills = this.saleBills.filter(s => s.id !== this.deletingSaleBill?.id);
           this.deletingSaleBill = null;
           this.toggleBillActionModal()
           await this.uiService.wait(100);
@@ -295,7 +295,7 @@ export class SalesComponent implements OnInit {
 
   // SHOW ITEMS
   getSaleBill(saleBillId: any): string {
-    const foundSaleBill = this.bills.find(saleBill => saleBill.id === saleBillId);
+    const foundSaleBill = this.saleBills.find(saleBill => saleBill.id === saleBillId);
     return foundSaleBill ? foundSaleBill.customer_name : 'Bill Not Found';
   }
   
@@ -327,7 +327,7 @@ export class SalesComponent implements OnInit {
       this.searchQuery = "";
       this.setQuery(this.filterText)
 
-      if (!this.bills.length) {
+      if (!this.saleBills.length) {
         return;
       } else {
         this.loadBills();
@@ -376,20 +376,20 @@ export class SalesComponent implements OnInit {
     this.showSortOrDelItems = false;
     this.toggleModal();
     
-    if (this.bills.length) {
+    if (this.saleBills.length) {
       this.toastrService.warning('Caution: All sales history will be deleted permanently!', undefined, { timeOut: 5000});
     }
   }
 
   onConfirmDeleteAll() {
-    if (!this.bills.length) {
+    if (!this.saleBills.length) {
       this.showModal = false;
       return;
     }
     
     let deletingBills: Observable<SaleBill>[] = [];
 
-    this.bills.forEach(bill => {
+    this.saleBills.forEach(bill => {
       deletingBills.push(this.salesService.deleteSaleBill(bill));
     });
 
@@ -407,7 +407,7 @@ export class SalesComponent implements OnInit {
   }
 
   sortItemsByDate() {
-    this.bills.sort((a, b): any => {
+    this.saleBills.sort((a, b): any => {
       if (a.time && b.time) {
         const dateA = Date.parse(a.time);
         const dateB = Date.parse(b.time)
@@ -426,7 +426,7 @@ export class SalesComponent implements OnInit {
   }
 
   sortItemsByName() {
-    this.bills.sort((a, b): any => {
+    this.saleBills.sort((a, b): any => {
       if (a.customer_name && b.customer_name) {
         let comparison = a.customer_name.localeCompare(b.customer_name);
   

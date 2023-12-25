@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, catchError, throwError, BehaviorSubject, Subject } from 'rxjs';
+import { Observable, catchError, throwError, BehaviorSubject, Subject, tap } from 'rxjs';
 import { Notification } from 'src/app/interface/Notification';
 import { Stock } from 'src/app/interface/Stock';
-import { ToastrService } from 'ngx-toastr';
 import { environment } from 'src/environments/environment';
+import { observableToBeFn } from 'rxjs/internal/testing/TestScheduler';
 
 const httpOptions = {
   headers: new HttpHeaders({
@@ -17,8 +17,9 @@ const httpOptions = {
 })
 export class NotificationsService {
   private apiUrl = environment.baseUrl
-  private notifications = new BehaviorSubject<Notification[]>([]);
-  private notifServiceStatusSubject = new Subject<boolean>();
+  private notifications: Notification[] = [];
+  private notificationsSubject: BehaviorSubject<Notification[]> = new BehaviorSubject<Notification[]>([]);
+  private notifServiceStatusSubject: Subject<boolean> = new Subject<boolean>();
 
   notifServiceStatus$ = this.notifServiceStatusSubject.asObservable();
 
@@ -30,9 +31,12 @@ export class NotificationsService {
     console.log('Error here →', err);
   }
 
-  addNotification(notification: Notification) {
-    return this.http.post<Notification>(`${this.apiUrl}ims-api/notifications/`, notification, httpOptions)
-    .pipe(
+  addNotification(notification: Notification): Observable<Notification> {
+    return this.http.post<Notification>(`${this.apiUrl}ims-api/notifications/`, notification, httpOptions).pipe(
+      tap((notif) => {
+        this.notifications.push(notif);
+        this.notificationsSubject.next(this.notifications.slice());
+      }),
       catchError((err) => {
         this.handleError(err);
         return throwError(() => `${err.statusText? err.statusText: 'An error occured'}: Failed to add new notification`);
@@ -41,26 +45,29 @@ export class NotificationsService {
   }
 
   getNotifications(): Observable<Notification[]> {
-    return this.http.get<Notification[]>(`${this.apiUrl}ims-api/notifications/`)
-    .pipe(
+    if (this.notifications.length > 0) {
+      return this.notificationsSubject.asObservable();
+    } else {
+      return this.http.get<Notification[]>(`${this.apiUrl}ims-api/notifications/`).pipe(
+      tap((notifs) => {
+        this.notifications = notifs;
+        this.notificationsSubject.next(notifs);
+      }),
       catchError((err) => {
         this.handleError(err);
         return throwError(() => `${err.statusText? err.statusText: 'An error occured'}: Failed to display notifications`);
       })
     );
+    }
   }
 
-  fetchNotifications(): BehaviorSubject<Notification[]> {
-    this.http.get<Notification[]>(`${this.apiUrl}ims-api/notifications/`).subscribe(
-      (notifications: Notification[]) => {this.notifications.next(notifications)}
-    )
-    return this.notifications;
-  }
-
-  deleteNotification(notification: Notification) {
+  deleteNotification(notification: Notification): Observable<Notification> {
     const url = `${this.apiUrl}ims-api/notifications/` + `${notification.id}`;
-    return this.http.delete<Notification>(url)
-    .pipe(
+    return this.http.delete<Notification>(url).pipe(
+      tap(() => {
+        this.notifications = this.notifications.filter(notif => notif.id !== notification.id);
+        this.notificationsSubject.next(this.notifications.slice());
+      }),
       catchError((err) => {
         this.handleError(err);
         return throwError(() => `${err.statusText? err.statusText: 'An error occured'}: Failed to delete notification`);

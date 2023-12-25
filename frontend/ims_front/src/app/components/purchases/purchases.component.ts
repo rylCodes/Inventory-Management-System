@@ -420,6 +420,8 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
               item.purchaseBill_id = bill.id;
             }
             this.purchaseService.editPurchaseItem(item).subscribe(item => {
+              const index = this.items.findIndex(i => i.id === item.id);
+              this.items[index] = item;
               this.loadBills();
               this.loadAllItems();
               this.loadFilteredItems();
@@ -565,6 +567,8 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
       .subscribe({
         next: async (billData) => {
           this.isLoading = false;
+          const index = this.bills.findIndex(bill => bill.id === billData.id);
+          this.bills[index] = billData;
           this.modalInputValue = undefined;
           this.showModal = false;
           this.showBillForm = false;
@@ -597,8 +601,12 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
       .editPurchaseItem(editingSaleItem)
       .subscribe({
         next: async (itemData) => {
-          this.isLoading = false;  
+          this.isLoading = false;
+          const index = this.items.findIndex(saleItem => saleItem.id === itemData.id);
+  
           this.toastrService.success("Successfully saved changes to the item.");
+  
+          this.items[index] = itemData;
         },
         error: (err) => {
           this.isLoading = false;
@@ -625,6 +633,7 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
     .subscribe({
       next: async () => {
         this.isLoading = false;
+        this.bills = this.bills.filter(s => s.id !== this.deletingBill?.id);
         this.deletingBill = null;
         this.toggleBillActionModal()
         this.toastrService.success("Transaction has been deleted successfully!");
@@ -713,6 +722,7 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
           }
         };
 
+        this.bills = this.bills.filter(s => s.id !== this.deletingItem?.id);
         this.deletingItem = null;
         this.modalInputValue = undefined;
         this.showModal = false;

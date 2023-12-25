@@ -19,6 +19,8 @@ export class PurchasesService {
   private items: PurchaseItem[] = [];
   private billsSubject: BehaviorSubject<PurchaseBill[]> = new BehaviorSubject<PurchaseBill[]>([]);
   private itemsSubject: BehaviorSubject<PurchaseItem[]> = new BehaviorSubject<PurchaseItem[]>([]);
+  private hasFetchedBills: boolean = false;
+  private hasFetchedItems: boolean = false;
 
   constructor(private http: HttpClient) { }
   
@@ -45,13 +47,14 @@ export class PurchasesService {
     if (searchQuery) {
       params = params.set('search', searchQuery)
     }
-    if (this.bills) {
+    if (this.hasFetchedBills) {
       return this.billsSubject.asObservable();
     } else {
       return this.http.get<PurchaseBill[]>(`${this.apiUrl}ims-api/purchase-bill/`, { params }).pipe(
         tap((bills) => {
           this.bills = bills;
           this.billsSubject.next(bills);
+          this.hasFetchedBills = true;
         }),
         catchError(err => {
           this.handlePurchaseError(err);
@@ -108,13 +111,14 @@ export class PurchasesService {
   }
 
   getPurchaseItems(): Observable<PurchaseItem[]> {
-    if (this.items) {
+    if (this.hasFetchedItems) {
       return this.itemsSubject.asObservable();
     } else {
       return this.http.get<PurchaseItem[]>(`${this.apiUrl}ims-api/purchase-item/`).pipe(
         tap((items) => {
           this.items = items;
           this.itemsSubject.next(items);
+          this.hasFetchedItems = true;
         }),
         catchError((err) => {
           this.handlePurchaseError(err);

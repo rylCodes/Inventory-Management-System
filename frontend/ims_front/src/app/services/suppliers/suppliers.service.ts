@@ -54,7 +54,7 @@ export class SuppliersService {
         tap((suppliers) => {
           this.suppliers = suppliers;
           this.suppliersSubject.next(suppliers);
-          this.hasFetchedData = false;
+          this.hasFetchedData = true;
         }),
         catchError((err) => {
           this.handleSupplierError(err);

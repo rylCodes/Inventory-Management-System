@@ -19,6 +19,8 @@ export class SalesService {
   private saleItems: SaleItem[] = [];
   private saleBillsSubject: BehaviorSubject<SaleBill[]> = new BehaviorSubject<SaleBill[]>([]);
   private saleItemsSubject: BehaviorSubject<SaleItem[]> = new BehaviorSubject<SaleItem[]>([]);
+  private hasFetchedBills: boolean = false;
+  private hasFetchedItems: boolean = false;
 
   constructor(private http: HttpClient) { }
   
@@ -46,13 +48,14 @@ export class SalesService {
       params = params.set('search', searchQuery)
     }
     
-    if (this.saleBills) {
+    if (this.hasFetchedBills) {
       return this.saleBillsSubject.asObservable();
     } else {
       return this.http.get<SaleBill[]>(`${this.apiUrl}ims-api/sales-bill/`, { params }).pipe(
         tap((bills) => {
           this.saleBills = bills;
           this.saleBillsSubject.next(bills);
+          this.hasFetchedBills = true;
         }),
         catchError((err) => {
           this.handleSaleError(err);
@@ -109,13 +112,14 @@ export class SalesService {
   }
 
   getSaleItems(): Observable<SaleItem[]> {
-    if (this.saleItems) {
+    if (this.hasFetchedItems) {
       return this.saleItemsSubject.asObservable();
     } else {
       return this.http.get<SaleItem[]>(`${this.apiUrl}ims-api/sales-item/`).pipe(
         tap((items) => {
           this.saleItems = items;
           this.saleItemsSubject.next(items);
+          this.hasFetchedItems = true;
         }),
         catchError((err) => {
           this.handleSaleError(err);

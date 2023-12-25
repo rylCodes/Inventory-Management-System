@@ -96,10 +96,6 @@ export class PurchasesService {
   // SALE ITEM
   addPurchaseItem(purchaseItem: PurchaseItem): Observable<PurchaseItem> {
     return this.http.post<PurchaseItem>(`${this.apiUrl}ims-api/purchase-item/`, purchaseItem, httpOptions).pipe(
-      tap((item) => {
-        this.items.push(item);
-        this.itemsSubject.next(this.items.slice());
-      }),
       catchError((err) => {
         this.handlePurchaseError(err);
         return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to add new purchase item!`);
@@ -124,16 +120,10 @@ export class PurchasesService {
     }
   }
 
-  editPurchaseItem(purchaseItem: PurchaseItem): Observable<PurchaseItem> {
+  editPurchaseItem(purchaseItem: PurchaseItem) {
     const url = `${this.apiUrl}ims-api/purchase-item/` + `${purchaseItem.id}/`;
-    return this.http.put<PurchaseItem>(url, purchaseItem, httpOptions).pipe(
-      tap(() => {
-        const index = this.items.findIndex(item => item.id === purchaseItem.id);
-        if (index !== -1) {
-          this.items[index] = purchaseItem;
-          this.itemsSubject.next(this.items.slice());
-        }
-      }),
+    return this.http.put<PurchaseItem>(url, purchaseItem, httpOptions)
+    .pipe(
       catchError((err) => {
         this.handlePurchaseError(err);
         return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to update purchase item!`);
@@ -141,19 +131,16 @@ export class PurchasesService {
     );
   }
 
-  deletePurchaseItem(purchaseItem: PurchaseItem, adminPassword?: string): Observable<PurchaseItem> {
+  deletePurchaseItem(purchaseItem: PurchaseItem, adminPassword?: string) {
     const url = `${this.apiUrl}ims-api/purchase-item/` + `${purchaseItem.id}`;
     const body = { admin_password: adminPassword };
-    return this.http.delete<PurchaseItem>(url, { body }).pipe(
-      tap(() => {
-        this.items = this.items.filter(item => item.id !== purchaseItem.id);
-        this.itemsSubject.next(this.items.slice());
-      }),
-      catchError((err) => {
-        this.handlePurchaseError(err);
-        return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to delete purchase item!`)
-      })
-    );
+    return this.http.delete<PurchaseItem>(url, { body })
+      .pipe(
+        catchError((err) => {
+          this.handlePurchaseError(err);
+          return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to delete purchase item!`)
+        })
+      );
   }
 
 }

@@ -20,6 +20,8 @@ export class ProductsService {
   private menus: Menu[] = [];
   private productsSubject: BehaviorSubject<Product[]> = new BehaviorSubject<Product[]>([]);
   private menusSubject: BehaviorSubject<Menu[]> = new BehaviorSubject<Menu[]>([]);
+  private hasFetchedMenus: boolean = false;
+  private hasFetchedProducts: boolean = false;
 
   constructor(private http: HttpClient) { }
   
@@ -47,13 +49,14 @@ export class ProductsService {
       params = params.set('search', searchQuery)
     };
 
-    if (this.menus) {
+    if (this.hasFetchedMenus) {
       return this.menusSubject.asObservable();
     } else {
       return this.http.get<Menu[]>(`${this.apiUrl}ims-api/menus/`, { params }).pipe(
         tap((menus) => {
           this.menus = menus;
           this.menusSubject.next(menus);
+          this.hasFetchedMenus = true;
         }),
         catchError((err) => {
           this.handleError(err);
@@ -112,13 +115,14 @@ export class ProductsService {
   }
 
   getProducts(): Observable<Product[]> {
-    if (this.products) {
+    if (this.hasFetchedProducts) {
       return this.productsSubject.asObservable();
     } else {
       return this.http.get<Product[]>(`${this.apiUrl}ims-api/products/`).pipe(
         tap((products) => {
           this.products = products;
           this.productsSubject.next(products);
+          this.hasFetchedProducts = true;
         }),
         catchError((err) => {
           this.handleError(err);

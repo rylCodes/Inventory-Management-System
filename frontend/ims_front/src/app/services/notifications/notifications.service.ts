@@ -20,6 +20,7 @@ export class NotificationsService {
   private notifications: Notification[] = [];
   private notificationsSubject: BehaviorSubject<Notification[]> = new BehaviorSubject<Notification[]>([]);
   private notifServiceStatusSubject: Subject<boolean> = new Subject<boolean>();
+  private hasFetchedData: boolean = false;
 
   notifServiceStatus$ = this.notifServiceStatusSubject.asObservable();
 
@@ -45,13 +46,14 @@ export class NotificationsService {
   }
 
   getNotifications(): Observable<Notification[]> {
-    if (this.notifications) {
+    if (this.hasFetchedData) {
       return this.notificationsSubject.asObservable();
     } else {
       return this.http.get<Notification[]>(`${this.apiUrl}ims-api/notifications/`).pipe(
       tap((notifs) => {
         this.notifications = notifs;
         this.notificationsSubject.next(notifs);
+        this.hasFetchedData = true;
       }),
       catchError((err) => {
         this.handleError(err);

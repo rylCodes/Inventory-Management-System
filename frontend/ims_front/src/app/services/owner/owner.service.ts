@@ -18,6 +18,7 @@ export class OwnerService {
   constructor(private http: HttpClient) { }
   private owners: Owner[] = [];
   private ownersSubject: BehaviorSubject<Owner[]> = new BehaviorSubject<Owner[]>([]);
+  private hasFetchedData: boolean = false;
 
   private apiUrl = environment.baseUrl;
   searchQuery: string | null = null;
@@ -45,13 +46,14 @@ export class OwnerService {
       params = params.set('search', this.searchQuery)
     };
 
-    if (this.owners) {
+    if (this.hasFetchedData) {
       return this.ownersSubject.asObservable();
     } else {
       return this.http.get<Owner[]>(`${this.apiUrl}ims-api/owners/`, { params: params}).pipe(
         tap((owners) => {
           this.owners = owners;
           this.ownersSubject.next(owners);
+          this.hasFetchedData = true;
         }),
         catchError((err) => {
           this.handleOwnerError(err);

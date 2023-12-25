@@ -18,7 +18,7 @@ export class PurchasesService {
   private bills: PurchaseBill[] = [];
   private items: PurchaseItem[] = [];
   private billsSubject: BehaviorSubject<PurchaseBill[]> = new BehaviorSubject<PurchaseBill[]>([]);
-  private itemsSubject: BehaviorSubject<PurchaseItem[]> = new BehaviorSubject<PurchaseItem[]>([]);
+  private allItemsSubject: BehaviorSubject<PurchaseItem[]> = new BehaviorSubject<PurchaseItem[]>([]);
   private hasFetchedBills: boolean = false;
   private hasFetchedItems: boolean = false;
 
@@ -101,7 +101,7 @@ export class PurchasesService {
     return this.http.post<PurchaseItem>(`${this.apiUrl}ims-api/purchase-item/`, purchaseItem, httpOptions).pipe(
       tap((item) => {
         this.items.push(item);
-        this.itemsSubject.next(this.items.slice());
+        this.allItemsSubject.next(this.items.slice());
       }),
       catchError((err) => {
         this.handlePurchaseError(err);
@@ -112,12 +112,12 @@ export class PurchasesService {
 
   getPurchaseItems(): Observable<PurchaseItem[]> {
     if (this.hasFetchedItems) {
-      return this.itemsSubject.asObservable();
+      return this.allItemsSubject.asObservable();
     } else {
       return this.http.get<PurchaseItem[]>(`${this.apiUrl}ims-api/purchase-item/`).pipe(
         tap((items) => {
           this.items = items;
-          this.itemsSubject.next(items);
+          this.allItemsSubject.next(items);
           this.hasFetchedItems = true;
         }),
         catchError((err) => {
@@ -135,7 +135,7 @@ export class PurchasesService {
         const index = this.items.findIndex(item => item.id === purchaseItem.id);
         if (index !== -1) {
           this.items[index] = purchaseItem;
-          this.itemsSubject.next(this.items.slice());
+          this.allItemsSubject.next(this.items.slice());
         }
       }),
       catchError((err) => {
@@ -151,7 +151,7 @@ export class PurchasesService {
     return this.http.delete<PurchaseItem>(url, { body }).pipe(
       tap(() => {
         this.items = this.items.filter(item => item.id !== purchaseItem.id);
-        this.itemsSubject.next(this.items.slice());
+        this.allItemsSubject.next(this.items.slice());
       }),
       catchError((err) => {
         this.handlePurchaseError(err);

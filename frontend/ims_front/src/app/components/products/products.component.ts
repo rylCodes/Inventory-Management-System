@@ -671,7 +671,6 @@ export class ProductsComponent implements OnInit {
 
     forkJoin(deletingMenus).subscribe({
       next: () => {
-        this.loadMenus();
         this.showModal = false;
         this.toastrService.success("All products has been deleted successfully.");
       },

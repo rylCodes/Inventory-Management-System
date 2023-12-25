@@ -246,8 +246,8 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
   // SHOW BILLS
   ngOnInit(): void {
     this.loadSuppliers();
-    this.loadFilteredItems();
-    this.loadAllItems();
+    // this.loadFilteredItems();
+    this.loadItems();
     this.loadStocks();
     this.loadBills();
   }  
@@ -272,32 +272,42 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
       });
   }
 
-  loadFilteredItems() {
-    this.isFetching = true;
-    this.purchaseService
-      .getPurchaseItems()
-      .subscribe({
-        next: (items) => {
-          if (this.showPurchaseBill) {
-            this.isFetching = false;
-            this.items = items.filter(item => item.purchaseBill_id === this.bill.id);
-          } else {
-            this.isFetching = false;
-            this.items = items.filter(item => item.purchaseBill_id === null);
-            this.bill.grand_total = this.calculateGrandtotal(this.items);
-          }
-        },
-        error: (err) => console.log(err),
-      });
-  }
+  // loadFilteredItems() {
+  //   this.isFetching = true;
+  //   this.purchaseService
+  //     .getPurchaseItems()
+  //     .subscribe({
+  //       next: (items) => {
+  //         if (this.showPurchaseBill) {
+  //           this.isFetching = false;
+  //           this.items = items.filter(item => item.purchaseBill_id === this.bill.id);
+  //         } else {
+  //           this.isFetching = false;
+  //           this.items = items.filter(item => item.purchaseBill_id === null);
+  //           this.bill.grand_total = this.calculateGrandtotal(this.items);
+  //         }
+  //       },
+  //       error: (err) => console.log(err),
+  //     });
+  // }
 
-  loadAllItems() {
+  loadItems() {
     this.purchaseService
-      .getPurchaseItems()
-      .subscribe({
-        next: items => this.allItems = items,
-        error: err => console.log(err),
-      });
+      .getPurchaseItems().subscribe({
+      next: items => {
+        this.allItems = items;
+
+        if (this.showPurchaseBill) {
+          this.isFetching = false;
+          this.items = items.filter(item => item.purchaseBill_id === this.bill.id);
+        } else {
+          this.isFetching = false;
+          this.items = items.filter(item => item.purchaseBill_id === null);
+          this.bill.grand_total = this.calculateGrandtotal(this.items);
+        }
+      },
+      error: err => console.log(err),
+    });
   }
 
   loadSuppliers() {

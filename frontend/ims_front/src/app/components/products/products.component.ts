@@ -184,13 +184,11 @@ export class ProductsComponent implements OnInit {
 
   viewMenuProducts(menu: Menu) {
     this.menu = menu;
-    this.loadProducts();
     this.toggleFormContainer();
 
     this.updatingMenuItems = !this.updatingMenuItems;
     if (!this.updatingMenuItems) {
       this.resetMenuForm();
-      this.loadProducts();
     }
   }
 
@@ -343,10 +341,8 @@ export class ProductsComponent implements OnInit {
             if (!product.menu) {
               product.menu = this.menus[lastMenuId].id;
             }
-            this.productService.updateProduct(product).subscribe(product => {
-              const index = this.products.findIndex(i => i.id === product.id);
-              this.products[index] = product;
-              this.loadProducts();
+            this.productService.updateProduct(product).subscribe({
+              error: err => console.log(err),
             })
           })
           this.resetMenuForm();
@@ -386,18 +382,15 @@ export class ProductsComponent implements OnInit {
       ...this.product,
     }
 
-    this.productService.addProduct(newProduct)
-      .subscribe({
-        next: async (product) => {
-          this.products.push(product);
-          this.loadProducts();
-          this.resetProductForm();
-          await this.uiService.wait(100);
-        },
-        error: (err) => {
-          this.uiService.displayErrorMessage(err);
-        }
-      });
+    this.productService.addProduct(newProduct).subscribe({
+      next: async (product) => {
+        this.resetProductForm();
+        await this.uiService.wait(100);
+      },
+      error: (err) => {
+        this.uiService.displayErrorMessage(err);
+      }
+    });
   }
 
   // UPDATE MENU
@@ -573,20 +566,19 @@ export class ProductsComponent implements OnInit {
     }
 
     this.productService
-      .deleteProduct(this.deletingProduct)
-      .subscribe({
-        next: async () => {
-          this.menus = this.menus.filter(s => s.id !== this.deletingProduct?.id);
-          this.deletingProduct = null;
-          this.showProductActionModal = false;
-          this.loadProducts();
-          await this.uiService.wait(100);
-          this.toastrService.success("Item has been deleted successfully!");
-        },
-        error: (err) => {
-          this.uiService.displayErrorMessage(err);
-        }
-      });
+    .deleteProduct(this.deletingProduct)
+    .subscribe({
+      next: async () => {
+        this.menus = this.menus.filter(s => s.id !== this.deletingProduct?.id);
+        this.deletingProduct = null;
+        this.showProductActionModal = false;
+        await this.uiService.wait(100);
+        this.toastrService.success("Item has been deleted successfully!");
+      },
+      error: (err) => {
+        this.uiService.displayErrorMessage(err);
+      }
+    });
   }
 
   updateRelatedSaleItem(menuData: Menu) {

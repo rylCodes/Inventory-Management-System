@@ -237,7 +237,6 @@ export class StocksComponent implements OnInit {
       .subscribe({
         next: async (stock) => {
           this.isLoading = false;
-          this.stocks.push(stock);
           this.toggleForm();
           await this.uiService.wait(100);
           this.toastrService.success("New stock has been created successfully!");
@@ -297,9 +296,6 @@ export class StocksComponent implements OnInit {
           next: async (stockData) => {
             this.updateRelatedMenu(stockData);
             this.isLoading = false;
-            const index = this.stocks.findIndex(stock => stock.id === stockData.id);
-            this.stocks[index] = stockData;
-            this.loadStocks();
             this.toggleForm();
 
             await this.uiService.wait(100);
@@ -449,7 +445,6 @@ export class StocksComponent implements OnInit {
 
     forkJoin(deletingStocks).subscribe({
       next: () => {
-        this.loadStocks();
         this.showModal = false;
         this.toastrService.success("All items has been deleted successfully.");
       },

@@ -204,7 +204,6 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
     this.toggleTableSettings();
     if (!this.showBillForm) {
       this.resetBillForm();
-      this.loadFilteredItems();
     }
   }
 
@@ -216,13 +215,11 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
 
   viewOrder(bill: PurchaseBill) {
     this.bill = bill;
-    this.loadFilteredItems();
     this.toggleFormContainer();
 
     this.showPurchaseBill = !this.showPurchaseBill;
     if (!this.showPurchaseBill) {
       this.resetBillForm();
-      this.loadFilteredItems();
     }
   }
 
@@ -423,9 +420,6 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
             this.purchaseService.editPurchaseItem(item).subscribe(item => {
               const index = this.items.findIndex(i => i.id === item.id);
               this.items[index] = item;
-              this.loadBills();
-              this.loadAllItems();
-              this.loadFilteredItems();
             });
           })
   
@@ -477,8 +471,6 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
     this.purchaseService.addPurchaseItem(newSaleItem)
     .subscribe({
       next: async (item) => {
-        this.items.push(item);
-        this.loadFilteredItems();
         this.resetItemForm();
 
         if (this.showPurchaseBill) {
@@ -500,7 +492,6 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
           .subscribe({
             next: bill => {
               this.bill = bill;
-              this.loadBills();
             },
             error: err => console.log(err) 
           });
@@ -729,7 +720,6 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
         this.modalInputValue = undefined;
         this.showModal = false;
         this.showItemActionModal = false;
-        this.loadFilteredItems();
         this.toastrService.success("Item has been deleted successfully!");
       },
       error: (err) => {
@@ -816,7 +806,6 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
 
     forkJoin(deletingBills).subscribe({
       next: () => {
-        this.loadBills();
         this.showModal = false;
         this.toastrService.success("All suppliers has been deleted successfully.");
       },

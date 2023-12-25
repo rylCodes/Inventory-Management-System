@@ -83,17 +83,6 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'ims_db',
-#         'USER': 'postgres',
-#         'PASSWORD': 'password121012',
-#         'HOST': 'localhost',
-#         'PORT': '5432',
-#     }
-# }
-
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
@@ -105,14 +94,6 @@ DATABASES = {
         # "OPTIONS": {"sslmode": "require"},
     }
 }
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -157,8 +138,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOW_ALL_ORIGIN = False
 CORS_ALLOWED_ORIGINS = [
-    # 'http://localhost:4200',
-    # 'http://127.0.0.1:4200',
     'https://icy-water-07fda8f00.4.azurestaticapps.net',
 ]
 

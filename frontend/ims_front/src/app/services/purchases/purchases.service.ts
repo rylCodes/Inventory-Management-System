@@ -104,20 +104,12 @@ export class PurchasesService {
   }
 
   getPurchaseItems(): Observable<PurchaseItem[]> {
-    if (this.items.length > 0) {
-      return this.itemsSubject.asObservable();
-    } else {
-      return this.http.get<PurchaseItem[]>(`${this.apiUrl}ims-api/purchase-item/`).pipe(
-        tap((items) => {
-          this.items = items;
-          this.itemsSubject.next(items);
-        }),
-        catchError((err) => {
-          this.handlePurchaseError(err);
-          return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to display purchase items!`)
-        })
-      );
-    }
+    return this.http.get<PurchaseItem[]>(`${this.apiUrl}ims-api/purchase-item/`).pipe(
+      catchError((err) => {
+        this.handlePurchaseError(err);
+        return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to display purchase items!`)
+      })
+    );
   }
 
   editPurchaseItem(purchaseItem: PurchaseItem) {

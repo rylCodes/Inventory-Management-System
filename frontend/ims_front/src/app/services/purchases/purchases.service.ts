@@ -18,7 +18,7 @@ export class PurchasesService {
   private bills: PurchaseBill[] = [];
   private items: PurchaseItem[] = [];
   private billsSubject: BehaviorSubject<PurchaseBill[]> = new BehaviorSubject<PurchaseBill[]>([]);
-  private itemsSubject: BehaviorSubject<PurchaseItem[]> = new BehaviorSubject<PurchaseItem[]>([]);
+  private hasFetchedData: boolean = false;
 
   constructor(private http: HttpClient) { }
   
@@ -29,10 +29,6 @@ export class PurchasesService {
   // SALE BILL
   addPurchaseBill(purchaseBill: PurchaseBill): Observable<PurchaseBill> {
     return this.http.post<PurchaseBill>(`${this.apiUrl}ims-api/purchase-bill/`, purchaseBill, httpOptions).pipe(
-      tap((bill) => {
-        this.bills.push(bill);
-        this.billsSubject.next(this.bills.slice());
-      }),
       catchError((err) => {
         this.handlePurchaseError(err);
         return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to add new purchase transaction!`);
@@ -45,13 +41,14 @@ export class PurchasesService {
     if (searchQuery) {
       params = params.set('search', searchQuery)
     }
-    if (this.bills.length > 0) {
+    if (this.hasFetchedData) {
       return this.billsSubject.asObservable();
     } else {
       return this.http.get<PurchaseBill[]>(`${this.apiUrl}ims-api/purchase-bill/`, { params }).pipe(
         tap((bills) => {
           this.bills = bills;
           this.billsSubject.next(bills);
+          this.hasFetchedData = true;
         }),
         catchError(err => {
           this.handlePurchaseError(err);
@@ -65,13 +62,6 @@ export class PurchasesService {
     const url = `${this.apiUrl}ims-api/purchase-bill/` + `${purchaseBill.id}/`;
     const body = adminPassword? { admin_password: adminPassword, ...purchaseBill } : purchaseBill;
     return this.http.put<PurchaseBill>(url, body, httpOptions).pipe(
-      tap(() => {
-        const index = this.bills.findIndex(bill => bill.id === purchaseBill.id);
-        if (index !== -1) {
-          this.bills[index] = purchaseBill;
-          this.billsSubject.next(this.bills.slice());
-        }
-      }),
       catchError((err) => { 
         this.handlePurchaseError(err);
         return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to update purchase transaction!`);
@@ -82,10 +72,6 @@ export class PurchasesService {
   deletePurchaseBill(purchaseBill: PurchaseBill): Observable<PurchaseBill> {
     const url = `${this.apiUrl}ims-api/purchase-bill/` + `${purchaseBill.id}`;
     return this.http.delete<PurchaseBill>(url).pipe(
-      tap(() => {
-        this.bills = this.bills.filter(bill => bill.id !== purchaseBill.id);
-        this.billsSubject.next(this.bills.slice());
-      }),
       catchError((err) => {
         this.handlePurchaseError(err);
         return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to delete purchase transaction!`)
@@ -126,13 +112,12 @@ export class PurchasesService {
   deletePurchaseItem(purchaseItem: PurchaseItem, adminPassword?: string) {
     const url = `${this.apiUrl}ims-api/purchase-item/` + `${purchaseItem.id}`;
     const body = { admin_password: adminPassword };
-    return this.http.delete<PurchaseItem>(url, { body })
-      .pipe(
-        catchError((err) => {
-          this.handlePurchaseError(err);
-          return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to delete purchase item!`)
-        })
-      );
+    return this.http.delete<PurchaseItem>(url, { body }).pipe(
+      catchError((err) => {
+        this.handlePurchaseError(err);
+        return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to delete purchase item!`)
+      })
+    );
   }
 
 }

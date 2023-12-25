@@ -250,7 +250,7 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
   ngOnInit(): void {
     this.loadSuppliers();
     this.loadFilteredItems();
-    // this.loadAllItems();
+    this.loadAllItems();
     this.loadStocks();
     this.loadBills();
   }  
@@ -415,6 +415,7 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
       .subscribe({
         next: async (bill) => {
           this.isLoading = false;
+          this.bills.push(bill);
           this.items.map(item => {
             if (!item.purchaseBill_id) {
               item.purchaseBill_id = bill.id;
@@ -423,7 +424,7 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
               const index = this.items.findIndex(i => i.id === item.id);
               this.items[index] = item;
               this.loadBills();
-              // this.loadAllItems();
+              this.loadAllItems();
               this.loadFilteredItems();
             });
           })
@@ -476,6 +477,7 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
     this.purchaseService.addPurchaseItem(newSaleItem)
     .subscribe({
       next: async (item) => {
+        this.items.push(item);
         this.loadFilteredItems();
         this.resetItemForm();
 

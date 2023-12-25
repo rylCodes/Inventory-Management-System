@@ -28,10 +28,6 @@
 
     addStock(addedStock: Stock): Observable<Stock> {
       return this.http.post<Stock>(`${this.apiUrl}ims-api/stocks/`, addedStock, httpOptions).pipe(
-        tap((stock) => {
-          this.stocks.push(stock);
-          this.stocksSubject.next(this.stocks.slice());
-        }),
         catchError((err) => {
           this.handleStockError(err);
           return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to add new stock!`);
@@ -43,7 +39,8 @@
       let params = new HttpParams;
       if (searchQuery) {
         params = params.set('search', searchQuery)
-      }
+      };
+
       if (this.hasFetchedData) {
         return this.stocksSubject.asObservable();
       } else {
@@ -64,13 +61,6 @@
     editStock(updatedStock: Stock): Observable<Stock> {
       const url = `${this.apiUrl}ims-api/stocks/` + `${updatedStock.id}/`;
       return this.http.put<Stock>(url, updatedStock, httpOptions).pipe(
-        tap(() => {
-          const index = this.stocks.findIndex(stock => stock.id === updatedStock.id);
-          if (index !== -1) {
-            this.stocks[index] = updatedStock;
-            this.stocksSubject.next(this.stocks.slice());
-          }
-        }),
         catchError((err) => {
           this.handleStockError(err);
           return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to update stock!`);
@@ -81,10 +71,6 @@
     deleteStock(deletedStock: Stock): Observable<Stock> {
       const url = `${this.apiUrl}ims-api/stocks/` + `${deletedStock.id}`;
       return this.http.delete<Stock>(url).pipe(
-        tap(() => {
-          this.stocks = this.stocks.filter(stock => stock.id !== deletedStock.id);
-          this.stocksSubject.next(this.stocks.slice());
-        }),
         catchError((err) => {
           this.handleStockError(err);
           if (err.error.error) {

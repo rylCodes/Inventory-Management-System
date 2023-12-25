@@ -170,6 +170,7 @@ export class SuppliersComponent implements OnInit {
       .subscribe({
         next: async (Supplier) => {
           this.isLoading = false;
+          this.suppliers.push(Supplier);
           this.toggleForm();
           this.toastrService.success("New supplier has been created successfully!")
         },

@@ -133,6 +133,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    // this.loadStocks();
     this.loadNotifications();
   }
 

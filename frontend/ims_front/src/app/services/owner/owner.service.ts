@@ -29,10 +29,6 @@ export class OwnerService {
 
   addOwner(addedOwner: Owner): Observable<Owner> {
     return this.http.post<Owner>(`${this.apiUrl}ims-api/owners/`, addedOwner, httpOptions).pipe(
-      tap((owner) => {
-        this.owners.push(owner);
-        this.ownersSubject.next(this.owners.slice());
-      }),
       catchError((err) => {
         this.handleOwnerError(err);
         return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to add new owner!`);
@@ -66,13 +62,6 @@ export class OwnerService {
   editOwner(updatedOwner: Owner): Observable<Owner> {
     const url = `${this.apiUrl}ims-api/owners/` + `${updatedOwner.id}/`;
     return this.http.put<Owner>(url, updatedOwner, httpOptions).pipe(
-      tap(() => {
-        const index = this.owners.findIndex(owner => owner.id === updatedOwner.id);
-        if (index !== -1) {
-          this.owners[index] = updatedOwner;
-          this.ownersSubject.next(this.owners.slice());
-        }
-      }),
       catchError((err) => {
         this.handleOwnerError(err);
         return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to update owner!`);
@@ -83,10 +72,6 @@ export class OwnerService {
   deleteOwner(deletedOwner: Owner): Observable<Owner> {
     const url = `${this.apiUrl}ims-api/owners/` + `${deletedOwner.id}`;
     return this.http.delete<Owner>(url).pipe(
-      tap(() => {
-        this.owners = this.owners.filter(owner => owner.id !== deletedOwner.id);
-        this.ownersSubject.next(this.owners.slice());
-      }),
       catchError((err) => {
         this.handleOwnerError(err);
         return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to delete owner!`)

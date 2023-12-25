@@ -31,10 +31,6 @@ export class SuppliersService {
 
   addSupplier(addedSupplier: Supplier) {
     return this.http.post<Supplier>(`${this.apiUrl}ims-api/suppliers/`, addedSupplier, httpOptions).pipe(
-      tap((supplier) => {
-        this.suppliers.push(supplier);
-        this.suppliersSubject.next(this.suppliers.slice());
-      }),
       catchError((err) => {
         this.handleSupplierError(err);
         return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to add new supplier!`);
@@ -46,7 +42,8 @@ export class SuppliersService {
     let params = new HttpParams;
     if (searchQuery) {
       params = params.set('search', searchQuery)
-    }
+    };
+
     if (this.hasFetchedData) {
       return this.suppliersSubject.asObservable();
     } else {
@@ -61,19 +58,12 @@ export class SuppliersService {
           return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to display suppliers!`)
         })
       );
-    }
+    };
   }
 
   editSupplier(updatedSupplier: Supplier): Observable<Supplier> {
     const url = `${this.apiUrl}ims-api/suppliers/` + `${updatedSupplier.id}/`;
     return this.http.put<Supplier>(url, updatedSupplier, httpOptions).pipe(
-      tap(() => {
-        const index = this.suppliers.findIndex(supplier => supplier.id === updatedSupplier.id);
-        if (index !== -1) {
-          this.suppliers[index] = updatedSupplier;
-          this.suppliersSubject.next(this.suppliers.slice());
-        }
-      }),
       catchError((err) => {
         this.handleSupplierError(err);
         return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to update supplier!`);
@@ -85,10 +75,6 @@ export class SuppliersService {
     const url = `${this.apiUrl}ims-api/suppliers/` + `${deletedSupplier.id}`;
     const body = { admin_password: adminPassword };
     return this.http.delete<Supplier>(url, { body }).pipe(
-      tap(() => {
-        this.suppliers = this.suppliers.filter(supplier => supplier.id !== deletedSupplier.id);
-        this.suppliersSubject.next(this.suppliers.slice());
-      }),
       catchError((err) => {
         this.handleSupplierError(err);
         if (err.error.error) {

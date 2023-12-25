@@ -20,7 +20,6 @@ export class SalesService {
   private saleBillsSubject: BehaviorSubject<SaleBill[]> = new BehaviorSubject<SaleBill[]>([]);
   private saleItemsSubject: BehaviorSubject<SaleItem[]> = new BehaviorSubject<SaleItem[]>([]);
   private hasFetchedBills: boolean = false;
-  private hasFetchedItems: boolean = false;
 
   constructor(private http: HttpClient) { }
   
@@ -31,10 +30,6 @@ export class SalesService {
   // SALE BILL
   addSaleBill(saleBill: SaleBill): Observable<SaleBill> {
     return this.http.post<SaleBill>(`${this.apiUrl}ims-api/sales-bill/`, saleBill, httpOptions).pipe(
-      tap((bill) => {
-        this.saleBills.push(bill);
-        this.saleBillsSubject.next(this.saleBills.slice());
-      }),
       catchError((err) => {
         this.handleSaleError(err);
         return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to add new sale transaction!`);
@@ -69,13 +64,6 @@ export class SalesService {
     const url = `${this.apiUrl}ims-api/sales-bill/` + `${updatedSaleBill.id}/`;
     const body = adminPassword? { admin_password: adminPassword, ...updatedSaleBill } : updatedSaleBill;
     return this.http.put<SaleBill>(url, body, httpOptions).pipe(
-      tap(() => {
-        const index = this.saleBills.findIndex(bill => bill.id === updatedSaleBill.id);
-        if (index !== -1) {
-          this.saleBills[index] = updatedSaleBill;
-          this.saleBillsSubject.next(this.saleBills.slice());
-        }
-      }),
       catchError((err) => { 
         this.handleSaleError(err);
         return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to update sale transaction!`);
@@ -86,10 +74,6 @@ export class SalesService {
   deleteSaleBill(deletedSaleBill: SaleBill): Observable<SaleBill> {
     const url = `${this.apiUrl}ims-api/sales-bill/` + `${deletedSaleBill.id}`;
     return this.http.delete<SaleBill>(url).pipe(
-      tap(() => {
-        this.saleBills = this.saleBills.filter(bill => bill.id !== deletedSaleBill.id);
-        this.saleBillsSubject.next(this.saleBills.slice());
-      }),
       catchError((err) => {
         this.handleSaleError(err);
         return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to delete sale transaction!`)
@@ -100,10 +84,6 @@ export class SalesService {
   // SALE ITEM
   addSaleItem(saleItem: SaleItem): Observable<SaleItem> {
     return this.http.post<SaleItem>(`${this.apiUrl}ims-api/sales-item/`, saleItem, httpOptions).pipe(
-      tap((item) => {
-        this.saleItems.push(item);
-        this.saleItemsSubject.next(this.saleItems.slice());
-      }),
       catchError((err) => {
         this.handleSaleError(err);
         return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to add new sale item!`);
@@ -112,33 +92,22 @@ export class SalesService {
   }
 
   getSaleItems(): Observable<SaleItem[]> {
-    if (this.hasFetchedItems) {
-      return this.saleItemsSubject.asObservable();
-    } else {
-      return this.http.get<SaleItem[]>(`${this.apiUrl}ims-api/sales-item/`).pipe(
-        tap((items) => {
-          this.saleItems = items;
-          this.saleItemsSubject.next(items);
-          this.hasFetchedItems = true;
-        }),
-        catchError((err) => {
-          this.handleSaleError(err);
-          return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to display items!`)
-        })
-      );
-    }
+    return this.http.get<SaleItem[]>(`${this.apiUrl}ims-api/sales-item/`).pipe(
+      tap((items) => {
+        this.saleItems = items;
+        this.saleItemsSubject.next(items);
+      }),
+      catchError((err) => {
+        this.handleSaleError(err);
+        return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to display items!`)
+      })
+    );
   }
+
 
   editSaleItem(updatedSaleItem: SaleItem): Observable<SaleItem> {
     const url = `${this.apiUrl}ims-api/sales-item/` + `${updatedSaleItem.id}/`;
     return this.http.put<SaleItem>(url, updatedSaleItem, httpOptions).pipe(
-      tap(() => {
-        const index = this.saleItems.findIndex(item => item.id === updatedSaleItem.id);
-        if (index !== -1) {
-          this.saleItems[index] = updatedSaleItem;
-          this.saleItemsSubject.next(this.saleItems.slice());
-        }
-      }),
       catchError((err) => {
         this.handleSaleError(err);
         return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to update sale item!`);
@@ -150,10 +119,6 @@ export class SalesService {
     const url = `${this.apiUrl}ims-api/sales-item/` + `${deletedSaleItem.id}`;
     const body = { admin_password: adminPassword }
     return this.http.delete<SaleItem>(url, { body }).pipe(
-      tap(() => {
-        this.saleItems = this.saleItems.filter(item => item.id !== deletedSaleItem.id);
-        this.saleItemsSubject.next(this.saleItems.slice());
-      }),
       catchError((err) => {
         this.handleSaleError(err);
         return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to delete sale item!`)

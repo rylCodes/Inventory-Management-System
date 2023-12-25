@@ -823,8 +823,8 @@ export class PosComponent implements OnInit, AfterContentChecked {
   addNotification() {
     const currentDate = new Date();
     const currentDay = currentDate.getDay();
-    const critStocks = this.stocksToCheck.filter(stock => stock.quantity <= 60);
-    const lowStocks = this.stocksToCheck.filter(stock => stock.quantity <= 120 && stock.quantity > 60);
+    const critStocks = this.stocksToCheck.filter(stock => stock.quantity <= 5);
+    const lowStocks = this.stocksToCheck.filter(stock => stock.quantity <= 20 && stock.quantity > 5);
   
     const createAndAddNotification = (content: string, warningType:string) => {
       const notifExists = this.notifications.some(notif => {

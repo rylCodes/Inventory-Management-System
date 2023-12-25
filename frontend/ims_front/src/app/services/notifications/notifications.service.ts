@@ -34,10 +34,6 @@ export class NotificationsService {
 
   addNotification(notification: Notification): Observable<Notification> {
     return this.http.post<Notification>(`${this.apiUrl}ims-api/notifications/`, notification, httpOptions).pipe(
-      tap((notif) => {
-        this.notifications.push(notif);
-        this.notificationsSubject.next(this.notifications.slice());
-      }),
       catchError((err) => {
         this.handleError(err);
         return throwError(() => `${err.statusText? err.statusText: 'An error occured'}: Failed to add new notification`);
@@ -50,11 +46,6 @@ export class NotificationsService {
       return this.notificationsSubject.asObservable();
     } else {
       return this.http.get<Notification[]>(`${this.apiUrl}ims-api/notifications/`).pipe(
-      tap((notifs) => {
-        this.notifications = notifs;
-        this.notificationsSubject.next(notifs);
-        this.hasFetchedData = true;
-      }),
       catchError((err) => {
         this.handleError(err);
         return throwError(() => `${err.statusText? err.statusText: 'An error occured'}: Failed to display notifications`);
@@ -66,10 +57,6 @@ export class NotificationsService {
   deleteNotification(notification: Notification): Observable<Notification> {
     const url = `${this.apiUrl}ims-api/notifications/` + `${notification.id}`;
     return this.http.delete<Notification>(url).pipe(
-      tap(() => {
-        this.notifications = this.notifications.filter(notif => notif.id !== notification.id);
-        this.notificationsSubject.next(this.notifications.slice());
-      }),
       catchError((err) => {
         this.handleError(err);
         return throwError(() => `${err.statusText? err.statusText: 'An error occured'}: Failed to delete notification`);

@@ -16,6 +16,7 @@
   export class StocksService {
     private stocks: Stock[] = [];
     private stocksSubject: BehaviorSubject<Stock[]> = new BehaviorSubject<Stock[]>([]);
+    private hasFetchedData: boolean = false;
     private apiUrl = environment.baseUrl;
     searchQuery: string = "SD";
 
@@ -43,13 +44,14 @@
       if (searchQuery) {
         params = params.set('search', searchQuery)
       }
-      if (this.stocks) {
+      if (this.hasFetchedData) {
         return this.stocksSubject.asObservable();
       } else {
         return this.http.get<Stock[]>(`${this.apiUrl}ims-api/stocks/`, { params}).pipe(
           tap((stocks) => {
             this.stocks = stocks,
             this.stocksSubject.next(stocks);
+            this.hasFetchedData = true;
           }),
           catchError((err) => {
             this.handleStockError(err);

@@ -204,6 +204,7 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
     this.toggleTableSettings();
     if (!this.showBillForm) {
       this.resetBillForm();
+      this.loadFilteredItems();
     }
   }
 
@@ -215,11 +216,13 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
 
   viewOrder(bill: PurchaseBill) {
     this.bill = bill;
+    this.loadFilteredItems();
     this.toggleFormContainer();
 
     this.showPurchaseBill = !this.showPurchaseBill;
     if (!this.showPurchaseBill) {
       this.resetBillForm();
+      this.loadFilteredItems();
     }
   }
 
@@ -246,8 +249,8 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
   // SHOW BILLS
   ngOnInit(): void {
     this.loadSuppliers();
-    // this.loadFilteredItems();
-    this.loadItems();
+    this.loadFilteredItems();
+    this.loadAllItems();
     this.loadStocks();
     this.loadBills();
   }  
@@ -272,42 +275,32 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
       });
   }
 
-  // loadFilteredItems() {
-  //   this.isFetching = true;
-  //   this.purchaseService
-  //     .getPurchaseItems()
-  //     .subscribe({
-  //       next: (items) => {
-  //         if (this.showPurchaseBill) {
-  //           this.isFetching = false;
-  //           this.items = items.filter(item => item.purchaseBill_id === this.bill.id);
-  //         } else {
-  //           this.isFetching = false;
-  //           this.items = items.filter(item => item.purchaseBill_id === null);
-  //           this.bill.grand_total = this.calculateGrandtotal(this.items);
-  //         }
-  //       },
-  //       error: (err) => console.log(err),
-  //     });
-  // }
-
-  loadItems() {
+  loadFilteredItems() {
+    this.isFetching = true;
     this.purchaseService
-      .getPurchaseItems().subscribe({
-      next: items => {
-        this.allItems = items;
+      .getPurchaseItems()
+      .subscribe({
+        next: (items) => {
+          if (this.showPurchaseBill) {
+            this.isFetching = false;
+            this.items = items.filter(item => item.purchaseBill_id === this.bill.id);
+          } else {
+            this.isFetching = false;
+            this.items = items.filter(item => item.purchaseBill_id === null);
+            this.bill.grand_total = this.calculateGrandtotal(this.items);
+          }
+        },
+        error: (err) => console.log(err),
+      });
+  }
 
-        if (this.showPurchaseBill) {
-          this.isFetching = false;
-          this.items = items.filter(item => item.purchaseBill_id === this.bill.id);
-        } else {
-          this.isFetching = false;
-          this.items = items.filter(item => item.purchaseBill_id === null);
-          this.bill.grand_total = this.calculateGrandtotal(this.items);
-        }
-      },
-      error: err => console.log(err),
-    });
+  loadAllItems() {
+    this.purchaseService
+      .getPurchaseItems()
+      .subscribe({
+        next: items => this.allItems = items,
+        error: err => console.log(err),
+      });
   }
 
   loadSuppliers() {
@@ -422,14 +415,14 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
       .subscribe({
         next: async (bill) => {
           this.isLoading = false;
-          this.bills.push(bill);
           this.items.map(item => {
             if (!item.purchaseBill_id) {
               item.purchaseBill_id = bill.id;
             }
             this.purchaseService.editPurchaseItem(item).subscribe(item => {
-              const index = this.items.findIndex(i => i.id === item.id);
-              this.items[index] = item;
+              this.loadBills();
+              this.loadAllItems();
+              this.loadFilteredItems();
             });
           })
   
@@ -481,6 +474,7 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
     this.purchaseService.addPurchaseItem(newSaleItem)
     .subscribe({
       next: async (item) => {
+        this.loadFilteredItems();
         this.resetItemForm();
 
         if (this.showPurchaseBill) {
@@ -502,6 +496,7 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
           .subscribe({
             next: bill => {
               this.bill = bill;
+              this.loadBills();
             },
             error: err => console.log(err) 
           });
@@ -570,8 +565,6 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
       .subscribe({
         next: async (billData) => {
           this.isLoading = false;
-          const index = this.bills.findIndex(bill => bill.id === billData.id);
-          this.bills[index] = billData;
           this.modalInputValue = undefined;
           this.showModal = false;
           this.showBillForm = false;
@@ -604,12 +597,8 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
       .editPurchaseItem(editingSaleItem)
       .subscribe({
         next: async (itemData) => {
-          this.isLoading = false;
-          const index = this.items.findIndex(saleItem => saleItem.id === itemData.id);
-  
+          this.isLoading = false;  
           this.toastrService.success("Successfully saved changes to the item.");
-  
-          this.items[index] = itemData;
         },
         error: (err) => {
           this.isLoading = false;
@@ -636,7 +625,6 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
     .subscribe({
       next: async () => {
         this.isLoading = false;
-        this.bills = this.bills.filter(s => s.id !== this.deletingBill?.id);
         this.deletingBill = null;
         this.toggleBillActionModal()
         this.toastrService.success("Transaction has been deleted successfully!");
@@ -725,11 +713,11 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
           }
         };
 
-        this.bills = this.bills.filter(s => s.id !== this.deletingItem?.id);
         this.deletingItem = null;
         this.modalInputValue = undefined;
         this.showModal = false;
         this.showItemActionModal = false;
+        this.loadFilteredItems();
         this.toastrService.success("Item has been deleted successfully!");
       },
       error: (err) => {
@@ -816,6 +804,7 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
 
     forkJoin(deletingBills).subscribe({
       next: () => {
+        this.loadBills();
         this.showModal = false;
         this.toastrService.success("All suppliers has been deleted successfully.");
       },

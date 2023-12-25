@@ -18,9 +18,7 @@ export class PurchasesService {
   private bills: PurchaseBill[] = [];
   private items: PurchaseItem[] = [];
   private billsSubject: BehaviorSubject<PurchaseBill[]> = new BehaviorSubject<PurchaseBill[]>([]);
-  private allItemsSubject: BehaviorSubject<PurchaseItem[]> = new BehaviorSubject<PurchaseItem[]>([]);
-  private hasFetchedBills: boolean = false;
-  private hasFetchedItems: boolean = false;
+  private itemsSubject: BehaviorSubject<PurchaseItem[]> = new BehaviorSubject<PurchaseItem[]>([]);
 
   constructor(private http: HttpClient) { }
   
@@ -47,14 +45,13 @@ export class PurchasesService {
     if (searchQuery) {
       params = params.set('search', searchQuery)
     }
-    if (this.hasFetchedBills) {
+    if (this.bills.length > 0) {
       return this.billsSubject.asObservable();
     } else {
       return this.http.get<PurchaseBill[]>(`${this.apiUrl}ims-api/purchase-bill/`, { params }).pipe(
         tap((bills) => {
           this.bills = bills;
           this.billsSubject.next(bills);
-          this.hasFetchedBills = true;
         }),
         catchError(err => {
           this.handlePurchaseError(err);
@@ -101,7 +98,7 @@ export class PurchasesService {
     return this.http.post<PurchaseItem>(`${this.apiUrl}ims-api/purchase-item/`, purchaseItem, httpOptions).pipe(
       tap((item) => {
         this.items.push(item);
-        this.allItemsSubject.next(this.items.slice());
+        this.itemsSubject.next(this.items.slice());
       }),
       catchError((err) => {
         this.handlePurchaseError(err);
@@ -111,14 +108,13 @@ export class PurchasesService {
   }
 
   getPurchaseItems(): Observable<PurchaseItem[]> {
-    if (this.hasFetchedItems) {
-      return this.allItemsSubject.asObservable();
+    if (this.items.length > 0) {
+      return this.itemsSubject.asObservable();
     } else {
       return this.http.get<PurchaseItem[]>(`${this.apiUrl}ims-api/purchase-item/`).pipe(
         tap((items) => {
           this.items = items;
-          this.allItemsSubject.next(items);
-          this.hasFetchedItems = true;
+          this.itemsSubject.next(items);
         }),
         catchError((err) => {
           this.handlePurchaseError(err);
@@ -135,7 +131,7 @@ export class PurchasesService {
         const index = this.items.findIndex(item => item.id === purchaseItem.id);
         if (index !== -1) {
           this.items[index] = purchaseItem;
-          this.allItemsSubject.next(this.items.slice());
+          this.itemsSubject.next(this.items.slice());
         }
       }),
       catchError((err) => {
@@ -151,7 +147,7 @@ export class PurchasesService {
     return this.http.delete<PurchaseItem>(url, { body }).pipe(
       tap(() => {
         this.items = this.items.filter(item => item.id !== purchaseItem.id);
-        this.allItemsSubject.next(this.items.slice());
+        this.itemsSubject.next(this.items.slice());
       }),
       catchError((err) => {
         this.handlePurchaseError(err);

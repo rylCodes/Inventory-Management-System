@@ -250,7 +250,7 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
   ngOnInit(): void {
     this.loadSuppliers();
     this.loadFilteredItems();
-    this.loadAllItems();
+    // this.loadAllItems();
     this.loadStocks();
     this.loadBills();
   }  
@@ -423,7 +423,7 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
               const index = this.items.findIndex(i => i.id === item.id);
               this.items[index] = item;
               this.loadBills();
-              this.loadAllItems();
+              // this.loadAllItems();
               this.loadFilteredItems();
             });
           })

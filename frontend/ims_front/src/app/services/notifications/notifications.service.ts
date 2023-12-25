@@ -45,7 +45,7 @@ export class NotificationsService {
   }
 
   getNotifications(): Observable<Notification[]> {
-    if (this.notifications.length > 0) {
+    if (this.notifications) {
       return this.notificationsSubject.asObservable();
     } else {
       return this.http.get<Notification[]>(`${this.apiUrl}ims-api/notifications/`).pipe(

@@ -47,7 +47,7 @@ export class ProductsService {
       params = params.set('search', searchQuery)
     };
 
-    if (this.menus.length > 0) {
+    if (this.menus) {
       return this.menusSubject.asObservable();
     } else {
       return this.http.get<Menu[]>(`${this.apiUrl}ims-api/menus/`, { params }).pipe(
@@ -112,7 +112,7 @@ export class ProductsService {
   }
 
   getProducts(): Observable<Product[]> {
-    if (this.products.length > 0) {
+    if (this.products) {
       return this.productsSubject.asObservable();
     } else {
       return this.http.get<Product[]>(`${this.apiUrl}ims-api/products/`).pipe(

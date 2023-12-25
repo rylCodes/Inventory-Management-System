@@ -45,7 +45,7 @@ export class SuppliersService {
     if (searchQuery) {
       params = params.set('search', searchQuery)
     }
-    if (this.suppliers,length > 0) {
+    if (this.suppliers) {
       return this.suppliersSubject.asObservable();
     } else {
       return this.http.get<Supplier[]>(`${this.apiUrl}ims-api/suppliers/`, { params }).pipe(

@@ -43,7 +43,7 @@
       if (searchQuery) {
         params = params.set('search', searchQuery)
       }
-      if (this.stocks,length > 0) {
+      if (this.stocks) {
         return this.stocksSubject.asObservable();
       } else {
         return this.http.get<Stock[]>(`${this.apiUrl}ims-api/stocks/`, { params}).pipe(

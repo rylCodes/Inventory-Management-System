@@ -46,7 +46,7 @@ export class SalesService {
       params = params.set('search', searchQuery)
     }
     
-    if (this.saleBills.length > 0) {
+    if (this.saleBills) {
       return this.saleBillsSubject.asObservable();
     } else {
       return this.http.get<SaleBill[]>(`${this.apiUrl}ims-api/sales-bill/`, { params }).pipe(
@@ -109,7 +109,7 @@ export class SalesService {
   }
 
   getSaleItems(): Observable<SaleItem[]> {
-    if (this.saleItems.length > 0) {
+    if (this.saleItems) {
       return this.saleItemsSubject.asObservable();
     } else {
       return this.http.get<SaleItem[]>(`${this.apiUrl}ims-api/sales-item/`).pipe(

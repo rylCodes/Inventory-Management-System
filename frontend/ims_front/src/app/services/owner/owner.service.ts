@@ -45,7 +45,7 @@ export class OwnerService {
       params = params.set('search', this.searchQuery)
     };
 
-    if (this.owners.length > 0) {
+    if (this.owners) {
       return this.ownersSubject.asObservable();
     } else {
       return this.http.get<Owner[]>(`${this.apiUrl}ims-api/owners/`, { params: params}).pipe(

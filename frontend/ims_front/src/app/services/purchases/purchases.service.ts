@@ -45,7 +45,7 @@ export class PurchasesService {
     if (searchQuery) {
       params = params.set('search', searchQuery)
     }
-    if (this.bills.length > 0) {
+    if (this.bills) {
       return this.billsSubject.asObservable();
     } else {
       return this.http.get<PurchaseBill[]>(`${this.apiUrl}ims-api/purchase-bill/`, { params }).pipe(
@@ -108,7 +108,7 @@ export class PurchasesService {
   }
 
   getPurchaseItems(): Observable<PurchaseItem[]> {
-    if (this.items.length > 0) {
+    if (this.items) {
       return this.itemsSubject.asObservable();
     } else {
       return this.http.get<PurchaseItem[]>(`${this.apiUrl}ims-api/purchase-item/`).pipe(

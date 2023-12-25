@@ -21,18 +21,18 @@ class StockList(generics.ListCreateAPIView):
 
         serializer = StockSerializer(queryset, many=True)
         return Response(serializer.data)
-    
-    def delete(self, request, *args, **kwargs):
-        try:
-            return super().delete(request, *args, **kwargs)
-        except ProtectedError as e:
-            error_message = "Unable to delete! This item is linked to other records."
-            return Response({"error": error_message}, status=status.HTTP_400_BAD_REQUEST)
 
 class StockDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Stock.objects.all()
     serializer_class = StockSerializer
     permission_classes = [IsAdminUser]
+
+    def delete(self, request, *args, **kwargs):
+        try:
+            return super().delete(request, *args, **kwargs)
+        except ProtectedError as e:
+            error_message = "Unable to delete! This product is linked to other records."
+            return Response({"error": error_message}, status=status.HTTP_400_BAD_REQUEST)
 
 # Menus views
 class MenuList(generics.ListCreateAPIView):

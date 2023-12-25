@@ -20,6 +20,8 @@ export class SuppliersService {
 
   private suppliers: Supplier[] = [];
   private suppliersSubject: BehaviorSubject<Supplier[]> = new BehaviorSubject<Supplier[]>([]);
+  private hasFetchedData: boolean = false;
+
   private apiUrl = environment.baseUrl;
   searchQuery: string | null = null;
 
@@ -45,13 +47,14 @@ export class SuppliersService {
     if (searchQuery) {
       params = params.set('search', searchQuery)
     }
-    if (this.suppliers) {
+    if (this.hasFetchedData) {
       return this.suppliersSubject.asObservable();
     } else {
       return this.http.get<Supplier[]>(`${this.apiUrl}ims-api/suppliers/`, { params }).pipe(
         tap((suppliers) => {
           this.suppliers = suppliers;
           this.suppliersSubject.next(suppliers);
+          this.hasFetchedData = false;
         }),
         catchError((err) => {
           this.handleSupplierError(err);

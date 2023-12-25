@@ -8,10 +8,10 @@
         </h2>
         <form class="flex flex-col mt-2" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
             <label class="mt-4 lg:mt-6" for="username">Username</label>
-            <input class="text-neutral-900 px-2 py-1 rounded-sm mt-1" type="text" formControlName="username">
+            <input class="text-neutral-900 px-2 py-1 rounded-sm mt-1" type="text" formControlName="username" id="username">
 
             <label class="mt-4 lg:mt-6" for="password">Password</label>
-            <input class="text-neutral-900 px-2 py-1 rounded-sm mt-1" type="password" formControlName="password">
+            <input class="text-neutral-900 px-2 py-1 rounded-sm mt-1" type="password" formControlName="password" id="password">
 
             <button class="mt-8 lg:mt-12 bg-white text-neutral-900 font-bold py-2 rounded hover:bg-neutral-100"
                 type="submit">Log in</button>

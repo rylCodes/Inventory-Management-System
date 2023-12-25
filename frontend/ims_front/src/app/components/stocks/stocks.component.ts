@@ -235,8 +235,9 @@ export class StocksComponent implements OnInit {
       this.isLoading = true;
       this.stockService.addStock(newStock)
       .subscribe({
-        next: async () => {
+        next: async (stock) => {
           this.isLoading = false;
+          this.stocks.push(stock);
           this.toggleForm();
           await this.uiService.wait(100);
           this.toastrService.success("New stock has been created successfully!");

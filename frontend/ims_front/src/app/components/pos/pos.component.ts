@@ -237,13 +237,16 @@ export class PosComponent implements OnInit, AfterContentChecked {
 
   viewOrder(saleBill: SaleBill) {
     this.saleBill = saleBill;
-    this.loadItems();
+    // this.loadItems();
+    this.saleItems = this.saleItems.filter(item => item.billno === saleBill.id && item.status);
     this.toggleBillTable();
 
     this.updatingOrder = !this.updatingOrder;
     if (!this.updatingOrder) {
       this.resetBillForm();
-      this.loadItems();
+      // this.loadItems();
+      this.saleItems = this.saleItems.filter(item => item.billno === null && item.status);
+      this.saleBill.grand_total = this.calculateGrandtotal(this.saleItems);
     }
   }
 
@@ -285,7 +288,7 @@ export class PosComponent implements OnInit, AfterContentChecked {
   loadNotifications() {
     this.notifService.getNotifications().subscribe({
       next: notifs => this.notifications = notifs,
-      error: err => console.log("Failed to fetch notifications", err),
+      error: err => console.log(err),
     })
   }
 
@@ -429,38 +432,43 @@ export class PosComponent implements OnInit, AfterContentChecked {
     }
 
     this.isLoading = true;
-    this.salesService.addSaleBill(newBill)
-      .subscribe({
-        next: async (bill) => {
-          this.isLoading = false;
-          this.activeBills.push(bill);
-          
-          this.saleItems.map(item => {
-            if (!item.billno) {
-              item.billno = bill.id;
-              this.salesService.editSaleItem(item).subscribe(item => {
-                const index = this.saleItems.findIndex(i => i.id === item.id);
-                this.saleItems[index] = item;
-                this.loadItems();
-              })
-            }
-          })
-
-          this.resetBillForm();
-          if (!bill.grand_total || bill.grand_total < 1) {
-            this.toastrService.warning(
-              "You have saved a transaction without a total bill amount. Make sure it is correct.",
-              "Zero Total Amount!",
-              {timeOut: 5000},
-            );
+    this.salesService.addSaleBill(newBill).subscribe({
+      next: async (bill) => {
+        this.isLoading = false;
+        this.activeBills.push(bill);
+        
+        this.saleItems.map(item => {
+          if (!item.billno) {
+            item.billno = bill.id;
+            this.salesService.editSaleItem(item).subscribe(item => {
+              const index = this.saleItems.findIndex(i => i.id === item.id);
+              this.saleItems[index] = item;
+              // this.loadItems();
+              if (this.updatingOrder) {
+                this.saleItems = this.saleItems.filter(item => item.billno === this.saleBill.id && item.status);
+              } else {
+                this.saleItems = this.saleItems.filter(item => item.billno === null && item.status);
+                this.saleBill.grand_total = this.calculateGrandtotal(this.saleItems);
+              }
+            })
           }
-          this.toastrService.success("New transaction has been added successfully!");
-        },
-        error: (err) => {
-          this.isLoading = false;
-          this.uiService.displayErrorMessage(err);
+        });
+
+        this.resetBillForm();
+        if (!bill.grand_total || bill.grand_total < 1) {
+          this.toastrService.warning(
+            "You have saved a transaction without a total bill amount. Make sure it is correct.",
+            "Zero Total Amount!",
+            {timeOut: 5000},
+          );
         }
-      });
+        this.toastrService.success("New transaction has been added successfully!");
+      },
+      error: (err) => {
+        this.isLoading = false;
+        this.uiService.displayErrorMessage(err);
+      }
+    });
   }
 
   // Add Items
@@ -481,29 +489,44 @@ export class PosComponent implements OnInit, AfterContentChecked {
       ...this.saleItem,
     }
     
+    this.isLoading = true;
     this.salesService.addSaleItem(newSaleItem)
     .subscribe({
       next: async (saleItem) => {
+        this.isLoading = false;
         this.saleItems.push(saleItem);
-        this.loadItems();
+        // this.loadItems();
+        if (this.updatingOrder) {
+          this.saleItems = this.saleItems.filter(item => item.billno === this.saleBill.id && item.status);
+        } else {
+          this.saleItems = this.saleItems.filter(item => item.billno === null && item.status);
+          this.saleBill.grand_total = this.calculateGrandtotal(this.saleItems);
+        }
 
         if (this.updatingOrder) {
           this.saleBill.grand_total += saleItem.sub_total;
           this.salesService.editSaleBill(this.saleBill)
           .subscribe({
-            next: () => {
-              this.loadBills();
+            next: (bill) => {
+              const index = this.activeBills.findIndex(saleBill => saleBill.id === bill.id);
+              if (index !== -1) {
+                this.activeBills[index] = bill
+              };
+
+              // this.loadBills();
               this.addNotification();
             },
-            error: err => console.log(err) 
+            error: err => {
+              console.log(err);
+            },
           });
         }
 
         this.resetItemForm();
       },
       error: (err) => {
-        this.uiService.displayErrorMessage(err);
-      }
+        this.isLoading = false;
+        this.uiService.displayErrorMessage(err);      }
     });
   }
 
@@ -559,6 +582,7 @@ export class PosComponent implements OnInit, AfterContentChecked {
         this.modalInputValue = undefined;
         this.showPermissionModal = false;
         this.showBillForm = false;
+        this.resetBillForm();
 
         this.toastrService.success("Successfully saved changes to the customer details.");
       },
@@ -684,7 +708,7 @@ export class PosComponent implements OnInit, AfterContentChecked {
   proceedDeleteItem() {
     if (!this.deletingSaleItem) {
       return;
-    }
+    };
 
     // Reduce total bill upon deleting an item
     this.saleBill.grand_total -= this.deletingSaleItem.sub_total;
@@ -692,24 +716,38 @@ export class PosComponent implements OnInit, AfterContentChecked {
     if (this.updatingOrder) {
       this.salesService.editSaleBill(this.saleBill)
       .subscribe({
-        next: () => {this.addNotification()},
+        next: (saleBillData) => {
+          const index = this.activeBills.findIndex(saleBill => saleBill.id === saleBillData.id);
+          this.activeBills[index] = saleBillData;
+          this.addNotification();
+        },
         error: (err) => {console.log(err)},
       });
-    }
+    };
 
+    this.isLoading = true;
     this.salesService
     .deleteSaleItem(this.deletingSaleItem, this.modalInputValue)
     .subscribe({
       next: async () => {
+        this.isLoading = false;
         this.activeBills = this.activeBills.filter(bill => bill.id !== this.deletingSaleItem?.id);
         this.deletingSaleItem = null;
         this.modalInputValue = undefined;
         this.showPermissionModal = false;
         this.showItemActionModal = false;
-        this.loadItems();
+        // this.loadItems();
+        if (this.updatingOrder) {
+          this.saleItems = this.saleItems.filter(item => item.billno === this.saleBill.id && item.status);
+        } else {
+          this.saleItems = this.saleItems.filter(item => item.billno === null && item.status);
+          this.saleBill.grand_total = this.calculateGrandtotal(this.saleItems);
+        }
+
         this.toastrService.success("Item has been deleted successfully!");
       },
       error: (err) => {
+        this.isLoading = false;
         this.showBillActionModal = false;
         this.uiService.displayErrorMessage(err);
       }
@@ -796,6 +834,12 @@ export class PosComponent implements OnInit, AfterContentChecked {
       .subscribe({
         next: (bill) => {
           this.isLoading = false;
+
+          const index = this.activeBills.findIndex(saleBill => saleBill.id === bill.id);
+          if (index !== -1) {
+            this.activeBills[index] = bill;
+          };
+
           if (bill.grand_total) {
             stocks.map(stock => {
               this.stockService.editStock(stock).subscribe();
@@ -851,7 +895,7 @@ export class PosComponent implements OnInit, AfterContentChecked {
               console.log("New notification has been added successfully!", notif);
             },
             error: (err) => {
-              console.log("Failed to add new notification", err);
+              console.log(err);
             },
           });
       }

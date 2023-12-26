@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Observable, catchError, throwError, BehaviorSubject, of, tap } from 'rxjs';
+import { Observable, catchError, throwError, BehaviorSubject, of, tap, Subject } from 'rxjs';
 import { SaleBill, SaleItem } from 'src/app/interface/Sale';
 import { environment } from 'src/environments/environment';
 
@@ -20,6 +20,7 @@ export class SalesService {
   private saleBillsSubject: BehaviorSubject<SaleBill[]> = new BehaviorSubject<SaleBill[]>([]);
   private saleItemsSubject: BehaviorSubject<SaleItem[]> = new BehaviorSubject<SaleItem[]>([]);
   private hasFetchedBills: boolean = false;
+  private serviceStatusSubject: Subject<boolean> = new Subject<boolean>();
 
   constructor(private http: HttpClient) { }
   
@@ -43,21 +44,17 @@ export class SalesService {
       params = params.set('search', searchQuery)
     }
     
-    if (this.hasFetchedBills) {
-      return this.saleBillsSubject.asObservable();
-    } else {
-      return this.http.get<SaleBill[]>(`${this.apiUrl}ims-api/sales-bill/`, { params }).pipe(
-        tap((bills) => {
-          this.saleBills = bills;
-          this.saleBillsSubject.next(bills);
-          this.hasFetchedBills = true;
-        }),
-        catchError((err) => {
-          this.handleSaleError(err);
-          return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to display transactions!`)
-        })
-      );
-    }
+    return this.http.get<SaleBill[]>(`${this.apiUrl}ims-api/sales-bill/`, { params }).pipe(
+      // tap((bills) => {
+      //   this.saleBills = bills;
+      //   this.saleBillsSubject.next(bills);
+      //   this.hasFetchedBills = true;
+      // }),
+      catchError((err) => {
+        this.handleSaleError(err);
+        return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to display transactions!`)
+      })
+    );
   }
 
   editSaleBill(updatedSaleBill: SaleBill, adminPassword?: string): Observable<SaleBill> {
@@ -124,6 +121,10 @@ export class SalesService {
         return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to delete sale item!`)
       })
     );
+  }
+
+  setServiceStatus(status: boolean):void {
+    this.serviceStatusSubject.next(status);
   }
 
 }

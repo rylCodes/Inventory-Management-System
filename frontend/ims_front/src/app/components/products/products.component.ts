@@ -572,10 +572,12 @@ export class ProductsComponent implements OnInit {
       return;
     }
 
+    this.isLoading = true;
     this.productService
       .deleteProduct(this.deletingProduct)
       .subscribe({
         next: async () => {
+          this.isLoading = false;
           this.menus = this.menus.filter(s => s.id !== this.deletingProduct?.id);
           this.deletingProduct = null;
           this.showProductActionModal = false;
@@ -584,6 +586,7 @@ export class ProductsComponent implements OnInit {
           this.toastrService.success("Item has been deleted successfully!");
         },
         error: (err) => {
+          this.isLoading = false;
           this.uiService.displayErrorMessage(err);
         }
       });
@@ -677,13 +680,16 @@ export class ProductsComponent implements OnInit {
       deletingMenus.push(this.productService.deleteMenu(menu));
     });
 
+    this.isLoading = true;
     forkJoin(deletingMenus).subscribe({
       next: () => {
+        this.isLoading = false;
         this.loadMenus();
         this.showModal = false;
         this.toastrService.success("All products has been deleted successfully.");
       },
       error: (err) => {
+        this.isLoading = false;
         this.showModal = false;
         this.uiService.displayErrorMessage(err);
       }

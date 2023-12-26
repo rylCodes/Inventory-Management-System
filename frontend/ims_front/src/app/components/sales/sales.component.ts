@@ -91,7 +91,6 @@ export class SalesComponent implements OnInit {
   menus: Menu[] = [];
   stocks: Stock[] = [];
   amountChange: number = 0;
-  eachBill: [] = [];
 
   bill: SaleBill = {
     id: undefined,
@@ -162,27 +161,34 @@ export class SalesComponent implements OnInit {
     this.showItemActionModal = !this.showItemActionModal;
   }
 
-  toggleInvoice(bill: SaleBill) {
+  async toggleInvoice(bill: SaleBill) {
     this.bill = bill;
-    this.loadBills();
-    this.loadEachBillItems();
+    const allBills = Array.from(this.bills);
+    const allEachBillItems = Array.from(this.eachBillItems);
+
+    await this.uiService.wait(100);
+    this.bills = this.bills.filter(salesBill => salesBill.id === bill.id)
+    this.eachBillItems = this.eachBillItems.filter(item => item.billno === bill.id);
 
     this.showInvoice = !this.showInvoice;
     if (this.showInvoice) {
       this.renderer.setStyle(document.body, 'overflow', 'hidden');
     } else {
       this.renderer.setStyle(document.body, 'overflow', 'auto');
+      this.bills = allBills;
+      this.eachBillItems = allEachBillItems;
       this.resetBill;
     }
   }
 
   // SHOW BILLS
   ngOnInit(): void {
-    this.loadBills();
-    this.loadAllItems();
+    // this.loadAllItems();
     this.loadMenus();
     this.loadStocks();
     this.loadOwner();
+    this.loadItems();
+    this.loadBills();
   }  
 
   loadBills() {
@@ -202,25 +208,26 @@ export class SalesComponent implements OnInit {
     });
   }
 
-  loadEachBillItems() {
+  loadItems() {
     this.salesService
     .getSaleItems()
     .subscribe({
       next: (items) => {
+        this.allItems = Array.from(items);
         this.eachBillItems = items.filter(item => item.billno === this.bill.id);
       },
       error: (err) => console.log(err)
     });
   }
 
-  loadAllItems() {
-    this.salesService
-      .getSaleItems()
-      .subscribe({
-        next: (items) => this.allItems = items,
-        error: (err) => console.log(err),
-      });
-  }
+  // loadAllItems() {
+  //   this.salesService
+  //     .getSaleItems()
+  //     .subscribe({
+  //       next: (items) => this.allItems = items,
+  //       error: (err) => console.log(err),
+  //     });
+  // }
 
   loadMenus() {
     this.productService
@@ -393,13 +400,16 @@ export class SalesComponent implements OnInit {
       deletingBills.push(this.salesService.deleteSaleBill(bill));
     });
 
+    this.isLoading = true;
     forkJoin(deletingBills).subscribe({
       next: () => {
+        this.isLoading = false;
         this.loadBills();
         this.showModal = false;
         this.toastrService.success("All sales history has been deleted successfully.");
       },
       error: (err) => {
+        this.isLoading = false;
         this.showModal = false;
         this.uiService.displayErrorMessage(err);
       }

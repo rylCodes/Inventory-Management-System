@@ -41,21 +41,17 @@
         params = params.set('search', searchQuery)
       };
 
-      if (this.hasFetchedData) {
-        return this.stocksSubject.asObservable();
-      } else {
-        return this.http.get<Stock[]>(`${this.apiUrl}ims-api/stocks/`, { params}).pipe(
-          tap((stocks) => {
-            this.stocks = stocks,
-            this.stocksSubject.next(stocks);
-            this.hasFetchedData = true;
-          }),
-          catchError((err) => {
-            this.handleStockError(err);
-            return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to display stocks!`);
-          })
-        );
-      }
+      return this.http.get<Stock[]>(`${this.apiUrl}ims-api/stocks/`, { params}).pipe(
+        // tap((stocks) => {
+        //   this.stocks = stocks,
+        //   this.stocksSubject.next(stocks);
+        //   this.hasFetchedData = true;
+        // }),
+        catchError((err) => {
+          this.handleStockError(err);
+          return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to display stocks!`);
+        })
+      );
     }
 
     editStock(updatedStock: Stock): Observable<Stock> {

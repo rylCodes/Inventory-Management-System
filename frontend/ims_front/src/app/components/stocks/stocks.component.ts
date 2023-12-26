@@ -447,13 +447,16 @@ export class StocksComponent implements OnInit {
       deletingStocks.push(this.stockService.deleteStock(stock));
     });
 
+    this.isLoading = true;
     forkJoin(deletingStocks).subscribe({
       next: () => {
+        this.isLoading = false;
         this.loadStocks();
         this.showModal = false;
         this.toastrService.success("All items has been deleted successfully.");
       },
       error: (err) => {
+        this.isLoading = false;
         this.showModal = false;
         this.uiService.displayErrorMessage(err);
       }

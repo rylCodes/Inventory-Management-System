@@ -41,21 +41,17 @@ export class PurchasesService {
     if (searchQuery) {
       params = params.set('search', searchQuery)
     }
-    if (this.hasFetchedData) {
-      return this.billsSubject.asObservable();
-    } else {
-      return this.http.get<PurchaseBill[]>(`${this.apiUrl}ims-api/purchase-bill/`, { params }).pipe(
-        tap((bills) => {
-          this.bills = bills;
-          this.billsSubject.next(bills);
-          this.hasFetchedData = true;
-        }),
-        catchError(err => {
-          this.handlePurchaseError(err);
-          return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to display purchase transactions!`);
-        })
-      );
-    }
+    return this.http.get<PurchaseBill[]>(`${this.apiUrl}ims-api/purchase-bill/`, { params }).pipe(
+      // tap((bills) => {
+      //   this.bills = bills;
+      //   this.billsSubject.next(bills);
+      //   this.hasFetchedData = true;
+      // }),
+      catchError(err => {
+        this.handlePurchaseError(err);
+        return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to display purchase transactions!`);
+      })
+    );
   }
 
   editPurchaseBill(purchaseBill: PurchaseBill, adminPassword?: string): Observable<PurchaseBill> {

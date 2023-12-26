@@ -44,21 +44,17 @@ export class SuppliersService {
       params = params.set('search', searchQuery)
     };
 
-    if (this.hasFetchedData) {
-      return this.suppliersSubject.asObservable();
-    } else {
-      return this.http.get<Supplier[]>(`${this.apiUrl}ims-api/suppliers/`, { params }).pipe(
-        tap((suppliers) => {
-          this.suppliers = suppliers;
-          this.suppliersSubject.next(suppliers);
-          this.hasFetchedData = true;
-        }),
-        catchError((err) => {
-          this.handleSupplierError(err);
-          return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to display suppliers!`)
-        })
-      );
-    };
+    return this.http.get<Supplier[]>(`${this.apiUrl}ims-api/suppliers/`, { params }).pipe(
+      // tap((suppliers) => {
+      //   this.suppliers = suppliers;
+      //   this.suppliersSubject.next(suppliers);
+      //   this.hasFetchedData = true;
+      // }),
+      catchError((err) => {
+        this.handleSupplierError(err);
+        return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to display suppliers!`)
+      })
+    );
   }
 
   editSupplier(updatedSupplier: Supplier): Observable<Supplier> {

@@ -341,13 +341,16 @@ saveUpdate() {
       deletingSuppliers.push(this.supplierService.deleteSupplier(stock));
     });
 
+    this.isLoading = true;
     forkJoin(deletingSuppliers).subscribe({
       next: () => {
+        this.isLoading = false;
         this.loadSuppliers();
         this.showModal = false;
         this.toastrService.success("All suppliers has been deleted successfully.");
       },
       error: (err) => {
+        this.isLoading = false;
         this.showModal = false;
         this.uiService.displayErrorMessage(err);
       }

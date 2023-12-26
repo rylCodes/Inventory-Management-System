@@ -42,21 +42,17 @@ export class ProductsService {
       params = params.set('search', searchQuery)
     };
 
-    if (this.hasFetchedBills) {
-      return this.menusSubject.asObservable();
-    } else {
-      return this.http.get<Menu[]>(`${this.apiUrl}ims-api/menus/`, { params }).pipe(
-        tap((menus) => {
-          this.menus = menus;
-          this.menusSubject.next(menus);
-          this.hasFetchedBills = true;
-        }),
-        catchError((err) => {
-          this.handleError(err);
-          return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to display menu!`)
-        })
-      );
-    }
+    return this.http.get<Menu[]>(`${this.apiUrl}ims-api/menus/`, { params }).pipe(
+      // tap((menus) => {
+      //   this.menus = menus;
+      //   this.menusSubject.next(menus);
+      //   this.hasFetchedBills = true;
+      // }),
+      catchError((err) => {
+        this.handleError(err);
+        return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to display menu!`)
+      })
+    );
   }
 
   updateMenu(updatedMenu: Menu): Observable<Menu> {

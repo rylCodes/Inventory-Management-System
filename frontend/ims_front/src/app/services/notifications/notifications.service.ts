@@ -19,10 +19,10 @@ export class NotificationsService {
   private apiUrl = environment.baseUrl
   private notifications: Notification[] = [];
   private notificationsSubject: BehaviorSubject<Notification[]> = new BehaviorSubject<Notification[]>([]);
-  private notifServiceStatusSubject: Subject<boolean> = new Subject<boolean>();
+  private serviceStatusSubject: Subject<boolean> = new Subject<boolean>();
   private hasFetchedData: boolean = false;
 
-  notifServiceStatus$ = this.notifServiceStatusSubject.asObservable();
+  notifServiceStatus$ = this.serviceStatusSubject.asObservable();
 
   stocks: Stock[] = [];
 
@@ -42,16 +42,12 @@ export class NotificationsService {
   }
 
   getNotifications(): Observable<Notification[]> {
-    if (this.hasFetchedData) {
-      return this.notificationsSubject.asObservable();
-    } else {
-      return this.http.get<Notification[]>(`${this.apiUrl}ims-api/notifications/`).pipe(
+    return this.http.get<Notification[]>(`${this.apiUrl}ims-api/notifications/`).pipe(
       catchError((err) => {
         this.handleError(err);
         return throwError(() => `${err.statusText? err.statusText: 'An error occured'}: Failed to display notifications`);
       })
     );
-    }
   }
 
   deleteNotification(notification: Notification): Observable<Notification> {
@@ -70,7 +66,7 @@ export class NotificationsService {
   }
 
   setServiceStatus(status: boolean): void {
-    this.notifServiceStatusSubject.next(status);
+    this.serviceStatusSubject.next(status);
   }
  
 }

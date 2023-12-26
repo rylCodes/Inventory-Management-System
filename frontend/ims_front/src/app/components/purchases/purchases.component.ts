@@ -201,10 +201,9 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
 
   toggleBillForm() {
     this.showBillForm = !this.showBillForm;
-    this.toggleTableSettings();
     if (!this.showBillForm) {
       this.resetBillForm();
-      this.loadFilteredItems();
+      this.loadItems();
     }
   }
 
@@ -216,13 +215,13 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
 
   viewOrder(bill: PurchaseBill) {
     this.bill = bill;
-    this.loadFilteredItems();
+    this.loadItems();
     this.toggleFormContainer();
 
     this.showPurchaseBill = !this.showPurchaseBill;
     if (!this.showPurchaseBill) {
       this.resetBillForm();
-      this.loadFilteredItems();
+      this.loadItems();
     }
   }
 
@@ -248,9 +247,9 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
 
   // SHOW BILLS
   ngOnInit(): void {
+    // this.loadAllItems();
+    this.loadItems();
     this.loadSuppliers();
-    this.loadFilteredItems();
-    this.loadAllItems();
     this.loadStocks();
     this.loadBills();
   }  
@@ -275,12 +274,14 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
       });
   }
 
-  loadFilteredItems() {
+  loadItems() {
     this.isFetching = true;
     this.purchaseService
       .getPurchaseItems()
       .subscribe({
         next: (items) => {
+          this.allItems = Array.from(items);
+
           if (this.showPurchaseBill) {
             this.isFetching = false;
             this.items = items.filter(item => item.purchaseBill_id === this.bill.id);
@@ -294,14 +295,14 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
       });
   }
 
-  loadAllItems() {
-    this.purchaseService
-      .getPurchaseItems()
-      .subscribe({
-        next: items => this.allItems = items,
-        error: err => console.log(err),
-      });
-  }
+  // loadAllItems() {
+  //   this.purchaseService
+  //     .getPurchaseItems()
+  //     .subscribe({
+  //       next: items => this.allItems = items,
+  //       error: err => console.log(err),
+  //     });
+  // }
 
   loadSuppliers() {
     this.supplierService
@@ -423,9 +424,9 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
             this.purchaseService.editPurchaseItem(item).subscribe(item => {
               const index = this.items.findIndex(i => i.id === item.id);
               this.items[index] = item;
+              // this.loadAllItems();
+              this.loadItems();
               this.loadBills();
-              this.loadAllItems();
-              this.loadFilteredItems();
             });
           })
   
@@ -474,11 +475,13 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
       ...this.item,
     }
 
+    this.isLoading = true;
     this.purchaseService.addPurchaseItem(newSaleItem)
     .subscribe({
       next: async (item) => {
+        this.isLoading = false;
         this.items.push(item);
-        this.loadFilteredItems();
+        this.loadItems();
         this.resetItemForm();
 
         if (this.showPurchaseBill) {
@@ -515,6 +518,7 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
         }
       },
       error: (err) => {
+        this.isLoading = false;
         this.uiService.displayErrorMessage(err)
       },
     });
@@ -524,12 +528,9 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
   // Update Bill
   updateBill(bill: PurchaseBill) {
     this.proceedEditBill = true;
-
     bill.billno.toUpperCase();
-
     this.bill = { ...bill };
     this.originalBill = { ...bill };
-
     this.toggleBillForm();
   }
 
@@ -574,6 +575,7 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
           this.modalInputValue = undefined;
           this.showModal = false;
           this.showBillForm = false;
+          this.resetBillForm();
   
           this.toastrService.success("Successfully saved changes to the purchase details.");
         },
@@ -635,7 +637,7 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
     .subscribe({
       next: async () => {
         this.isLoading = false;
-        this.bills = this.bills.filter(s => s.id !== this.deletingBill?.id);
+        this.bills = this.bills.filter(bill => bill.id !== this.deletingBill?.id);
         this.deletingBill = null;
         this.toggleBillActionModal()
         this.toastrService.success("Transaction has been deleted successfully!");
@@ -699,10 +701,12 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
 
     this.bill.grand_total -= this.deletingItem.sub_total;
 
+    this.isLoading = true;
     this.purchaseService
     .deletePurchaseItem(this.deletingItem, this.modalInputValue)
     .subscribe({
       next: async () => {
+        this.isLoading = false;
         // Reduce bill total amount upon deleting an item
         if (this.showPurchaseBill) {
           this.purchaseService.editPurchaseBill(this.bill)
@@ -729,10 +733,11 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
         this.modalInputValue = undefined;
         this.showModal = false;
         this.showItemActionModal = false;
-        this.loadFilteredItems();
+        this.loadItems();
         this.toastrService.success("Item has been deleted successfully!");
       },
       error: (err) => {
+        this.isLoading = false;
         this.uiService.displayErrorMessage(err);
       }
     });
@@ -814,13 +819,16 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
       deletingBills.push(this.purchaseService.deletePurchaseBill(bill));
     });
 
+    this.isLoading = true;
     forkJoin(deletingBills).subscribe({
       next: () => {
+        this.isLoading = false;
         this.loadBills();
         this.showModal = false;
         this.toastrService.success("All suppliers has been deleted successfully.");
       },
       error: (err) => {
+        this.isLoading = false;
         this.showModal = false;
         this.uiService.displayErrorMessage(err);
       }

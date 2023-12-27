@@ -38,6 +38,59 @@
     </div>
 
     <div class="relative w-full">
+        <!-- TRANSACTION HISTORY TABLE -->
+        <div class="w-full text-center shadow-xl rounded-xl mt-1 lg:mt-2">
+            <table class="w-full table-fixed rounded-xl">
+                <thead class="text-neutral-300 bg-neutral-900">
+                    <th>Date/Time</th>
+                    <th class="w-1/5 md:w-auto">TRN Code</th>
+                    <th class="w-1/5 md:w-auto">Customer</th>
+                    <th class="hidden md:table-cell">Remarks</th>
+                    <th>Items</th>
+                    <th>Total</th>
+                    <th class="hidden md:table-cell">MOP</th>
+                    <th>Action</th>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let bill of bills | paginate: { itemsPerPage: itemsPerPage, currentPage: p }">
+                        <td class="py-1 p-0.5 md:px-1 md:py-2">{{bill.time | date: "MMM dd, hh:mm a"}}</td>
+                        <td class="py-1 p-0.5 md:px-1 md:py-2">{{bill.billno}}</td>
+                        <td class="py-1 p-0.5 md:px-1 md:py-2">{{bill.customer_name}}</td>
+                        <td class="py-1 p-0.5 md:px-1 md:py-2 hidden md:table-cell">{{bill.remarks}}</td>
+                        <td class="py-1 p-0.5 md:px-1 md:py-2">{{getItemLength(bill)}}</td>
+                        <td class="py-1 p-0.5 md:px-1 md:py-2">&#8369;{{bill.grand_total | number: '1.2-2'}}</td>
+                        <td class="py-1 p-0.5 md:px-1 md:py-2 lowercase hidden md:table-cell">{{bill.mode_of_payment}}</td>
+                        <td class="py-1 p-0.5 md:px-1 md:py-2">
+                            <div class="flex justify-center items-center space-x-2 md:space-x-4">
+                                <fa-icon class="hover:scale-110 cursor-pointer" [icon]="faRectangleList" (click)="toggleInvoice(bill)">
+                                </fa-icon>
+                                <!-- Delete SaleBill -->
+                                <fa-icon class="hover:scale-110 cursor-pointer" [ngStyle]="{color: 'red'}" [icon]="faTrashCan"
+                                    (click)="deleteSaleBill(bill)">
+                                </fa-icon>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <!-- When no items to show. -->
+            <div class="w-full h-[5vh]" *ngIf="!bills.length && !isFetching">
+                <p class="text-center my-4">No items to show.</p>
+            </div>
+            <!-- While fetching data. -->
+            <div *ngIf="!bills.length && isFetching" class="h-[10vh]">
+                <app-loader></app-loader>
+            </div>
+        </div>
+
+        <!-- Paginator -->
+        <div class="flex justify-center items-center mt-6 md:mt-8">
+            <pagination-controls
+                (pageChange)="p = $event"
+                [autoHide]="true">
+            </pagination-controls>
+        </div>
+
         <!-- INVOICE -->
         <div *ngIf="showInvoice" class="top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] fixed overflow-y-auto">
             <div class="bg-white rounded-lg w-4/5 h-fit mt-8 mx-auto lg:w-1/2">
@@ -138,58 +191,6 @@
                     </button>
                 </div>
             </div>
-        </div>
-
-        <!-- TRANSACTION HISTORY TABLE -->
-        <div class="w-full text-center shadow-xl rounded-xl mt-1 lg:mt-2">
-            <table class="w-full table-fixed rounded-xl">
-                <thead class="text-neutral-300 bg-neutral-900">
-                    <th>Date/Time</th>
-                    <th class="w-1/5 md:w-auto">TRN Code</th>
-                    <th class="w-1/5 md:w-auto">Customer</th>
-                    <th class="hidden md:table-cell">Remarks</th>
-                    <th>Items</th>
-                    <th>Total</th>
-                    <th class="hidden md:table-cell">MOP</th>
-                    <th>Action</th>
-                </thead>
-                <tbody>
-                    <tr *ngFor="let bill of bills | paginate: { itemsPerPage: itemsPerPage, currentPage: p }">
-                        <td class="py-1 p-0.5 md:px-1 md:py-2">{{bill.time | date: "MMM dd, hh:mm a"}}</td>
-                        <td class="py-1 p-0.5 md:px-1 md:py-2">{{bill.billno}}</td>
-                        <td class="py-1 p-0.5 md:px-1 md:py-2">{{bill.customer_name}}</td>
-                        <td class="py-1 p-0.5 md:px-1 md:py-2 hidden md:table-cell">{{bill.remarks}}</td>
-                        <td class="py-1 p-0.5 md:px-1 md:py-2">{{getItemLength(bill)}}</td>
-                        <td class="py-1 p-0.5 md:px-1 md:py-2">&#8369;{{bill.grand_total | number: '1.2-2'}}</td>
-                        <td class="py-1 p-0.5 md:px-1 md:py-2 lowercase hidden md:table-cell">{{bill.mode_of_payment}}</td>
-                        <td class="py-1 p-0.5 md:px-1 md:py-2">
-                            <div class="flex justify-center items-center space-x-2 md:space-x-4">
-                                <fa-icon class="hover:scale-110 cursor-pointer" [icon]="faRectangleList" (click)="toggleInvoice(bill)">
-                                </fa-icon>
-                                <!-- Delete SaleBill -->
-                                <fa-icon class="hover:scale-110 cursor-pointer" [ngStyle]="{color: 'red'}" [icon]="faTrashCan"
-                                    (click)="deleteSaleBill(bill)">
-                                </fa-icon>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <!-- When no items to show. -->
-            <div class="w-full h-[5vh]" *ngIf="!bills.length && !isFetching">
-                <p class="text-center my-4">No items to show.</p>
-            </div>
-            <!-- While fetching data. -->
-            <div *ngIf="!bills.length && isFetching" class="h-[10vh]">
-                <app-loader></app-loader>
-            </div>
-        </div>
-
-        <div class="flex justify-center items-center mt-6 md:mt-8">
-            <pagination-controls
-                (pageChange)="p = $event"
-                [autoHide]="true">
-            </pagination-controls>
         </div>
 
         <!-- BILL MODAL: Confirm to Delete Bill -->

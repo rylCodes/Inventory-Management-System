@@ -96,7 +96,7 @@
                     <td class="py-1 p-0.5 md:px-1 md:py-2">{{supplier.name}}</td>
                     <td class="py-1 p-0.5 md:px-1 md:py-2">{{supplier.address}}</td>
                     <td class="py-1 p-0.5 md:px-1 md:py-2 break-words">{{supplier.phone }}</td>
-                    <td class="py-1 p-0.5 md:px-1 md:py-2 break-words">{{supplier.email }}</td>
+                    <td class="py-1 p-0.5 md:px-1 md:py-2 break-words lg:break-normal">{{supplier.email}}</td>
                     <td class="py-1 p-0.5 md:px-1 md:py-2 hidden md:table-cell">
                         <span class="text-white text-xs px-2 py-1 rounded-md"
                             [ngClass]="supplier.status? 'bg-[#008000]' : 'bg-[#ffa500]'">
@@ -147,4 +147,8 @@
         (closeModal)="toggleModal()" (buttonClick)="onConfirmDeleteAll()" [btnText]="'Delete all'" [btnBgColor]="'red'">
     </app-modal>
 
+    <!-- CSS Loader -->
+    <div *ngIf="isLoading" class="top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.3)] fixed z-[9999]">
+        <app-loader></app-loader>
+    </div>
 </div>

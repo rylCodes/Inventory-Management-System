@@ -164,13 +164,15 @@ export class SalesComponent implements OnInit {
   toggleInvoice(bill: SaleBill) {
     this.bill = bill;
 
+    this.eachBillItems = Array.from(this.allItems).filter(item => item.billno === this.bill.id);
+
     this.showInvoice = !this.showInvoice;
     if (this.showInvoice) {
       this.renderer.setStyle(document.body, 'overflow', 'hidden');
     } else {
       this.renderer.setStyle(document.body, 'overflow', 'auto');
       this.resetBill;
-    }
+    };
   }
 
   // SHOW BILLS

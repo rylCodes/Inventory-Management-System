@@ -147,7 +147,7 @@ export class StocksComponent implements OnInit {
       this.showTableSettings = true;
       this.proceedEdit = false;
       this.resetForm();
-    }
+    };
   }
 
   toggleActionModal() {
@@ -260,22 +260,22 @@ export class StocksComponent implements OnInit {
     } else if (!this.stock.unit) {
       this.toastrService.error("Enter item unit!");
       return;
-    }
+    };
 
     if (JSON.stringify(this.originalStock) === JSON.stringify(this.stock)) {
       this.toggleForm();
       return;
-    }
+    };
 
     if (this.stock.unit === "otherUnit" && this.customUnit) {
       this.stock.unit = this.customUnit;
-    }
+    };
 
     const editingStock = {
       ...this.stock,
       stock_name: this.stock.stock_name.toUpperCase(),
       description: this.stock.description.toUpperCase(),
-    }
+    };
 
     const isStockNameExist = this.stocks.some(stock => stock.id !== editingStock.id && stock.stock_name === editingStock.stock_name);
 
@@ -284,32 +284,30 @@ export class StocksComponent implements OnInit {
       return;
     } else {
         this.stockService
-        .editStock(editingStock)
-        .subscribe({
-          next: async (stockData) => {
-            this.updateRelatedMenu(stockData);
-            this.isLoading = false;
-            const index = this.stocks.findIndex(stock => stock.id === stockData.id);
-            this.stocks[index] = stockData;
-            // this.loadStocks();
-            this.toggleForm();
+        .editStock(editingStock).subscribe({
+        next: async (stockData) => {
+          this.updateRelatedMenu(stockData);
+          this.isLoading = false;
+          const index = this.stocks.findIndex(stock => stock.id === stockData.id);
+          this.stocks[index] = stockData;
+          // this.loadStocks();
+          this.toggleForm();
 
-            await this.uiService.wait(100);
-            if (stockData.quantity < 0) {
-              this.toastrService
-              .warning(
-                "Please verify if the product's quantity is correct.",
-                "Negative Quantity!",
-                {timeOut: 5000}
-              );
-            }
-            this.toastrService.success("Successfully saved changes to the stock.");
-          },
-          error: (err) => {
-            this.isLoading = false;
-            this.uiService.displayErrorMessage(err);
+          if (stockData.quantity < 0) {
+            this.toastrService
+            .warning(
+              "Please verify if the product's quantity is correct.",
+              "Negative Quantity!",
+              {timeOut: 5000}
+            );
           }
-        });
+          this.toastrService.success("Successfully saved changes to the stock.");
+        },
+        error: (err) => {
+          this.isLoading = false;
+          this.uiService.displayErrorMessage(err);
+        }
+      });
     }
   }
 

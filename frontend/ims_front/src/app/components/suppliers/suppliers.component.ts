@@ -72,7 +72,20 @@ export class SuppliersComponent implements OnInit {
     date_added: undefined,
     date_updated: undefined,
     status: true,
-  }
+  };
+
+  
+  originalSupplier: Supplier = {
+    id: undefined, 
+    code: undefined,
+    name: "",
+    phone: "",
+    address: "",
+    email: "",
+    date_added: undefined,
+    date_updated: undefined,
+    status: true,
+  };
 
   constructor(
     private supplierService: SuppliersService,
@@ -86,20 +99,28 @@ export class SuppliersComponent implements OnInit {
   }
 
   resetForm() {
-    this.supplier.name = "";
-    this.supplier.address = "";
-    this.supplier.phone = "";
-    this.supplier.email = "";
-    this.supplier.status = true;
+    this.supplier = {
+      id: undefined, 
+      code: undefined,
+      name: "",
+      phone: "",
+      address: "",
+      email: "",
+      date_added: undefined,
+      date_updated: undefined,
+      status: true,
+    };
   }
 
   toggleForm() {    
     this.showForm = !this.showForm;
-    this.toggleTableSettings();
+    this.showTableSettings = false;
+    this.showSearchBar = false;
     if (!this.showForm) {
+      this.showTableSettings = true;
       this.proceedEdit = false;
       this.resetForm();
-    }
+    };
   }
 
   toggleActionModal() {
@@ -141,7 +162,7 @@ export class SuppliersComponent implements OnInit {
     if (!this.supplier.name) {
       this.toastrService.error("Enter supplier!")
       return;
-    }
+    };
 
     const newSupplier = {
       id: this.supplier.id,
@@ -188,6 +209,8 @@ export class SuppliersComponent implements OnInit {
 // UPDATE SUPPLIER
 updateSupplier(supplier: Supplier) {
   this.proceedEdit = true;
+  this.supplier = { ...supplier };
+  this.originalSupplier = { ...supplier };
   this.supplier.id = supplier.id;
   this.supplier.code = supplier.code;
   this.supplier.name = supplier.name.toUpperCase();
@@ -199,17 +222,21 @@ updateSupplier(supplier: Supplier) {
 }
 
 saveUpdate() {
+  if (!this.supplier.name) {
+    this.toastrService.error("Enter supplier!")
+    return;
+  };
+
+  if (JSON.stringify(this.originalSupplier) === JSON.stringify(this.supplier)) {
+    this.toggleForm();
+    return;
+  };
+
   const editingSupplier = {
-    id: this.supplier.id,
-    code: this.supplier.code,
+    ...this.supplier,
     name: this.supplier.name.toUpperCase(),
     address: this.supplier.address.toUpperCase(),
-    phone: this.supplier.phone,
-    email: this.supplier.email,
-    date_added: this.supplier.date_added,
-    date_updated: this.supplier.date_updated,
-    status: this.supplier.status,
-  }
+  };
 
   const isSupplierExist = this.suppliers.some(supplier => supplier.id !== editingSupplier.id && supplier.name === editingSupplier.name);
   const isPhoneExist = this.suppliers.some(supplier => supplier.phone && supplier.id !== editingSupplier.id && supplier.phone === editingSupplier.phone);
@@ -226,17 +253,17 @@ saveUpdate() {
   } else {
       this.isLoading = true;
       this.supplierService
-      .editSupplier(editingSupplier)
-      .subscribe({
+      .editSupplier(editingSupplier).subscribe({
         next: async (supplierData) => {
           const index = this.suppliers.findIndex(supplier => supplier.id === supplierData.id);
           this.suppliers[index] = supplierData;
+          this.isLoading = false;
           this.toggleForm();
           this.toastrService.success("Successfully saved changes to the supplier.")
         },
         error: (err) => {
           this.isLoading = false;
-          this.uiService.displayErrorMessage(err);
+          this.uiService.displayErrorMessage(err);  
         }
       });
     }

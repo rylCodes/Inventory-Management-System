@@ -175,7 +175,7 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
     this.showSaveBillModal = !this.showSaveBillModal;
     if (this.showSaveBillModal) {
       if (!this.bill.billno) {
-        this.toastrService.error("Failed: Please enter bill no.");
+        this.toastrService.error("Failed: Please enter O.R. number");
         this.showSaveBillModal = false;
         return;
       } else if (!this.bill.supplier_id) {
@@ -214,6 +214,8 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
     this.showFormContainer = !this.showFormContainer;
     this.toggleBillTable();
     this.toggleTableSettings();
+    this.resetBillForm();
+    this.resetItemForm();
   }
 
   viewOrder(bill: PurchaseBill) {

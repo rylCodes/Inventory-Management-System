@@ -161,22 +161,14 @@ export class SalesComponent implements OnInit {
     this.showItemActionModal = !this.showItemActionModal;
   }
 
-  async toggleInvoice(bill: SaleBill) {
+  toggleInvoice(bill: SaleBill) {
     this.bill = bill;
-    const allBills = Array.from(this.bills);
-    const allEachBillItems = Array.from(this.eachBillItems);
-
-    await this.uiService.wait(100);
-    this.bills = this.bills.filter(salesBill => salesBill.id === bill.id)
-    this.eachBillItems = this.eachBillItems.filter(item => item.billno === bill.id);
 
     this.showInvoice = !this.showInvoice;
     if (this.showInvoice) {
       this.renderer.setStyle(document.body, 'overflow', 'hidden');
     } else {
       this.renderer.setStyle(document.body, 'overflow', 'auto');
-      this.bills = allBills;
-      this.eachBillItems = allEachBillItems;
       this.resetBill;
     }
   }

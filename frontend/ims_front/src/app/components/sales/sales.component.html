@@ -180,7 +180,7 @@
                 <p class="text-center my-4">No items to show.</p>
             </div>
             <!-- While fetching data. -->
-            <div *ngIf="isFetching" class="h-[10vh]">
+            <div *ngIf="!bills.length && isFetching" class="h-[10vh]">
                 <app-loader></app-loader>
             </div>
         </div>

@@ -79,7 +79,7 @@
                     <p class="text-center my-4">No items to show.</p>
                 </div>
                 <!-- While fetching data. -->
-                <div *ngIf="saleItems.length > 0 && isFetching" class="h-[10vh]">
+                <div *ngIf="!saleItems.length && isFetching" class="h-[10vh]">
                     <app-loader></app-loader>
                 </div>
             </div>
@@ -202,7 +202,7 @@
                 <p class="text-center my-4">No ongoing transactions.</p>
             </div>
             <!-- While fetching data. -->
-            <div *ngIf="activeBills.length > 0 && isFetching" class="h-[10vh]">
+            <div *ngIf="!activeBills.length && isFetching" class="h-[10vh]">
                 <app-loader></app-loader>
             </div>
         </div>

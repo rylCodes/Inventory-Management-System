@@ -168,7 +168,7 @@
                     <p class="text-center my-4">No items to show.</p>
                 </div>
                 <!-- While fetching items -->
-                <div *ngIf="products.length > 0 && isFetching" class="h-[10vh]">
+                <div *ngIf="!products.length && isFetching" class="h-[10vh]">
                     <app-loader></app-loader>
                 </div>
             </div>
@@ -316,7 +316,7 @@
             <p class="text-center my-4">No products.</p>
         </div>
         <!-- While fetching menu data -->
-        <div *ngIf="menus.length > 0 && isFetching" class="h-[10vh]">
+        <div *ngIf="!menus.length && isFetching" class="h-[10vh]">
             <app-loader></app-loader>
         </div>
     </div>

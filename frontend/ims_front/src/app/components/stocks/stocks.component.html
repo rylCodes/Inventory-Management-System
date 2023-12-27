@@ -134,7 +134,7 @@
                         </span>
                     </td>
                     <td class="relative py-1 p-0.5 md:px-1 md:py-2">
-                        <div class="flex justify-center items-center space-x-2 lg:space-x-3">
+                        <div class="flex justify-center items-center space-x-2 md:space-x-4">
                             <!-- Edit Stock -->
                             <fa-icon class="hover:scale-110 cursor-pointer" [ngStyle]="{color: 'green'}" [icon]="faPen"
                                 (click)="updateStock(stock)">
@@ -144,7 +144,7 @@
                                 (click)="deleteStock(stock)">
                             </fa-icon>
                         </div>
-                        <!-- Delete Stock -->
+                        <!-- Notification icon -->
                         <div class="absolute top-0 right-0 h-full w-3 flex items-center justify-center pr-1 sm:w-6">
                             <fa-icon class="text-neutral-400 text-xxs sm:text-xs" *ngIf="stock.show_notification"
                                 [icon]="faBell">

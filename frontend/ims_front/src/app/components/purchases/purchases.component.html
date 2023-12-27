@@ -132,6 +132,7 @@
             <div class="table-container w-full text-center shadow-xl mt-4 md:w-3/4">
                 <table class="w-full table-fixed">
                     <thead class="text-neutral-300 bg-neutral-900">
+                        <th *ngIf="items.length > 0" class="w-7"></th>
                         <th class="w-1/4">Date/Time</th>
                         <th>Item Name</th>
                         <th>Price</th>
@@ -140,16 +141,14 @@
                     </thead>
                     <tbody>
                         <tr *ngFor="let item of items">
-                            <td class="py-1 p-0.5 md:px-1 md:py-2">
-                                <div class="flex items-center justify-center space-x-1 md:space-x-3">
-                                    <button class="px-1.5 py-1 rounded-md bg-[#ff0000]" (click)="deleteItem(item)">
-                                        <fa-icon class="scale-75" [icon]="faTrashCan"
-                                            [ngStyle]="{color: 'rgb(212 212 212)'}">
-                                        </fa-icon>
-                                    </button>
-                                    <p>{{item.purchase_date | date: "MMM dd, hh:mm a"}}</p>
-                                </div>
+                            <td *ngIf="items.length > 0" class="m-auto overflow-visible">
+                                <button class="px-1.5 py-1 rounded-md bg-[#ff0000]" (click)="deleteItem(item)">
+                                    <fa-icon class="scale-75" [icon]="faTrashCan"
+                                        [ngStyle]="{color: 'rgb(212 212 212)'}">
+                                    </fa-icon>
+                                </button>
                             </td>
+                            <td class="py-1 p-0.5 md:px-1 md:py-2">{{item.purchase_date | date: "MMM dd, hh:mm a"}}</td>
                             <td class="py-1 p-0.5 md:px-1 md:py-2">{{getStockDetails(item.stock_id).stockName}}</td>
                             <td class="py-1 p-0.5 md:px-1 md:py-2">&#8369;{{item.item_price | number: '1.2-2'}}</td>
                             <td class="py-1 p-0.5 md:px-1 md:py-2">{{item.quantity_purchased}}</td>
@@ -233,6 +232,7 @@
     <div *ngIf="showBillTable" class="w-full text-center shadow-xl rounded-xl mt-1 lg:mt-2">
         <table class="w-full table-fixed rounded-xl">
             <thead class="text-neutral-300 bg-neutral-900">
+                <th *ngIf="bills.length > 0" class="w-7"></th>
                 <th class="w-1/4 md:w-auto">OR No.</th>
                 <th>Name</th>
                 <th>Items</th>
@@ -243,16 +243,13 @@
             </thead>
             <tbody>
                 <tr *ngFor="let bill of bills">
-                    <td class="p-2 text-clip overflow-hidden">
-                        <div class="flex items-center space-x-2 md:space-x-4">
-                            <!-- View Order List -->
-                            <button class="px-1.5 py-0.5 rounded-md bg-neutral-800 ml-2" (click)="viewOrder(bill)">
-                                <fa-icon [icon]="faRectangleList" [ngStyle]="{color: 'rgb(212 212 212)'}">
-                                </fa-icon>
-                            </button>
-                            <span>{{bill.billno}}</span>
-                        </div>
+                    <td *ngIf="bills.length > 0" class="m-auto overflow-visible">
+                        <button class="px-1.5 py-0.5 rounded-md bg-neutral-800" (click)="viewOrder(bill)">
+                            <fa-icon [icon]="faRectangleList" [ngStyle]="{color: 'rgb(212 212 212)'}">
+                            </fa-icon>
+                        </button>
                     </td>
+                    <td class="py-1 p-0.5 md:px-1 md:py-2">{{bill.billno}}</td>
                     <td class="py-1 p-0.5 md:px-1 md:py-2">{{getSupplierDetails(bill.supplier_id).supplierName}}</td>
                     <td class="py-1 p-0.5 md:px-1 md:py-2">{{getItemLength(bill)}}</td>
                     <td class="py-1 p-0.5 md:px-1 md:py-2">&#8369;{{bill.grand_total | number: '1.2-2'}}</td>
@@ -274,7 +271,7 @@
             </tbody>
         </table>
         <!-- When no items to show. -->
-        <div class="w-full h-[5vh]" *ngIf="!bills.length && !isFetching">
+        <div class="w-full h-[5vh]" *ngIf="noBillsToShow && !isFetching">
             <p class="text-center my-4">No purchases.</p>
         </div>
         <!-- While fetching data. -->

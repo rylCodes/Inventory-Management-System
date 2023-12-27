@@ -49,28 +49,29 @@
                 <!-- ITEM TABLE -->
                 <table class="w-full table-fixed">
                     <thead class="text-neutral-300 bg-neutral-900">
+                        <th *ngIf="saleItems.length > 0" class="w-7"></th>
                         <th>Time</th>
                         <th>Product</th>
-                        <th>Quantity</th>
+                        <th>Qty</th>
                         <th>Price</th>
                         <th>Sub Total</th>
                     </thead>
-                    <tbody class="relative">
+                    <tbody>
                         <tr *ngFor="let item of saleItems">
-                            <td class="flex items-center justify-center py-1 p-0.5 md:p-2 space-x-2 lg:space-x-4">
+                            <td *ngIf="saleItems.length > 0" class="m-auto overflow-visible">
                                 <button class="px-1.5 py-1 rounded-md bg-[#ff0000] cursor-pointer" (click)="deleteSaleItem(item)">
                                     <fa-icon class="scale-75" [icon]="faTrashCan"
                                         [ngStyle]="{color: 'rgb(212 212 212)'}">
                                     </fa-icon>
                                 </button>
-                                <p>{{item.sale_date | date: 'hh:mm a'}}</p>
                             </td>
-                            <td class="py-1 p-0.5 md:p-2">{{getMenuDetails(item.menu).name}}</td>
-                            <td class="py-1 p-0.5 md:p-2">{{item.quantity}}</td>
-                            <td class="py-1 p-0.5 md:p-2">
+                            <td class="py-1 px-0.5 md:px-1 md:py-2">{{item.sale_date | date: 'hh:mm a'}}</td>
+                            <td class="py-1 px-0.5 md:px-1 md:py-2">{{getMenuDetails(item.menu).name}}</td>
+                            <td class="py-1 px-0.5 md:px-1 md:py-2">{{item.quantity}}</td>
+                            <td class="py-1 px-0.5 md:px-1 md:py-2">
                                 <p>{{item.price| number: '1.2-2'}}</p>
                             </td>
-                            <td class="py-1 p-0.5 md:p-2">{{item.sub_total | number: '1.2-2'}}</td>
+                            <td class="py-1 px-0.5 md:px-1 md:py-2">{{item.sub_total | number: '1.2-2'}}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -161,6 +162,7 @@
         <div *ngIf="showBillTable" class="w-full text-center shadow-xl rounded-xl mt-4">
             <table class="w-full table-fixed rounded-xl">
                 <thead class="text-neutral-300 bg-neutral-900">
+                    <th *ngIf="activeBills.length > 0" class="w-7"></th>
                     <th>Time</th>
                     <th class="w-[20%] md:w-auto">TRN Code</th>
                     <th>Customer</th>
@@ -171,30 +173,29 @@
                 </thead>
                 <tbody>
                     <tr *ngFor="let bill of activeBills">
-                        <td class="py-1 p-0.5 md:px-1 md:py-2">
-                            <!-- View Order List -->
-                            <div class="flex items-center space-x-1 md:space-x-2">
-                                <button class="px-1.5 py-0.5 rounded-md bg-neutral-800 ml-2" (click)="viewOrder(bill)">
-                                    <fa-icon [icon]="faRectangleList" [ngStyle]="{color: 'rgb(212 212 212)'}">
-                                    </fa-icon>
-                                </button>
-                                <p>{{bill.time | date: 'hh:mm a'}}</p>
-                            </div>
+                        <td *ngIf="activeBills.length > 0" class="m-auto overflow-visible">
+                            <button class="px-1.5 py-0.5 rounded-md bg-neutral-800" (click)="viewOrder(bill)">
+                                <fa-icon [icon]="faRectangleList" [ngStyle]="{color: 'rgb(212 212 212)'}">
+                                </fa-icon>
+                            </button>
                         </td>
-                        <td class="py-1 p-0.5 md:px-1 md:py-2">{{bill.billno}}</td>
-                        <td class="py-1 p-0.5 md:px-1 md:py-2">{{bill.customer_name}}</td>
-                        <td class="py-1 p-0.5 md:px-1 md:py-2 hidden md:table-cell">{{bill.remarks}}</td>
-                        <td class="py-1 p-0.5 md:px-1 md:py-2">{{getItemLength(bill)}}</td>
-                        <td class="py-1 p-0.5 md:px-1 md:py-2">&#8369;{{bill.grand_total | number: '1.2-2'}}</td>
-                        <td class="flex justify-center py-1 p-0.5 md:px-1 md:py-2 space-x-2 md:space-x-4">
-                            <!-- Edit Sale Bill -->
-                            <fa-icon class="hover:scale-110 cursor-pointer" [ngStyle]="{color: 'green'}" [icon]="faPen"
-                                (click)="updateSaleBill(bill)">
-                            </fa-icon>
-                            <!-- Delete SaleBill -->
-                            <fa-icon class="hover:scale-110 cursor-pointer" [ngStyle]="{color: 'red'}" [icon]="faTrashCan"
-                                (click)="deleteSaleBill(bill)">
-                            </fa-icon>
+                        <td class="py-1 px-0.5 md:px-1 md:py-2">{{bill.time | date: 'hh:mm a'}}</td>
+                        <td class="py-1 px-0.5 md:px-1 md:py-2">{{bill.billno}}</td>
+                        <td class="py-1 px-0.5 md:px-1 md:py-2">{{bill.customer_name}}</td>
+                        <td class="py-1 px-0.5 md:px-1 md:py-2 hidden md:table-cell">{{bill.remarks}}</td>
+                        <td class="py-1 px-0.5 md:px-1 md:py-2">{{getItemLength(bill)}}</td>
+                        <td class="py-1 px-0.5 md:px-1 md:py-2">&#8369;{{bill.grand_total | number: '1.2-2'}}</td>
+                        <td class="py-1 px-0.5 md:px-1 md:py-2">
+                            <div class="flex justify-center items-center space-x-2 md:space-x-4">
+                                <!-- Edit Sale Bill -->
+                                <fa-icon class="hover:scale-110 cursor-pointer" [ngStyle]="{color: 'green'}" [icon]="faPen"
+                                    (click)="updateSaleBill(bill)">
+                                </fa-icon>
+                                <!-- Delete SaleBill -->
+                                <fa-icon class="hover:scale-110 cursor-pointer" [ngStyle]="{color: 'red'}" [icon]="faTrashCan"
+                                    (click)="deleteSaleBill(bill)">
+                                </fa-icon>
+                            </div>
                         </td>
                     </tr>
                 </tbody>
@@ -300,7 +301,7 @@
                         <thead class="bg-orange-600 text-white p-2 cursor-pointer">
                             <th>DESCRIPTIONS</th>
                             <th>PRICE</th>
-                            <th>QUANTITY</th>
+                            <th>QTY</th>
                             <th>TOTAL</th>
                         </thead>
                         <tbody>

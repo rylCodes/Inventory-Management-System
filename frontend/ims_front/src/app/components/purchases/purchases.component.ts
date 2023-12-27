@@ -426,9 +426,10 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
       this.purchaseService.addPurchaseBill(newBill)
       .subscribe({
         next: async (bill) => {
-          this.isLoading = false;
           this.bills.push(bill);
           this.bills.length === 0? this.noBillsToShow = true: this.noBillsToShow = false;
+
+          this.isLoading = false;
 
           this.items.map(item => {
             if (!item.purchaseBill_id) {
@@ -497,7 +498,6 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
     this.purchaseService.addPurchaseItem(newSaleItem)
     .subscribe({
       next: async (item) => {
-        this.isLoading = false;
         this.items.push(item);
         this.allItems.push(item);
 
@@ -537,6 +537,8 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
           this.bill.grand_total = this.calculateGrandtotal(this.items);
           this.items.length === 0? this.noItemsToShow = true: this.noItemsToShow = false;
         };
+
+        this.isLoading = false;
     
         if (!item || item.item_price < 1) {
           this.toastrService.warning(
@@ -668,8 +670,11 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
     .deletePurchaseBill(this.deletingBill)
     .subscribe({
       next: async () => {
-        this.isLoading = false;
         this.bills = this.bills.filter(bill => bill.id !== this.deletingBill?.id);
+        this.bills.length === 0? this.noBillsToShow = true: this.noBillsToShow = false;
+
+        this.isLoading = false;
+
         this.deletingBill = null;
         this.toggleBillActionModal()
         this.toastrService.success("Transaction has been deleted successfully!");
@@ -739,10 +744,10 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
     .deletePurchaseItem(this.deletingItem, this.modalInputValue)
     .subscribe({
       next: async () => {
-        this.isLoading = false;
-
         this.items = this.items.filter(item => item.id !== this.deletingItem?.id);
         this.items.length === 0? this.noItemsToShow = true: this.noItemsToShow = false;
+
+        this.isLoading = false;
 
         this.allItems = this.allItems.filter(item => item.id !== this.deletingItem?.id);
 

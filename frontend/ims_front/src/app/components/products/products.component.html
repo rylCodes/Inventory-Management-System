@@ -141,25 +141,24 @@
             <div class="table-container w-full text-center shadow-xl mt-4 md:w-3/4">
                 <table class="w-full table-fixed">
                     <thead class="text-neutral-300 bg-neutral-900">
+                        <th *ngIf="products.length > 0" class="w-7"></th>
                         <th>Date Added</th>
                         <th>Item</th>
                         <th>Qty Per Order</th>
                     </thead>
                     <tbody>
                         <tr *ngFor="let product of products">
-                            <td class="py-1 p-0.5 md:px-1 md:py-2">
-                                <div class="flex justify-center items-center space-x-2 md:space-x-4">
-                                    <button class="px-1.5 py-1 rounded-md bg-[#ff0000]"
-                                        (click)="deleteProduct(product)">
-                                        <fa-icon class="scale-75" [icon]="faTrashCan"
-                                            [ngStyle]="{color: 'rgb(212 212 212)'}">
-                                        </fa-icon>
-                                    </button>
-                                    <p>{{product.date_added | date: 'MM-dd-yyyy'}}</p>
-                                </div>
+                            <td *ngIf="products.length > 0" class="m-auto overflow-visible">
+                                <button class="px-1.5 py-1 rounded-md bg-[#ff0000]"
+                                    (click)="deleteProduct(product)">
+                                    <fa-icon class="scale-75" [icon]="faTrashCan"
+                                        [ngStyle]="{color: 'rgb(212 212 212)'}">
+                                    </fa-icon>
+                                </button>
                             </td>
-                            <td class="py-1 p-0.5 md:px-1 md:py-2">{{getStockDetails(product.stock_id).stock_name}}</td>
-                            <td class="py-1 p-0.5 md:px-1 md:py-2">{{product.qty_per_order}}</td>
+                            <td class="py-1 px-0.5 md:px-1 md:py-2">{{product.date_added | date: 'MM-dd-yyyy'}}</td>
+                            <td class="py-1 px-0.5 md:px-1 md:py-2">{{getStockDetails(product.stock_id).stock_name}}</td>
+                            <td class="py-1 px-0.5 md:px-1 md:py-2">{{product.qty_per_order}}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -220,9 +219,10 @@
                     <label class="mt-2" for="menu.category">Category:</label>
                     <select class="border border-neutral-900 px-2 py-1 rounded-sm mt-1" name="menu.category"
                         id="menu.category" [(ngModel)]="menu.category">
-                        <option value="LIQUOR">LIQUOR</option>
-                        <option value="FOOD">FOOD</option>
-                        <option value="DRINKS">DRINKS</option>
+                        <option value="FOODs">FOODS</option>
+                        <option value="BEVERAGES">BEVERAGES</option>
+                        <option value="APPETIZERS">APPETIZERS</option>
+                        <option value="DESSERTs">DESSERTS</option>
                         <option class="text-neutral-500" value="otherCategory">other category...</option>
                     </select>
                     <!-- Input field for custom category when "other category..." is selected -->
@@ -262,7 +262,8 @@
     <div *ngIf="showMenuTable" class="w-full text-center shadow-xl rounded-xl mt-1 lg:mt-2">
         <table class="w-full table-fixed rounded-xl">
             <thead class="text-neutral-300 bg-neutral-900">
-                <th class="w-1/4 md:w-[15%]">Code</th>
+                <th *ngIf="menus.length > 0" class="w-7"></th>
+                <th class="">Code</th>
                 <th>Name</th>
                 <th>Category</th>
                 <th class="hidden w-1/6 md:table-cell">Description</th>
@@ -274,29 +275,26 @@
             <tbody>
                 <tr class="{{menu.status? 'active' : 'inactive'}}"
                     *ngFor="let menu of menus | paginate: { itemsPerPage: itemsPerPage, currentPage: p, totalItems: totalItems }">
-                    <td class="py-1 p-0.5 md:px-1 md:py-2">
-                        <!-- View Order List -->
-                        <div class="flex items-center space-x-1 md:space-x-2">
-                            <button class="px-1.5 py-0.5 rounded-md bg-neutral-800 ml-2"
-                                (click)="viewMenuProducts(menu)">
-                                <fa-icon [icon]="faRectangleList" [ngStyle]="{color: 'rgb(212 212 212)'}">
-                                </fa-icon>
-                            </button>
-                            <p>{{menu.code}}</p>
-                        </div>
+                    <td *ngIf="menus.length > 0" class="m-auto overflow-visible">
+                        <button class="px-1.5 py-0.5 rounded-md bg-neutral-800"
+                            (click)="viewMenuProducts(menu)">
+                            <fa-icon [icon]="faRectangleList" [ngStyle]="{color: 'rgb(212 212 212)'}">
+                            </fa-icon>
+                        </button>
                     </td>
-                    <td class="py-1 p-0.5 md:px-1 md:py-2">{{menu.name}}</td>
-                    <td class="py-1 p-0.5 md:px-1 md:py-2">{{menu.category}}</td>
-                    <td class="py-1 p-0.5 md:px-1 md:py-2 hidden md:table-cell">{{menu.description}}</td>
-                    <td class="py-1 p-0.5 md:px-1 md:py-2">&#8369;{{menu.price | number: '1.2-2'}}</td>
-                    <td class="py-1 p-0.5 md:px-1 md:py-2 hidden md:table-cell">
+                    <td class="py-1 px-0.5 md:px-1 md:py-2">{{menu.code}}</td>
+                    <td class="py-1 px-0.5 md:px-1 md:py-2">{{menu.name}}</td>
+                    <td class="py-1 px-0.5 md:px-1 md:py-2">{{menu.category}}</td>
+                    <td class="py-1 px-0.5 md:px-1 md:py-2 hidden md:table-cell">{{menu.description}}</td>
+                    <td class="py-1 px-0.5 md:px-1 md:py-2">&#8369;{{menu.price | number: '1.2-2'}}</td>
+                    <td class="py-1 px-0.5 md:px-1 md:py-2 hidden md:table-cell">
                         <span class="text-white text-xs px-2 py-1 rounded-md"
                             [ngClass]="menu.status? 'bg-[#008000]' : 'bg-[#ffa500]'">
                             {{menu.status? 'active' : 'inactive'}}
                         </span>
                     </td>
-                    <td class="py-1 p-0.5 md:px-1 md:py-2 hidden md:table-cell">{{menu.date_added | date: 'MM-dd-yyyy'}}</td>
-                    <td class="py-1 p-0.5 md:px-1 md:py-2">
+                    <td class="py-1 px-0.5 md:px-1 md:py-2 hidden md:table-cell">{{menu.date_added | date: 'MM-dd-yyyy'}}</td>
+                    <td class="py-1 px-0.5 md:px-1 md:py-2">
                         <div class="flex justify-center space-x-2 md:space-x-4">
                             <!-- Edit Menu -->
                             <fa-icon class="hover:scale-110 cursor-pointer" [ngStyle]="{color: 'green'}" [icon]="faPen"

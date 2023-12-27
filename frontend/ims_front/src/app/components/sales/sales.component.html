@@ -54,8 +54,8 @@
                         </div>
                         <div class="w-2/5">
                             <h4 class="font-bold text-base text-orange-600 lg:text-lg">BILL TO</h4>
-                            <p>Transaction Code: {{bill.billno}}</p>
-                            <p>Name: {{bill.customer_name}}</p>
+                            <p>TRN Code: {{bill.billno}}</p>
+                            <p>Customer: {{bill.customer_name}}</p>
                         </div>
                     </div>
                     <table class="mt-8 w-full">
@@ -144,9 +144,9 @@
         <div class="w-full text-center shadow-xl rounded-xl mt-1 lg:mt-2">
             <table class="w-full table-fixed rounded-xl">
                 <thead class="text-neutral-300 bg-neutral-900">
-                    <th>Date Time</th>
-                    <th class="w-1/5 md:w-auto">Transaction Code</th>
-                    <th class="w-1/5 md:w-auto">Customer Name</th>
+                    <th>Date/Time</th>
+                    <th class="w-1/5 md:w-auto">TRN Code</th>
+                    <th class="w-1/5 md:w-auto">Customer</th>
                     <th class="hidden md:table-cell">Remarks</th>
                     <th>Items</th>
                     <th>Total</th>
@@ -163,11 +163,11 @@
                         <td class="py-1 p-0.5 md:px-1 md:py-2">&#8369;{{bill.grand_total | number: '1.2-2'}}</td>
                         <td class="py-1 p-0.5 md:px-1 md:py-2 lowercase hidden md:table-cell">{{bill.mode_of_payment}}</td>
                         <td class="py-1 p-0.5 md:px-1 md:py-2">
-                            <div class="flex justify-center space-x-3 md:space-x-4">
-                                <fa-icon class="hover:scale-110" [icon]="faRectangleList" (click)="toggleInvoice(bill)">
+                            <div class="flex justify-center items-center space-x-2 md:space-x-4">
+                                <fa-icon class="hover:scale-110 cursor-pointer" [icon]="faRectangleList" (click)="toggleInvoice(bill)">
                                 </fa-icon>
                                 <!-- Delete SaleBill -->
-                                <fa-icon class="hover:scale-110" [ngStyle]="{color: 'red'}" [icon]="faTrashCan"
+                                <fa-icon class="hover:scale-110 cursor-pointer" [ngStyle]="{color: 'red'}" [icon]="faTrashCan"
                                     (click)="deleteSaleBill(bill)">
                                 </fa-icon>
                             </div>

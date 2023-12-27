@@ -317,16 +317,16 @@ export class ProductsComponent implements OnInit {
     } else if (this.menu.price < 0 || this.menu.price === null) {
       this.toastrService.error("Invalid price input!");
       return;
-    }
+    };
 
     if (this.menu.category === "otherCategory" && this.customCategory) {
       this.menu.category = this.customCategory;
-    }
+    };
 
     const is_staff = sessionStorage.getItem("is_staff");
     if (is_staff === "false") {
       this.menu.status = false;
-    }
+    };
     
     const newMenu = {
       ...this.menu,
@@ -348,25 +348,30 @@ export class ProductsComponent implements OnInit {
       this.productService.addMenu(newMenu)
       .subscribe({
         next: async (menu) => {
-          this.isLoading = false;
           this.menus.push(menu);
           this.menus.length === 0? this.noMenuToShow = true: this.noMenuToShow = false;
+
+          this.isLoading = false;
           
           const lastMenu = this.menus.length - 1;
-          this.products.map(product => {
-            if (!product.menu) {
-              product.menu = this.menus[lastMenu].id;
+          this.products.map(eachProduct => {
+            if (!eachProduct.menu) {
+              eachProduct.menu = this.menus[lastMenu].id;
             };
             
-            this.productService.updateProduct(product).subscribe(product => {
-              const index = this.products.findIndex(i => i.id === product.id);
-              this.products[index] = product;
-              this.allProducts[index] = product;
-            })
+            this.productService.updateProduct(eachProduct).subscribe(productData => {
+              const index = this.products.findIndex(product => product.id === productData.id);
+              if (index !== -1) {
+                this.products[index] = productData;
+                this.allProducts[index] = productData;
+              };
+            });
           });
 
           this.resetMenuForm();
-          this.resetProductForm();
+          this.products = Array.from(this.allProducts).filter(product => product.menu === null);
+          this.products.length === 0? this.noProductsToShow = true: this.noProductsToShow = false;
+
           this.toggleFormContainer();
           await this.uiService.wait(100);
           if (!menu.price || menu.price < 1) {
@@ -402,6 +407,7 @@ export class ProductsComponent implements OnInit {
       ...this.product,
     };
 
+    this.isLoading = true;
     this.productService.addProduct(newProduct)
       .subscribe({
         next: async (product) => {
@@ -416,9 +422,11 @@ export class ProductsComponent implements OnInit {
             this.products.length === 0? this.noProductsToShow = true : this.noProductsToShow = false;
           };
 
+          this.isLoading = false;
           this.resetProductForm();
         },
         error: (err) => {
+          this.isLoading = false;
           this.uiService.displayErrorMessage(err);
         }
       });
@@ -498,16 +506,17 @@ export class ProductsComponent implements OnInit {
   onConfirmDeleteMenu() {
     if (!this.deletingMenu) {
       return;
-    }
+    };
 
     this.isLoading = true;
     this.productService
       .deleteMenu(this.deletingMenu)
       .subscribe({
         next: async () => {
-          this.isLoading = false;
-          this.menus = this.menus.filter(s => s.id !== this.deletingMenu?.id);
+          this.menus = this.menus.filter(menu => menu.id !== this.deletingMenu?.id);
           this.menus.length === 0? this.noMenuToShow = true: this.noMenuToShow = false;
+
+          this.isLoading = false;
 
           this.deletingMenu = null;
           this.toggleMenuActionModal()
@@ -600,8 +609,11 @@ export class ProductsComponent implements OnInit {
       .deleteProduct(this.deletingProduct)
       .subscribe({
         next: async () => {
+          this.products = this.products.filter(product => product.id !== this.deletingProduct?.id);
+          this.products.length === 0? this.noProductsToShow = true: this.noProductsToShow = false;
+
           this.isLoading = false;
-          this.menus = this.menus.filter(s => s.id !== this.deletingProduct?.id);
+
           this.deletingProduct = null;
           this.showProductActionModal = false;
           this.loadProducts();

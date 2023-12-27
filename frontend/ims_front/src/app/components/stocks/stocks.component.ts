@@ -156,17 +156,9 @@ export class StocksComponent implements OnInit {
 
   // SHOW STOCKS
   ngOnInit(): void {
-    this.loadNotifications();
     this.loadProducts();
     this.loadMenus();
     this.loadStocks();
-  }
-
-  loadNotifications(): void {
-    this.notifService.getNotifications().subscribe({
-      next: notifs => this.notifications = notifs,
-      error: err => console.log("Failed to fetch notifications", err),
-    })
   }
 
   loadStocks(): void {
@@ -299,7 +291,7 @@ export class StocksComponent implements OnInit {
             this.isLoading = false;
             const index = this.stocks.findIndex(stock => stock.id === stockData.id);
             this.stocks[index] = stockData;
-            this.loadStocks();
+            // this.loadStocks();
             this.toggleForm();
 
             await this.uiService.wait(100);

@@ -61,6 +61,9 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
   isAscending: boolean = true;
   isSortedAToZ: boolean = true;
 
+  noItemsToShow: boolean = false;
+  noBillsToShow: boolean = false;
+
   deletingBill?: PurchaseBill | null = null;
   deletingItem?: PurchaseItem | null = null;
 
@@ -203,7 +206,7 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
     this.showBillForm = !this.showBillForm;
     if (!this.showBillForm) {
       this.resetBillForm();
-      this.loadItems();
+      this.resetItemForm();
     }
   }
 
@@ -215,18 +218,27 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
 
   viewOrder(bill: PurchaseBill) {
     this.bill = bill;
-    this.loadItems();
     this.toggleFormContainer();
 
     this.showPurchaseBill = !this.showPurchaseBill;
-    if (!this.showPurchaseBill) {
+    if (this.showPurchaseBill) {
+      this.items = Array.from(this.allItems).filter(item => item.purchaseBill_id === this.bill.id);
+      this.items.length === 0? this.noItemsToShow = true : this.noItemsToShow = false;
+    } else {
       this.resetBillForm();
-      this.loadItems();
-    }
+      this.resetItemForm();
+      this.items = Array.from(this.allItems).filter(item => item.purchaseBill_id === null);
+      this.bill.grand_total = this.calculateGrandtotal(this.items);
+      this.items.length === 0? this.noItemsToShow = true : this.noItemsToShow = false;
+    };
   }
 
   increaseQtyInput(): void {
     this.item.quantity_purchased ++;
+  }
+
+  increasePriceInput(): void {
+    this.item.item_price ++;
   }
 
   decreaseQtyInput(): void {
@@ -234,6 +246,13 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
       return;
     }
     this.item.quantity_purchased --;
+  }
+
+  decreasePriceInput(): void {
+    if (this.item.item_price < 1) {
+      return;
+    }
+    this.item.item_price --;
   }
 
   calculateGrandtotal(items: PurchaseItem[]): number {
@@ -248,9 +267,9 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
   // SHOW BILLS
   ngOnInit(): void {
     // this.loadAllItems();
-    this.loadItems();
     this.loadSuppliers();
     this.loadStocks();
+    this.loadItems();
     this.loadBills();
   }  
 
@@ -261,48 +280,40 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
   loadBills() {
     this.isFetching = true;
     this.purchaseService
-      .getPurchaseBills(this.filterText)
-      .subscribe({
-        next: bills => {
-          this.isFetching = false;
-          this.bills = bills
-        },
-        error: error => {
-          this.isFetching = false;
-          this.uiService.displayErrorMessage(error)
-        },
-      });
+    .getPurchaseBills(this.filterText).subscribe({
+      next: bills => {
+        this.isFetching = false;
+        this.bills = bills;
+        this.bills.length === 0? this.noBillsToShow = true: this.noBillsToShow = false;
+      },
+      error: error => {
+        this.isFetching = false;
+        this.uiService.displayErrorMessage(error)
+      },
+    });
   }
 
   loadItems() {
     this.isFetching = true;
     this.purchaseService
-      .getPurchaseItems()
-      .subscribe({
-        next: (items) => {
-          this.allItems = Array.from(items);
+    .getPurchaseItems().subscribe({
+      next: (items) => {
+        this.allItems = Array.from(items);
 
-          if (this.showPurchaseBill) {
-            this.isFetching = false;
-            this.items = items.filter(item => item.purchaseBill_id === this.bill.id);
-          } else {
-            this.isFetching = false;
-            this.items = items.filter(item => item.purchaseBill_id === null);
-            this.bill.grand_total = this.calculateGrandtotal(this.items);
-          }
-        },
-        error: (err) => console.log(err),
-      });
+        if (this.showPurchaseBill) {
+          this.isFetching = false;
+          this.items = items.filter(item => item.purchaseBill_id === this.bill.id);
+          this.items.length === 0? this.noItemsToShow = true: this.noItemsToShow = false;
+        } else {
+          this.isFetching = false;
+          this.items = items.filter(item => item.purchaseBill_id === null);
+          this.bill.grand_total = this.calculateGrandtotal(this.items);
+          this.items.length === 0? this.noItemsToShow = true: this.noItemsToShow = false;
+        };
+      },
+      error: (err) => console.log(err),
+    });
   }
-
-  // loadAllItems() {
-  //   this.purchaseService
-  //     .getPurchaseItems()
-  //     .subscribe({
-  //       next: items => this.allItems = items,
-  //       error: err => console.log(err),
-  //     });
-  // }
 
   loadSuppliers() {
     this.supplierService
@@ -384,7 +395,7 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
     const newBill = {
       ...this.bill,
       billno: this.bill.billno.toUpperCase(),
-    }
+    };
 
     const items = Array.from(this.items);
     const stocks = Array.from(this.stocks);
@@ -417,6 +428,8 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
         next: async (bill) => {
           this.isLoading = false;
           this.bills.push(bill);
+          this.bills.length === 0? this.noBillsToShow = true: this.noBillsToShow = false;
+
           this.items.map(item => {
             if (!item.purchaseBill_id) {
               item.purchaseBill_id = bill.id;
@@ -424,19 +437,23 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
             this.purchaseService.editPurchaseItem(item).subscribe(item => {
               const index = this.items.findIndex(i => i.id === item.id);
               this.items[index] = item;
-              // this.loadAllItems();
-              this.loadItems();
-              this.loadBills();
+              this.allItems[index] = item;
             });
-          })
+          });
+
+          this.resetBillForm();
+          this.items = Array.from(this.allItems).filter(item => item.purchaseBill_id === null);
+          this.items.length === 0? this.noItemsToShow = true: this.noItemsToShow = false;
   
-          // Adjusted inventories upon saving the purchase.
+          // Adjust inventories upon saving the purchase.
           stocks.map(stock => {
             this.stockService.editStock(stock)
-            .subscribe();
+            .subscribe(updatedStock => {
+              const index = this.stocks.findIndex(stock => stock.id === updatedStock.id);
+              this.stocks[index] = updatedStock;
+            });
           });
   
-          this.resetBillForm();
           this.toggleSaveBillModal();
           this.toggleFormContainer();
   
@@ -446,7 +463,8 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
               "Zero Total Amount!",
               {timeOut: 5000}
             );
-          }
+          }; 
+
           this.toastrService.success("Success: New purchase has been added.");
         },
 
@@ -481,33 +499,44 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
       next: async (item) => {
         this.isLoading = false;
         this.items.push(item);
-        this.loadItems();
-        this.resetItemForm();
+        this.allItems.push(item);
 
         if (this.showPurchaseBill) {
+          // Update stock quantity upon deleting an item
           const foundStock = this.stocks.find(stock => stock.id === item.stock_id);
           if (foundStock) {
             foundStock.quantity += item.quantity_purchased;
             this.stockService.editStock(foundStock).subscribe({
-              next: (stock) => console.log('stock quantity has been updated', stock),
+              next: (updatedStock) => {
+                const index = this.stocks.findIndex(stock => stock.id === updatedStock.id);
+                this.stocks[index] = updatedStock;
+                console.log('stock quantity has been updated', updatedStock);
+              },
               error: (err) => console.log('Failed to update stock quantity', err),
             });
-          }
-        };
+          };
 
-        // Update total bill upon adding an item
-        if (this.showPurchaseBill) {
+          // Update total bill upon adding an item
           this.bill.grand_total += item.sub_total;
-
           this.purchaseService.editPurchaseBill(this.bill)
           .subscribe({
-            next: bill => {
-              this.bill = bill;
-              this.loadBills();
+            next: updatedBill => {
+              this.bill = updatedBill;
+              
+              const index = this.bills.findIndex(bill => bill.id === updatedBill.id);
+              this.bills[index] = updatedBill;
             },
             error: err => console.log(err) 
           });
-        }
+
+          // Filter items
+          this.items = Array.from(this.allItems).filter(item => item.purchaseBill_id === this.bill.id);
+          this.items.length === 0? this.noItemsToShow = true: this.noItemsToShow = false;
+        } else {
+          this.items = Array.from(this.allItems).filter(item => item.purchaseBill_id === null);
+          this.bill.grand_total = this.calculateGrandtotal(this.items);
+          this.items.length === 0? this.noItemsToShow = true: this.noItemsToShow = false;
+        };
     
         if (!item || item.item_price < 1) {
           this.toastrService.warning(
@@ -515,7 +544,9 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
             "Zero Price!",
             {timeOut: 5000}
           );
-        }
+        };
+
+        this.resetItemForm();
       },
       error: (err) => {
         this.isLoading = false;
@@ -572,6 +603,7 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
           this.isLoading = false;
           const index = this.bills.findIndex(bill => bill.id === billData.id);
           this.bills[index] = billData;
+
           this.modalInputValue = undefined;
           this.showModal = false;
           this.showBillForm = false;
@@ -699,6 +731,7 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
       return;
     }
 
+    // Reduce bill total amount upon deleting an item
     this.bill.grand_total -= this.deletingItem.sub_total;
 
     this.isLoading = true;
@@ -707,22 +740,34 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
     .subscribe({
       next: async () => {
         this.isLoading = false;
-        // Reduce bill total amount upon deleting an item
+
+        this.items = this.items.filter(item => item.id !== this.deletingItem?.id);
+        this.items.length === 0? this.noItemsToShow = true: this.noItemsToShow = false;
+
+        this.allItems = this.allItems.filter(item => item.id !== this.deletingItem?.id);
+
         if (this.showPurchaseBill) {
           this.purchaseService.editPurchaseBill(this.bill)
           .subscribe({
-            next: data => {this.bill = data},
+            next: data => {
+              this.bill = data;
+
+              const index = this.bills.findIndex(bill => bill.id === data.id);
+              this.bills[index] = data;
+            },
             error: (err) => {console.log(err)},
           });
-        };
 
-        // Update stock quantity upon deleting an item
-        const foundStock = this.stocks.find(stock => stock.id === this.deletingItem?.stock_id);
-        if (this.showPurchaseBill) {
+          // Update stock quantity upon deleting an item
+          const foundStock = this.stocks.find(stock => stock.id === this.deletingItem?.stock_id);
           if (foundStock && this.deletingItem) {
             foundStock.quantity -= this.deletingItem.quantity_purchased;
             this.stockService.editStock(foundStock).subscribe({
-              next: (stock) => console.log('Stock quantity has been updated', stock),
+              next: (updatedStock) => {
+                const index = this.stocks.findIndex(stock => stock.id === updatedStock.id);
+                this.stocks[index] = updatedStock;
+                console.log('Stock quantity has been updated', updatedStock);
+              },
               error: (err) => console.log(err),
             });
           }
@@ -733,7 +778,6 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
         this.modalInputValue = undefined;
         this.showModal = false;
         this.showItemActionModal = false;
-        this.loadItems();
         this.toastrService.success("Item has been deleted successfully!");
       },
       error: (err) => {

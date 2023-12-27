@@ -40,6 +40,8 @@ export class SuppliersComponent implements OnInit {
   isAscending: boolean = true;
   isSortedAToZ: boolean = true;
 
+  noSuppliersToShow: boolean = false;
+
   deletingSupplier?: Supplier | null = null;
   proceedEdit: boolean = false;
 
@@ -117,6 +119,7 @@ export class SuppliersComponent implements OnInit {
       next: (suppliers) => {
         this.isFetching = false;
         this.suppliers = suppliers;
+        this.suppliers.length === 0? this.noSuppliersToShow = true: this.noSuppliersToShow = false;
       },
       error: (err) => {
         this.isFetching = false;

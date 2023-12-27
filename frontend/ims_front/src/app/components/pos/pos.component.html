@@ -27,11 +27,11 @@
             <div class="flex flex-col w-2/5">
                 <label for="quantity">Quantity:</label>
                 <div class="flex items-center space-x-1">
-                    <fa-icon [icon]="faMinus" (click)="decreaseQtyInput()"></fa-icon>
+                    <fa-icon class="cursor-pointer" [icon]="faMinus" (click)="decreaseQtyInput()"></fa-icon>
                     <input appSelectAllText
                         class="text-center uppercase border border-neutral-900 px-1 py-0.5    rounded-sm mt-1 w-2/3"
                         type="number" name="quantity" id="quantity" [(ngModel)]="saleItem.quantity">
-                    <fa-icon [icon]="faPlus" (click)="increaseQtyInput()"></fa-icon>
+                    <fa-icon class="cursor-pointer" [icon]="faPlus" (click)="increaseQtyInput()"></fa-icon>
                 </div>
             </div>
 
@@ -58,7 +58,7 @@
                     <tbody class="relative">
                         <tr *ngFor="let item of saleItems">
                             <td class="flex items-center justify-center py-1 p-0.5 md:p-2 space-x-2 lg:space-x-4">
-                                <button class="px-1.5 py-1 rounded-md bg-[#ff0000]" (click)="deleteSaleItem(item)">
+                                <button class="px-1.5 py-1 rounded-md bg-[#ff0000] cursor-pointer" (click)="deleteSaleItem(item)">
                                     <fa-icon class="scale-75" [icon]="faTrashCan"
                                         [ngStyle]="{color: 'rgb(212 212 212)'}">
                                     </fa-icon>
@@ -74,13 +74,13 @@
                         </tr>
                     </tbody>
                 </table>
-                <!-- When no items to show -->
-                <div class="w-full h-[5vh]" *ngIf="!saleItems.length && !isFetching">
-                    <p class="text-center my-4">No items to show.</p>
-                </div>
                 <!-- While fetching data. -->
-                <div *ngIf="!saleItems.length && isFetching" class="h-[10vh]">
+                <div *ngIf="saleItems.length === 0 && isFetching" class="h-[10vh]">
                     <app-loader></app-loader>
+                </div>
+                <!-- When no items to show -->
+                <div class="w-full h-[5vh]" *ngIf="noItemsToShow && !isFetching">
+                    <p class="text-center my-4">No items.</p>
                 </div>
             </div>
 
@@ -115,7 +115,7 @@
             <div *ngIf="updatingOrder"
                 class="bg-[#fff] self-start h-auto mx-auto p-4 rounded-lg shadow-xl text-neutral-900 mt-4 w-full md:flex-1">
                 <form class="flex flex-col">
-                    <h3 for="saleBill.customer_name">Transaction Code:</h3>
+                    <h3 for="saleBill.customer_name">TRN Code:</h3>
                     <p class="uppercase border border-neutral-900 px-1 py-0.5 rounded-sm mt-1 text-center">
                         {{saleBill.billno}}
                     </p>
@@ -162,8 +162,8 @@
             <table class="w-full table-fixed rounded-xl">
                 <thead class="text-neutral-300 bg-neutral-900">
                     <th>Time</th>
-                    <th class="w-[20%] md:w-auto">Transaction Code</th>
-                    <th>Customer Name</th>
+                    <th class="w-[20%] md:w-auto">TRN Code</th>
+                    <th>Customer</th>
                     <th class="hidden md:table-cell"><span>Remarks</span></th>
                     <th class="w-[10%] md:w-auto">Items</th>
                     <th>Total</th>
@@ -171,39 +171,41 @@
                 </thead>
                 <tbody>
                     <tr *ngFor="let bill of activeBills">
-                        <td class="flex justify-center items-center space-x-2 py-1 p-0.5 md:p-2 md:space-x-4">
+                        <td class="py-1 p-0.5 md:px-1 md:py-2">
                             <!-- View Order List -->
-                            <button class="px-1.5 py-0.5 rounded-md bg-neutral-800 ml-2" (click)="viewOrder(bill)">
-                                <fa-icon [icon]="faRectangleList" [ngStyle]="{color: 'rgb(212 212 212)'}">
-                                </fa-icon>
-                            </button>
-                            <p>{{bill.time | date: 'hh:mm a'}}</p>
+                            <div class="flex items-center space-x-1 md:space-x-2">
+                                <button class="px-1.5 py-0.5 rounded-md bg-neutral-800 ml-2" (click)="viewOrder(bill)">
+                                    <fa-icon [icon]="faRectangleList" [ngStyle]="{color: 'rgb(212 212 212)'}">
+                                    </fa-icon>
+                                </button>
+                                <p>{{bill.time | date: 'hh:mm a'}}</p>
+                            </div>
                         </td>
-                        <td class="py-1 p-0.5 md:p-2">{{bill.billno}}</td>
-                        <td class="py-1 p-0.5 md:p-2">{{bill.customer_name}}</td>
-                        <td class="py-1 p-0.5 md:p-2 hidden md:table-cell">{{bill.remarks}}</td>
-                        <td class="py-1 p-0.5 md:p-2">{{getItemLength(bill)}}</td>
-                        <td class="py-1 p-0.5 md:p-2">&#8369;{{bill.grand_total | number: '1.2-2'}}</td>
-                        <td class="flex justify-center py-1 p-0.5 md:p-2 space-x-2 md:space-x-4">
+                        <td class="py-1 p-0.5 md:px-1 md:py-2">{{bill.billno}}</td>
+                        <td class="py-1 p-0.5 md:px-1 md:py-2">{{bill.customer_name}}</td>
+                        <td class="py-1 p-0.5 md:px-1 md:py-2 hidden md:table-cell">{{bill.remarks}}</td>
+                        <td class="py-1 p-0.5 md:px-1 md:py-2">{{getItemLength(bill)}}</td>
+                        <td class="py-1 p-0.5 md:px-1 md:py-2">&#8369;{{bill.grand_total | number: '1.2-2'}}</td>
+                        <td class="flex justify-center py-1 p-0.5 md:px-1 md:py-2 space-x-2 md:space-x-4">
                             <!-- Edit Sale Bill -->
-                            <fa-icon class="hover:scale-110" [ngStyle]="{color: 'green'}" [icon]="faPen"
+                            <fa-icon class="hover:scale-110 cursor-pointer" [ngStyle]="{color: 'green'}" [icon]="faPen"
                                 (click)="updateSaleBill(bill)">
                             </fa-icon>
                             <!-- Delete SaleBill -->
-                            <fa-icon class="hover:scale-110" [ngStyle]="{color: 'red'}" [icon]="faTrashCan"
+                            <fa-icon class="hover:scale-110 cursor-pointer" [ngStyle]="{color: 'red'}" [icon]="faTrashCan"
                                 (click)="deleteSaleBill(bill)">
                             </fa-icon>
                         </td>
                     </tr>
                 </tbody>
             </table>
-            <!-- When no transactions to show -->
-            <div class="w-full h-[5vh]" *ngIf="!activeBills.length && !isFetching">
-                <p class="text-center my-4">No ongoing transactions.</p>
-            </div>
             <!-- While fetching data. -->
-            <div *ngIf="!activeBills.length && isFetching" class="h-[10vh]">
+            <div *ngIf="activeBills.length === 0 && isFetching" class="h-[10vh]">
                 <app-loader></app-loader>
+            </div>
+            <!-- When no transactions to show -->
+            <div class="w-full h-[5vh]" *ngIf="noActiveBillsToShow && !isFetching">
+                <p class="text-center my-4">No ongoing transactions.</p>
             </div>
         </div>
 
@@ -290,12 +292,12 @@
                         </div>
                         <div class="w-2/5">
                             <h4 class="font-bold text-base text-orange-600 lg:text-lg">BILL TO</h4>
-                            <p>Transaction Code: {{saleBill.billno}}</p>
+                            <p>TRN Code: {{saleBill.billno}}</p>
                             <p>Name: {{saleBill.customer_name}}</p>
                         </div>
                     </div>
                     <table class="mt-8 w-full">
-                        <thead class="bg-orange-600 text-white p-2">
+                        <thead class="bg-orange-600 text-white p-2 cursor-pointer">
                             <th>DESCRIPTIONS</th>
                             <th>PRICE</th>
                             <th>QUANTITY</th>

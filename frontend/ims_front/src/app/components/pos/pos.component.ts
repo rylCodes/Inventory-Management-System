@@ -27,6 +27,9 @@ export class PosComponent implements OnInit, AfterContentChecked {
   isFetching: boolean = false;
   isLoading: boolean = false;
 
+  noActiveBillsToShow: boolean = false;
+  noItemsToShow: boolean = false;
+
   proceedEditBill: boolean = false;
   proceedEditItem: boolean = false;
   proceedPayment: boolean = false;
@@ -169,6 +172,7 @@ export class PosComponent implements OnInit, AfterContentChecked {
     this.proceedPayment = !this.proceedPayment;
     if (!this.proceedPayment) {
       this.saleBill.amount_tendered = 0;
+      this.amountChange = 0;
     }
   } 
 
@@ -176,7 +180,7 @@ export class PosComponent implements OnInit, AfterContentChecked {
     this.showInvoice = !this.showInvoice;
     if (!this.showInvoice) {
       this.toastrService.success('Transaction has been completed successfully!');
-      this.loadBills();
+      this.activeBills = Array.from(this.allBills).filter(bill => !bill.status);
       this.viewOrder(this.saleBill);
     }
   }
@@ -215,6 +219,7 @@ export class PosComponent implements OnInit, AfterContentChecked {
     this.showBillForm = !this.showBillForm;
     if (!this.showBillForm) {
       this.resetBillForm();
+      this.resetItemForm();
     }
   }
 
@@ -238,16 +243,20 @@ export class PosComponent implements OnInit, AfterContentChecked {
   viewOrder(saleBill: SaleBill) {
     this.saleBill = saleBill;
     // this.loadItems();
-    this.saleItems = this.saleItems.filter(item => item.billno === saleBill.id && item.status);
     this.toggleBillTable();
 
     this.updatingOrder = !this.updatingOrder;
-    if (!this.updatingOrder) {
-      this.resetBillForm();
+    if (this.updatingOrder) {
       // this.loadItems();
-      this.saleItems = this.saleItems.filter(item => item.billno === null && item.status);
+      this.saleItems = Array.from(this.allItems).filter(item => item.billno === this.saleBill.id && item.status);
+      this.saleItems.length === 0? this.noItemsToShow = true : this.noItemsToShow = false;
+    } else {
+      this.resetBillForm();
+      this.resetItemForm();
+      this.saleItems = Array.from(this.allItems).filter(item => item.billno === null && item.status);
       this.saleBill.grand_total = this.calculateGrandtotal(this.saleItems);
-    }
+      this.saleItems.length === 0? this.noItemsToShow = true : this.noItemsToShow = false;
+    };
   }
 
   calculateGrandtotal(saleItems: SaleItem[]): number {
@@ -299,13 +308,15 @@ export class PosComponent implements OnInit, AfterContentChecked {
     .subscribe({
       next: (salesBills) => {
         this.isFetching = false;
-        this.activeBills = salesBills.filter(item => !item.status);
+        this.activeBills = salesBills.filter(bill => !bill.status);
+        this.activeBills.length === 0? this.noActiveBillsToShow = true: this.noActiveBillsToShow = false;
+
         this.allBills = salesBills;
       },
       error: (err) => {
         this.isFetching = false;
         this.uiService.displayErrorMessage(err);
-      }
+      },
     });
   }
 
@@ -316,14 +327,16 @@ export class PosComponent implements OnInit, AfterContentChecked {
     .subscribe({
       next: (saleItems) => {
         this.isFetching = false;
-        this.allItems = saleItems.filter(item => item.status);
+        this.allItems = saleItems;
 
         if (this.updatingOrder) {
           this.saleItems = saleItems.filter(item => item.billno === this.saleBill.id && item.status);
+          this.saleItems.length === 0? this.noItemsToShow = true: this.noItemsToShow = false;
         } else {
           this.saleItems = saleItems.filter(item => item.billno === null && item.status);
           this.saleBill.grand_total = this.calculateGrandtotal(this.saleItems);
-        }
+          this.saleItems.length === 0? this.noItemsToShow = true: this.noItemsToShow = false;
+        };
       },
       error: (err) => {
         this.isFetching = false;
@@ -423,45 +436,49 @@ export class PosComponent implements OnInit, AfterContentChecked {
     if (!this.saleBill.customer_name) {
       this.toastrService.error("Enter customer");
       return;
-    }
+    };
     
     const newBill = {
       ...this.saleBill,
       customer_name: this.saleBill.customer_name.toUpperCase(),
       remarks: this.saleBill.remarks.toUpperCase(),
-    }
+    };
 
     this.isLoading = true;
     this.salesService.addSaleBill(newBill).subscribe({
       next: async (bill) => {
         this.isLoading = false;
         this.activeBills.push(bill);
+        this.allBills.push(bill);
+        this.activeBills.length === 0? this.noActiveBillsToShow = true: this.noActiveBillsToShow = false;
         
+        const lastActiveBill = this.activeBills.length - 1;
         this.saleItems.map(item => {
           if (!item.billno) {
-            item.billno = bill.id;
-            this.salesService.editSaleItem(item).subscribe(item => {
-              const index = this.saleItems.findIndex(i => i.id === item.id);
+            item.billno = this.activeBills[lastActiveBill].id;
+          };
+
+          this.salesService.editSaleItem(item).subscribe(item => {
+            const index = this.saleItems.findIndex(i => i.id === item.id);
+            if (index !== -1) {
               this.saleItems[index] = item;
-              // this.loadItems();
-              if (this.updatingOrder) {
-                this.saleItems = this.saleItems.filter(item => item.billno === this.saleBill.id && item.status);
-              } else {
-                this.saleItems = this.saleItems.filter(item => item.billno === null && item.status);
-                this.saleBill.grand_total = this.calculateGrandtotal(this.saleItems);
-              }
-            })
-          }
+              this.allItems[index] = item;
+            }
+          });
         });
 
         this.resetBillForm();
+        this.saleItems = Array.from(this.allItems).filter(item => item.billno === null && item.status);
+        this.saleItems.length === 0? this.noItemsToShow = true: this.noItemsToShow = false;
+
         if (!bill.grand_total || bill.grand_total < 1) {
           this.toastrService.warning(
             "You have saved a transaction without a total bill amount. Make sure it is correct.",
             "Zero Total Amount!",
             {timeOut: 5000},
           );
-        }
+        };
+
         this.toastrService.success("New transaction has been added successfully!");
       },
       error: (err) => {
@@ -495,32 +512,34 @@ export class PosComponent implements OnInit, AfterContentChecked {
       next: async (saleItem) => {
         this.isLoading = false;
         this.saleItems.push(saleItem);
-        // this.loadItems();
-        if (this.updatingOrder) {
-          this.saleItems = this.saleItems.filter(item => item.billno === this.saleBill.id && item.status);
-        } else {
-          this.saleItems = this.saleItems.filter(item => item.billno === null && item.status);
-          this.saleBill.grand_total = this.calculateGrandtotal(this.saleItems);
-        }
+        this.allItems.push(saleItem);
 
         if (this.updatingOrder) {
+          // Update total bill upon adding an item
           this.saleBill.grand_total += saleItem.sub_total;
           this.salesService.editSaleBill(this.saleBill)
           .subscribe({
             next: (bill) => {
               const index = this.activeBills.findIndex(saleBill => saleBill.id === bill.id);
               if (index !== -1) {
-                this.activeBills[index] = bill
+                this.activeBills[index] = bill;
+                this.allBills[index] = bill;
               };
 
-              // this.loadBills();
               this.addNotification();
             },
             error: err => {
               console.log(err);
             },
           });
-        }
+
+          this.saleItems = this.saleItems.filter(item => item.billno === this.saleBill.id && item.status);
+          this.saleItems.length === 0? this.noItemsToShow = true: this.noItemsToShow = false;
+        } else {
+          this.saleItems = this.saleItems.filter(item => item.billno === null && item.status);
+          this.saleBill.grand_total = this.calculateGrandtotal(this.saleItems);
+          this.saleItems.length === 0? this.noItemsToShow = true: this.noItemsToShow = false;
+        };
 
         this.resetItemForm();
       },
@@ -579,6 +598,7 @@ export class PosComponent implements OnInit, AfterContentChecked {
         this.isLoading = false;
         const index = this.activeBills.findIndex(saleBill => saleBill.id === saleBillData.id);
         this.activeBills[index] = saleBillData;
+        this.allBills[index] = saleBillData;
         this.modalInputValue = undefined;
         this.showPermissionModal = false;
         this.showBillForm = false;
@@ -610,7 +630,9 @@ export class PosComponent implements OnInit, AfterContentChecked {
       .subscribe({
         next: async () => {
           this.isLoading =false;
-          this.activeBills = this.activeBills.filter(s => s.id !== this.deletingSaleBill?.id);
+          this.activeBills = this.activeBills.filter(bill => bill.id !== this.deletingSaleBill?.id);
+          this.activeBills.length === 0? this.noActiveBillsToShow = true: this.noActiveBillsToShow = false;
+
           this.deletingSaleBill = null;
           this.showBillActionModal = false;
           this.toastrService.success("Transaction has been deleted successfully!");
@@ -713,36 +735,41 @@ export class PosComponent implements OnInit, AfterContentChecked {
     // Reduce total bill upon deleting an item
     this.saleBill.grand_total -= this.deletingSaleItem.sub_total;
 
-    if (this.updatingOrder) {
-      this.salesService.editSaleBill(this.saleBill)
-      .subscribe({
-        next: (saleBillData) => {
-          const index = this.activeBills.findIndex(saleBill => saleBill.id === saleBillData.id);
-          this.activeBills[index] = saleBillData;
-          this.addNotification();
-        },
-        error: (err) => {console.log(err)},
-      });
-    };
-
     this.isLoading = true;
     this.salesService
     .deleteSaleItem(this.deletingSaleItem, this.modalInputValue)
     .subscribe({
       next: async () => {
         this.isLoading = false;
-        this.activeBills = this.activeBills.filter(bill => bill.id !== this.deletingSaleItem?.id);
+        this.saleItems = this.saleItems.filter(item => item.id !== this.deletingSaleItem?.id);
+        this.saleItems.length === 0? this.noItemsToShow = true: this.noItemsToShow = false;
+
+        this.allItems = this.allItems.filter(item => item.id !== this.deletingSaleItem?.id);
+
+        if (this.updatingOrder) {
+          this.salesService.editSaleBill(this.saleBill)
+          .subscribe({
+            next: (saleBillData) => {
+              const index = this.activeBills.findIndex(saleBill => saleBill.id === saleBillData.id);
+              this.activeBills[index] = saleBillData;
+              this.allBills[index] = saleBillData;
+              this.addNotification();
+            },
+            error: (err) => {console.log(err)},
+          });
+        };
+
         this.deletingSaleItem = null;
         this.modalInputValue = undefined;
         this.showPermissionModal = false;
         this.showItemActionModal = false;
         // this.loadItems();
-        if (this.updatingOrder) {
-          this.saleItems = this.saleItems.filter(item => item.billno === this.saleBill.id && item.status);
-        } else {
-          this.saleItems = this.saleItems.filter(item => item.billno === null && item.status);
-          this.saleBill.grand_total = this.calculateGrandtotal(this.saleItems);
-        }
+        // if (this.updatingOrder) {
+        //   this.saleItems = this.saleItems.filter(item => item.billno === this.saleBill.id && item.status);
+        // } else {
+        //   this.saleItems = this.saleItems.filter(item => item.billno === null && item.status);
+        //   this.saleBill.grand_total = this.calculateGrandtotal(this.saleItems);
+        // }
 
         this.toastrService.success("Item has been deleted successfully!");
       },
@@ -763,20 +790,20 @@ export class PosComponent implements OnInit, AfterContentChecked {
     }
 
     this.isLoading = true;
-    this.salesService.editSaleBill(this.saleBill)
-      .subscribe({
-        next: (data) => {
-          this.isLoading = false;
-          const index = this.activeBills.findIndex(saleBill => saleBill.id === data.id);
-          this.activeBills[index] = data;
-          this.loadBills();
-          this.addNotification();
-        },
-        error: (err) => {
-          this.isLoading = false;
-          this.uiService.displayErrorMessage(err);
-        }
-      });
+    this.salesService.editSaleBill(this.saleBill).subscribe({
+      next: (data) => {
+        this.isLoading = false;
+        const index = this.activeBills.findIndex(saleBill => saleBill.id === data.id);
+        this.activeBills[index] = data;
+        this.allBills[index] = data;
+        // this.loadBills();
+        this.addNotification();
+      },
+      error: (err) => {
+        this.isLoading = false;
+        this.uiService.displayErrorMessage(err);
+      }
+    });
   }
 
   onPayment() {
@@ -838,13 +865,15 @@ export class PosComponent implements OnInit, AfterContentChecked {
           const index = this.activeBills.findIndex(saleBill => saleBill.id === bill.id);
           if (index !== -1) {
             this.activeBills[index] = bill;
+            this.allBills[index] = bill;
           };
 
           if (bill.grand_total) {
             stocks.map(stock => {
               this.stockService.editStock(stock).subscribe();
             });
-            this.loadBills();
+
+            // this.loadBills();
             this.toggleInvoice();
             this.toggleProceedPayment();
             this.addNotification();
@@ -867,8 +896,8 @@ export class PosComponent implements OnInit, AfterContentChecked {
   addNotification() {
     const currentDate = new Date();
     const currentDay = currentDate.getDay();
-    const critStocks = this.stocksToCheck.filter(stock => stock.quantity <= 5);
-    const lowStocks = this.stocksToCheck.filter(stock => stock.quantity <= 20 && stock.quantity > 5);
+    const critStocks = this.stocksToCheck.filter(stock => stock.quantity <= 60);
+    const lowStocks = this.stocksToCheck.filter(stock => stock.quantity <= 120 && stock.quantity > 60);
   
     const createAndAddNotification = (content: string, warningType:string) => {
       const notifExists = this.notifications.some(notif => {

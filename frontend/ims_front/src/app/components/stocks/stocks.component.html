@@ -115,32 +115,32 @@
             </thead>
             <tbody class="relative">
                 <tr class="{{stock.status? 'active' : 'inactive'}}" *ngFor="let stock of stocks">
-                    <td class="py-1 p-0.5 md:p-2">{{stock.code}}</td>
-                    <td class="py-1 p-0.5 md:p-2">{{stock.stock_name}}</td>
-                    <td class="py-1 p-0.5 md:p-2">{{stock.description}}</td>
-                    <td class="py-1 p-0.5 md:p-2" [ngClass]="{
-                            'text-[#ff0000]' : stock.quantity <= 5,
-                            'text-[#ffa500]': stock.quantity <= 20 && stock.quantity > 5,
-                            'font-semibold': stock.quantity <= 20,
+                    <td class="py-1 p-0.5 md:px-1 md:py-2">{{stock.code}}</td>
+                    <td class="py-1 p-0.5 md:px-1 md:py-2">{{stock.stock_name}}</td>
+                    <td class="py-1 p-0.5 md:px-1 md:py-2">{{stock.description}}</td>
+                    <td class="py-1 p-0.5 md:px-1 md:py-2" [ngClass]="{
+                            'text-[#ff0000]' : stock.quantity <= 60,
+                            'text-[#ffa500]': stock.quantity <= 120 && stock.quantity > 60,
+                            'font-semibold': stock.quantity <= 120,
                             }">
                         {{stock.quantity | number: '1.0-3'}}
                     </td>
-                    <td class="py-1 p-0.5 md:p-2">{{stock.unit}}</td>
-                    <td class="py-1 p-0.5 md:p-2 hidden md:table-cell">{{stock.date_updated | date: 'dd/MM/yyyy'}}</td>
-                    <td class="py-1 p-0.5 md:p-2 hidden md:table-cell">
+                    <td class="py-1 p-0.5 md:px-1 md:py-2">{{stock.unit}}</td>
+                    <td class="py-1 p-0.5 md:px-1 md:py-2 hidden md:table-cell">{{stock.date_updated | date: 'dd/MM/yyyy'}}</td>
+                    <td class="py-1 p-0.5 md:px-1 md:py-2 hidden md:table-cell">
                         <span class="text-white text-xs px-2 py-1 rounded-md"
                             [ngClass]="stock.status? 'bg-[#008000]' : 'bg-[#ffa500]'">
                             {{stock.status? 'active' : 'inactive'}}
                         </span>
                     </td>
-                    <td class="relative py-1 p-0.5 md:p-2">
+                    <td class="relative py-1 p-0.5 md:px-1 md:py-2">
                         <div class="flex justify-center items-center space-x-2 lg:space-x-3">
                             <!-- Edit Stock -->
-                            <fa-icon class="hover:scale-110" [ngStyle]="{color: 'green'}" [icon]="faPen"
+                            <fa-icon class="hover:scale-110 cursor-pointer" [ngStyle]="{color: 'green'}" [icon]="faPen"
                                 (click)="updateStock(stock)">
                             </fa-icon>
                             <!-- Delete Stock -->
-                            <fa-icon class="hover:scale-110" [ngStyle]="{color: 'red'}" [icon]="faTrashCan"
+                            <fa-icon class="hover:scale-110 cursor-pointer" [ngStyle]="{color: 'red'}" [icon]="faTrashCan"
                                 (click)="deleteStock(stock)">
                             </fa-icon>
                         </div>

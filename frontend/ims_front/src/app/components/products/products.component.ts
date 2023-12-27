@@ -54,6 +54,9 @@ export class ProductsComponent implements OnInit {
   isAscending: boolean = true;
   isSortedAToZ: boolean = true;
 
+  noProductsToShow: boolean = false;
+  noMenuToShow: boolean = false;
+
   p: number = 1;
   itemsPerPage: number = 10;
   totalItems: number = 0;
@@ -93,6 +96,7 @@ export class ProductsComponent implements OnInit {
 
   menus: Menu[] = [];
   products: Product[] = [];
+  allProducts: Product[] = [];
   stocks: Stock[] = [];
   saleItems: SaleItem[] = [];
 
@@ -184,14 +188,18 @@ export class ProductsComponent implements OnInit {
 
   viewMenuProducts(menu: Menu) {
     this.menu = menu;
-    this.loadProducts();
     this.toggleFormContainer();
 
     this.updatingMenuItems = !this.updatingMenuItems;
-    if (!this.updatingMenuItems) {
+    if (this.updatingMenuItems) {
+      this.products = Array.from(this.allProducts).filter(product => product.menu === this.menu.id);
+      this.products.length === 0? this.noProductsToShow = true : this.noProductsToShow = false;
+    } else {
       this.resetMenuForm();
-      this.loadProducts();
-    }
+      this.resetProductForm();
+      this.products = Array.from(this.allProducts).filter(product => product.menu === null);
+      this.products.length === 0? this.noProductsToShow = true : this.noProductsToShow = false;
+    };
   }
 
   increaseQtyInput(): void {
@@ -230,6 +238,8 @@ export class ProductsComponent implements OnInit {
     .subscribe({
       next: menus => {
         this.menus = menus;
+        this.menus.length === 0? this.noMenuToShow = true: this.noMenuToShow = false;
+
         menus.forEach(menu => {
           if (!menu.status) {
             this.updateRelatedSaleItem(menu);
@@ -247,12 +257,15 @@ export class ProductsComponent implements OnInit {
     .subscribe({
       next: (products) => {
         this.isFetching = false;
+        this.allProducts = products;
 
         if (this.updatingMenuItems) {
           this.products = products.filter(product => product.menu === this.menu.id);
+          this.products.length === 0? this.noProductsToShow = true: this.noProductsToShow = false;
         } else {
           this.products = products.filter(product => product.menu === null);
-        }
+          this.products.length === 0? this.noProductsToShow = true: this.noProductsToShow = false;
+        };
 
         this.productService
         .getMenus().subscribe(menus => {
@@ -337,18 +350,21 @@ export class ProductsComponent implements OnInit {
         next: async (menu) => {
           this.isLoading = false;
           this.menus.push(menu);
+          this.menus.length === 0? this.noMenuToShow = true: this.noMenuToShow = false;
           
-          const lastMenuId = this.menus.length - 1;
+          const lastMenu = this.menus.length - 1;
           this.products.map(product => {
             if (!product.menu) {
-              product.menu = this.menus[lastMenuId].id;
-            }
+              product.menu = this.menus[lastMenu].id;
+            };
+            
             this.productService.updateProduct(product).subscribe(product => {
               const index = this.products.findIndex(i => i.id === product.id);
               this.products[index] = product;
-              this.loadProducts();
+              this.allProducts[index] = product;
             })
-          })
+          });
+
           this.resetMenuForm();
           this.resetProductForm();
           this.toggleFormContainer();
@@ -384,15 +400,23 @@ export class ProductsComponent implements OnInit {
 
     const newProduct = {
       ...this.product,
-    }
+    };
 
     this.productService.addProduct(newProduct)
       .subscribe({
         next: async (product) => {
           this.products.push(product);
-          this.loadProducts();
+          this.allProducts.push(product);
+
+          if (this.updatingMenuItems) {
+            this.products = Array.from(this.allProducts).filter(product => product.menu === this.menu.id);
+            this.products.length === 0? this.noProductsToShow = true : this.noProductsToShow = false;
+          } else {
+            this.products = Array.from(this.allProducts).filter(product => product.menu === null);
+            this.products.length === 0? this.noProductsToShow = true : this.noProductsToShow = false;
+          };
+
           this.resetProductForm();
-          await this.uiService.wait(100);
         },
         error: (err) => {
           this.uiService.displayErrorMessage(err);
@@ -483,9 +507,10 @@ export class ProductsComponent implements OnInit {
         next: async () => {
           this.isLoading = false;
           this.menus = this.menus.filter(s => s.id !== this.deletingMenu?.id);
+          this.menus.length === 0? this.noMenuToShow = true: this.noMenuToShow = false;
+
           this.deletingMenu = null;
           this.toggleMenuActionModal()
-          await this.uiService.wait(100);
           this.toastrService.success("Product has been deleted successfully.");
         },
         error: (err) => {
@@ -544,12 +569,10 @@ export class ProductsComponent implements OnInit {
         next: async (productData) => {
           this.isLoading = false;
           const index = this.products.findIndex(product => product.id === productData.id);
-  
-          await this.uiService.wait(100);
-          this.toastrService.success("Successfully saved changes to the item.");
-  
           this.products[index] = productData;
-        },
+          this.allProducts[index] = productData;
+          this.toastrService.success("Successfully saved changes to the item.");
+          },
         error: (err) => {
           this.isLoading = false;
           this.uiService.displayErrorMessage(err);

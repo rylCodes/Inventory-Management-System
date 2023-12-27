@@ -155,14 +155,14 @@
                 </thead>
                 <tbody>
                     <tr *ngFor="let bill of bills | paginate: { itemsPerPage: itemsPerPage, currentPage: p }">
-                        <td class="py-1 p-0.5 md:p-2">{{bill.time | date: "MMM dd, hh:mm a"}}</td>
-                        <td class="py-1 p-0.5 md:p-2">{{bill.billno}}</td>
-                        <td class="py-1 p-0.5 md:p-2">{{bill.customer_name}}</td>
-                        <td class="py-1 p-0.5 md:p-2 hidden md:table-cell">{{bill.remarks}}</td>
-                        <td class="py-1 p-0.5 md:p-2">{{getItemLength(bill)}}</td>
-                        <td class="py-1 p-0.5 md:p-2">&#8369;{{bill.grand_total | number: '1.2-2'}}</td>
-                        <td class="py-1 p-0.5 md:p-2 lowercase hidden md:table-cell">{{bill.mode_of_payment}}</td>
-                        <td class="py-1 p-0.5 md:p-2">
+                        <td class="py-1 p-0.5 md:px-1 md:py-2">{{bill.time | date: "MMM dd, hh:mm a"}}</td>
+                        <td class="py-1 p-0.5 md:px-1 md:py-2">{{bill.billno}}</td>
+                        <td class="py-1 p-0.5 md:px-1 md:py-2">{{bill.customer_name}}</td>
+                        <td class="py-1 p-0.5 md:px-1 md:py-2 hidden md:table-cell">{{bill.remarks}}</td>
+                        <td class="py-1 p-0.5 md:px-1 md:py-2">{{getItemLength(bill)}}</td>
+                        <td class="py-1 p-0.5 md:px-1 md:py-2">&#8369;{{bill.grand_total | number: '1.2-2'}}</td>
+                        <td class="py-1 p-0.5 md:px-1 md:py-2 lowercase hidden md:table-cell">{{bill.mode_of_payment}}</td>
+                        <td class="py-1 p-0.5 md:px-1 md:py-2">
                             <div class="flex justify-center space-x-3 md:space-x-4">
                                 <fa-icon class="hover:scale-110" [icon]="faRectangleList" (click)="toggleInvoice(bill)">
                                 </fa-icon>

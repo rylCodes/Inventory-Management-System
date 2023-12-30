@@ -1,11 +1,13 @@
 <div class="relative bg-neutral-300 w-full h-screen text-neutral-300 pt-32">
     <div class="bg-neutral-900 w-[400px] h-auto mx-auto px-8 py-10 rounded-lg">
-        <h2 class="text-center">
-            Log in to<br>
-            <span class="text-3xl font-bold lg:text-3xl">
-                {{title}}
-            </span>
-        </h2>
+        <p class="text-center">Log in to</p>
+        <div class="flex justify-center items-center">
+            <img class="w-[36px] h-auto" src="assets\logo\cube-white.png" alt="invenia-logo">
+            <div class="text-center text-neutral-100">
+                <p class="text-[36px] leading-none font-extrabold">Invenia<span class="font-semibold">+</span></p>
+                <p class="text-xxs">Inventory Management System | POS</p>
+            </div>
+        </div>
         <form class="flex flex-col mt-2" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
             <label class="mt-4 lg:mt-6" for="username">Username</label>
             <input class="text-neutral-900 px-2 py-1 rounded-sm mt-1" type="text" formControlName="username" id="username">

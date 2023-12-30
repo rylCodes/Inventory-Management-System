@@ -74,6 +74,7 @@ const appRoutes: Routes = [
     ChartsComponent,
   ],
   imports: [
+    // MatIconModule,
     BrowserModule,
     AppRoutingModule,
     RouterModule.forRoot(appRoutes, { useHash: true }),

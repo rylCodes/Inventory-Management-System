@@ -11,6 +11,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { ChartModule } from 'angular-highcharts';
 import { DatePipe } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
 
 import { authGuard } from './guard/auth.guard';
 import { AuthService } from './services/auth/auth.service';
@@ -74,7 +75,7 @@ const appRoutes: Routes = [
     ChartsComponent,
   ],
   imports: [
-    // MatIconModule,
+    MatIconModule,
     BrowserModule,
     AppRoutingModule,
     RouterModule.forRoot(appRoutes, { useHash: true }),

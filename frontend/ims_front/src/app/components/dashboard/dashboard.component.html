@@ -12,22 +12,31 @@
         <div class="flex w-full space-x-2 md:flex-row md:w-1/2">
             <!-- Inventory -->
             <div class="flex flex-col justify-between text-neutral-50 h-auto w-1/2 rounded-sm md:rounded-md bg-gradient-to-r from-green-700 to-green-500">
-                <div class="flex justify-around items-center mt-6 lg:mt-8">
+                <div class="flex justify-between px-4 items-center mt-6 lg:mt-8">
                     <div>
                         <h3 class="font-semibold text-lg lg:text-xl">Inventory</h3>
-                        <p class="text-base lg:text-lg">{{stocks.length}} {{stocks.length > 1 ? 'items' : 'item'}}</p>
+                        <p *ngIf="stocks.length" class="text-base lg:text-lg">
+                            {{stocks.length}} {{stocks.length > 1 ? 'items' : 'item'}}
+                        </p>
+                        <p *ngIf="!stocks.length && isFetching" class="text-base lg:text-lg">--</p>
                     </div>
                     <div class="text-5xl lg:text-7xl">
                         <fa-icon [icon]="faBoxesStacked"></fa-icon>
                     </div>
                 </div>
-                <div *ngIf="stockWithLowestQuantity" class="flex flex-col justify-around p-3 sm:flex-row">
-                    <p class="text-xxs sm:text-xs">Lowest stock: {{stockWithLowestQuantity.stock_name}}</p>
-                    <p class="text-xxs sm:text-xs">Quantity: {{stockWithLowestQuantity.quantity}} {{stockWithLowestQuantity.unit}}</p>
+                <div *ngIf="!isFetching" class="flex flex-col justify-between p-3 sm:flex-row">
+                    <p class="text-xxs sm:text-xs">
+                        Lowest stock: {{stockWithLowestQuantity? stockWithLowestQuantity.stock_name: '--'}}
+                    </p>
+                    <p class="text-xxs sm:text-xs">
+                        Quantity: {{stockWithLowestQuantity? stockWithLowestQuantity.quantity: 0}} {{stockWithLowestQuantity? stockWithLowestQuantity.unit: ''}}
+                    </p>
                 </div>
-                <div *ngIf="!stockWithLowestQuantity" class="flex flex-col justify-around p-3 sm:flex-row">
-                    <p>No stock available</p>
+                <div *ngIf="isFetching" class="flex flex-col justify-around p-3 sm:flex-row">
+                    <p class="text-xxs sm:text-xs">No stocks</p>
+                    <p class="text-xxs sm:text-xs">--</p>
                 </div>
+                <!-- Proceed to Stock Route -->
                 <a routerLink="/stocks" class="flex justify-center items-center px-2 py-1 space-x-1 w-full bg-[rgba(0,0,0,0.2)] lg:py-1.5 hover:bg-[rgba(0,0,0,0.3)] hover:font-medium">
                     <p>Proceed</p>
                     <fa-icon [icon]="faCircleArrowRight"></fa-icon>
@@ -36,11 +45,13 @@
             <!-- Menu -->
             <div
                 class="flex flex-col justify-between text-neutral-50 h-auto w-1/2 rounded-sm md:rounded-md bg-gradient-to-r from-orange-700 to-orange-500">
-                <div class="flex justify-around items-center mt-6 lg:mt-8">
+                <div class="flex justify-between px-4 items-center mt-6 lg:mt-8">
                     <div>
                         <h3 class="font-semibold text-lg lg:text-xl">Menu</h3>
-                        <p class="text-base lg:text-lg">{{products.length}} {{products.length>1? 'products': 'product'}}
+                        <p *ngIf="products.length" class="text-base lg:text-lg">
+                            {{products.length}} {{products.length>1? 'products': 'product'}}
                         </p>
+                        <p *ngIf="!products.length" class="text-base lg:text-lg">--</p>
                     </div>
                     <div class="text-5xl lg:text-7xl">
                         <fa-icon [icon]="faRectangleList"></fa-icon>
@@ -58,11 +69,14 @@
             <!-- Supplier -->
             <div
                 class="flex flex-col justify-between text-neutral-50 h-auto w-1/2 rounded-sm md:rounded-md bg-gradient-to-r from-blue-700 to-blue-500">
-                <div class="flex justify-around items-center py-6 lg:py-8">
+                <div class="flex justify-between px-4 items-center mt-6 lg:mt-8">
                     <div>
                         <h3 class="font-semibold text-lg lg:text-xl">Supplier</h3>
-                        <p class="text-base lg:text-lg">{{suppliers.length}} {{suppliers.length > 1? 'suppliers':
-                            'supplier'}}</p>
+                        <p *ngIf="suppliers.length" class="text-base lg:text-lg">
+                        {{suppliers.length}} {{suppliers.length > 1? 'suppliers':
+                            'supplier'}}
+                        </p>
+                        <p *ngIf="!suppliers.length" class="text-base lg:text-lg">--</p>
                     </div>
                     <div class="text-5xl lg:text-7xl">
                         <fa-icon [icon]="faBoxesPacking"></fa-icon>
@@ -76,18 +90,25 @@
             </div>
             <!-- Sales -->
             <div class="flex flex-col justify-between text-neutral-50 h-auto w-1/2 rounded-sm md:rounded-md bg-gradient-to-r from-yellow-700 to-yellow-500">
-                <div class="flex justify-around items-center mt-6 lg:mt-8">
+                <div class="flex justify-between px-4 items-center mt-6 lg:mt-8">
                     <div>
                         <h3 class="font-semibold text-lg lg:text-xl">Today's Sales</h3>
-                        <p class="text-base lg:text-lg">&#8369;{{getTodaySales() | number: '1.2-2'}}</p>
+                        <p *ngIf="getTodaySales() >= 0 && !isFetching" class="text-base lg:text-lg">
+                            &#8369;{{getTodaySales() | number: '1.2-2'}}
+                        </p>
+                        <p *ngIf="!getTodaySales() && isFetching" class="text-base lg:text-lg">--</p>
                     </div>
                     <div class="text-5xl lg:text-7xl">
                         <fa-icon [icon]="faMoneyBillTrendUp"></fa-icon>
                     </div>
                 </div>
-                <div class="flex flex-col justify-between p-3 sm:flex-row">
+                <div *ngIf="!isFetching" class="flex flex-col justify-between p-3 sm:flex-row">
                     <p class="text-xxs sm:text-xs">Yesterday: &#8369;{{getYesterdaySales() | number: '1.2-2'}}</p>
                     <p class="text-xxs sm:text-xs">This week: &#8369;{{getThisWeekSales() | number: '1.2-2'}}</p>
+                </div>
+                <div *ngIf="isFetching" class="flex flex-col justify-around p-3 sm:flex-row">
+                    <p class="text-xxs sm:text-xs">--</p>
+                    <p class="text-xxs sm:text-xs">--</p>
                 </div>
                 <a routerLink="/sales" class="flex justify-center items-center px-2 py-1 space-x-1 w-full bg-[rgba(0,0,0,0.2)] lg:py-1.5 hover:bg-[rgba(0,0,0,0.3)] hover:font-medium">
                     <span>Proceed</span>
@@ -97,7 +118,12 @@
         </div>
     </div>
 
-    <div class="mt-4 shadow-xl max-w-full text-neutral-300">
-        <app-charts></app-charts>
+    <!-- Charts -->
+    <div *ngIf="stocks.length > 0 || purchaseBills.length > 0 || saleBills.length > 0"
+        class="mt-4 shadow-xl max-w-full text-neutral-300">
+        <app-charts [stocks]="stocks"
+                    [sales]="saleBills"
+                    [purchases]="purchaseBills">
+        </app-charts>
     </div>
 </div>

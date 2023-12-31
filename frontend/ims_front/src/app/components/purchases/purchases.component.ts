@@ -268,7 +268,6 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
 
   // SHOW BILLS
   ngOnInit(): void {
-    // this.loadAllItems();
     this.loadSuppliers();
     this.loadStocks();
     this.loadItems();
@@ -319,25 +318,23 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
 
   loadSuppliers() {
     this.supplierService
-      .getSuppliers()
-      .subscribe({
-        next: suppliers => {
-          const activeSuppliers = suppliers.filter(supplier => supplier.status === true);
-          this.suppliers = activeSuppliers;
-        },
-        error: err => console.log(err)
-      })
+    .getSuppliers().subscribe({
+      next: suppliers => {
+        const activeSuppliers = suppliers.filter(supplier => supplier.status === true);
+        this.suppliers = activeSuppliers;
+      },
+      error: err => console.log(err)
+    });
   }
 
   loadStocks() {
-    this.stockService
-      .getStocks()
-      .subscribe({
-        next: stocks => {
-          this.stocks = stocks;
-        },
-        error: err => console.log(err)
-      })
+    this.stockService.getStocks()
+    .subscribe({
+      next: stocks => {
+        this.stocks = stocks;
+      },
+      error: err => console.log(err)
+    })
   }
 
   getItemLength(bill: PurchaseBill) {

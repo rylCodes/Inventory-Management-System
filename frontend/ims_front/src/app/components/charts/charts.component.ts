@@ -1,5 +1,4 @@
-import { DatePipe } from '@angular/common';
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { Chart } from 'angular-highcharts';
 import { SaleBill } from 'src/app/interface/Sale';
 import { SalesService } from 'src/app/services/sales/sales.service';
@@ -8,6 +7,7 @@ import { PurchasesService } from 'src/app/services/purchases/purchases.service';
 import { Stock } from 'src/app/interface/Stock';
 import { StocksService } from 'src/app/services/stocks/stocks.service';
 import { Subject } from 'rxjs';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-charts',
@@ -17,14 +17,14 @@ import { Subject } from 'rxjs';
 export class ChartsComponent implements OnInit, OnDestroy {
   private unsubscribe$: Subject<void> = new Subject<void>();
 
-  sales: SaleBill[] = [];
+  @Input() sales: SaleBill[] = [];
   accumulatedSales: SaleBill[] = [];
   barChart?: Chart;
   
-  purchases: PurchaseBill[] = [];
+  @Input() purchases: PurchaseBill[] = [];
   accumulatedPurchases: PurchaseBill[] = [];
 
-  stocks: Stock[] = [];
+  @Input() stocks: Stock[] = [];
   pieChart?: Chart;
 
   currentDate = new Date();
@@ -49,58 +49,25 @@ export class ChartsComponent implements OnInit, OnDestroy {
   }
 
   loadSales(): void {
-    this.saleService.getSaleBills().subscribe({
-      next: sales => {
-        this.sales = sales.filter(sale => sale.status);
+    this.accumulatedSales = this.calculateAccumulatedSales(this.sales);
 
-        if (!sales || sales.length === 0) {
-          this.accumulatedSales = this.calculateAccumulatedSales(this.mockSales());
-        } else {
-          this.accumulatedSales = this.calculateAccumulatedSales(sales);
-        }
-
-        if (this.accumulatedSales.length > 0 && this.accumulatedPurchases.length > 0) {
-          this.initializeBarChart();
-        };
-      },
-      error: err => console.log("Failed to display sales", err),
-    });
+    if (this.accumulatedSales.length > 0 || this.accumulatedPurchases.length > 0) {
+      this.initializeBarChart();
+    };
   }
 
   loadPurchases(): void {
-    this.purchasesService.getPurchaseBills().subscribe({
-      next: purchases => {
-        this.purchases = purchases;
-        
-        if (!purchases || purchases.length === 0) {
-          this.accumulatedPurchases = this.calculateAccumulatedPurchases(this.mockPurchase());
-        } else {
-          this.accumulatedPurchases = this.calculateAccumulatedPurchases(purchases);
-        }
+    this.accumulatedPurchases = this.calculateAccumulatedPurchases(this.purchases);
 
-        if (this.accumulatedSales.length > 0 && this.accumulatedPurchases.length > 0) {
-          this.initializeBarChart();
-        };
-      },
-      error: err => console.log("Failed to fetch purchases", err),
-    });
+      if (this.accumulatedSales.length > 0 || this.accumulatedPurchases.length > 0) {
+        this.initializeBarChart();
+      };
   }
 
-  loadStocks() {
-    this.stockService.getStocks().subscribe({
-      next: (stocks) => {
-        if (!stocks || stocks.length === 0) {
-          this.stocks = this.mockStocks();
-        } else {
-          this.stocks = stocks;
-        }
-
-        if (this.stocks.length > 0) {
-          this.initializePieChart();
-        };
-      },
-      error: (err) => console.log("Failed to fetch stocks!", err),
-    })
+  loadStocks() {        
+    if (this.stocks.length > 0) {
+      this.initializePieChart();
+    };
   }
 
   calculateAccumulatedPurchases(purchases: PurchaseBill[]): PurchaseBill[] {

@@ -146,12 +146,14 @@
                         </div>
                         <!-- Notification icon -->
                         <div class="absolute top-0 right-0 h-full w-3 flex items-center justify-center pr-1 sm:w-6">
-                            <fa-icon class="text-neutral-400 text-xxs sm:text-xs" *ngIf="stock.show_notification"
+                            <!-- <fa-icon class="text-neutral-400 text-xxs sm:text-xs" *ngIf="stock.show_notification"
                                 [icon]="faBell">
-                            </fa-icon>
-                            <fa-icon class="text-neutral-400 text-xxs sm:text-xs" *ngIf="!stock.show_notification"
+                            </fa-icon> -->
+                            <mat-icon class="text-neutral-400 text-xs sm:text-sm" *ngIf="stock.show_notification">notifications_active</mat-icon>
+                            <!-- <fa-icon class="text-neutral-400 text-xxs sm:text-xs" *ngIf="!stock.show_notification"
                                 [icon]="faBellSlash">
-                            </fa-icon>
+                            </fa-icon> -->
+                            <mat-icon class="text-neutral-400 text-xs sm:text-sm" *ngIf="!stock.show_notification">notifications_off</mat-icon>
                         </div>
                     </td>
                 </tr>

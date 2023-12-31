@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { UserDetails } from 'src/app/interface/UserDetails';
 import { UiService } from 'src/app/services/ui/ui.service';
 import { StocksService } from 'src/app/services/stocks/stocks.service';
@@ -13,7 +13,7 @@ import { PurchaseBill, PurchaseItem } from 'src/app/interface/Purchase';
 import { SaleBill, SaleItem } from 'src/app/interface/Sale';
 import { DatePipe } from '@angular/common';
 import { faCircleArrowRight, faBoxesPacking, faRectangleList, faBoxesStacked, faMoneyBillTrendUp } from '@fortawesome/free-solid-svg-icons';
-import { Subscription } from 'rxjs';
+import { Observable, Subscription, forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard',
@@ -21,29 +21,28 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./dashboard.component.css']
 })
 
-export class DashboardComponent implements OnInit, OnDestroy {
+export class DashboardComponent implements OnInit {
 
   dashboardItems: any = [];
   stocks: Stock[] = [];
-  stocksToCheck: Stock[] = [];
   products: Menu[] = [];
   saleBills: SaleBill[] = [];
   saleItems: SaleItem[] = [];
-  todaySaleBills: SaleBill[] = [];
-  yesterdaySaleBills: SaleBill[] = [];
-  thisWeekSaleBills: SaleBill[] = [];
+  todaySaleBills?: SaleBill[];
+  yesterdaySaleBills?: SaleBill[];
+  thisWeekSaleBills?: SaleBill[];
   purchaseBills: PurchaseBill[] = [];
   purchaseItems: PurchaseItem[] = [];
   suppliers: Supplier[] = [];
   stockWithLowestQuantity?: Stock;
-
-  saleBillsSubscription: Subscription = new Subscription();
 
   faBoxesStacked = faBoxesStacked;
   faCircleArrowRight = faCircleArrowRight;
   faBoxesPacking = faBoxesPacking;
   faRectangleList = faRectangleList;
   faMoneyBillTrendUp = faMoneyBillTrendUp;
+
+  isFetching: boolean = false;
 
   constructor(
     private uiService: UiService,
@@ -56,64 +55,39 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.saleBillsSubscription = this.saleService.getSaleBills()
-    .subscribe({
-      next: (saleBills) => {
-        this.saleBills = saleBills;
-      },
-      error: (err) => {
-        console.log(err);
-      }
-    });
+    this.isFetching = true;
 
-    this.supplierService.getSuppliers()
-    .subscribe({
-      next: (suppliers) => {
-        this.suppliers = suppliers;
-      },
-      error: (err) => {
-        console.log(err);
-      }
-    });
+    const saleBills$: Observable<SaleBill[]> = this.saleService.getSaleBills();
+    const suppliers$: Observable<Supplier[]> = this.supplierService.getSuppliers();
+    const stocks$: Observable<Stock[]> = this.stockServices.getStocks();
+    const products$: Observable<Menu[]> = this.productService.getMenus();
+    const purchaseBills$: Observable<PurchaseBill[]> = this.purchaseService.getPurchaseBills();
 
-    this.stockServices
-    .getStocks()
-    .subscribe({
-      next: (stocks) => {
-        this.stocks = stocks;
-        this.stocksToCheck = stocks.filter(stock => stock.unit !== 'ml' && stock.unit !== 'gram');
-        this.stockWithLowestQuantity  = stocks.reduce((minStock, currentStock) => {
+    forkJoin({
+      saleBills: saleBills$,
+      suppliers: suppliers$,
+      stocks: stocks$,
+      products: products$,
+      purchaseBills: purchaseBills$,
+    }).subscribe({
+      next: (data) => {
+        this.saleBills = data.saleBills;
+        this.suppliers = data.suppliers;
+        this.stocks = data.stocks;
+        this.products = data.products;
+        this.purchaseBills = data.purchaseBills;
+        
+        this.stockWithLowestQuantity  = data.stocks.reduce((minStock, currentStock) => {
           return currentStock.quantity < minStock.quantity ? currentStock : minStock;
-        }, stocks[0]);
+        }, data.stocks[0]);
+
+        this.isFetching = false;
       },
       error: (err) => {
+        this.isFetching = false;
         console.log(err);
-      }
-    });
-
-    this.productService.getMenus()
-    .subscribe({
-      next: (products) => {
-        this.products = products;
       },
-      error: (err) => {
-        console.log(err);
-      }
-    });
-
-    // this.saleService.getSaleItems()
-    // .subscribe({
-    //   next: (saleItems) => {
-    //     this.saleItems = saleItems;
-    //   },
-    //   error: (err) => {
-    //     console.log(err);
-    //   }
-    // });
-  }
-
-  ngOnDestroy(): void {
-    this.saleBillsSubscription.unsubscribe();
+    })
   }
 
   getTodaySales(): number {
@@ -125,9 +99,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
       return billDate === dateToday && bill.status;
     })
 
-    if (!this.todaySaleBills || this.todaySaleBills.length === 0) {
+    if (!this.todaySaleBills) {
       return 0;
-    }
+    };
+
     this.todaySaleBills.forEach(bill => {
       if (bill && bill.grand_total) {
         total += bill.grand_total;
@@ -146,7 +121,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       return billDate === dateYesterday && bill.status;
     })
 
-    if (!this.yesterdaySaleBills || this.yesterdaySaleBills.length === 0) {
+    if (!this.yesterdaySaleBills) {
       return 0;
     }
     this.yesterdaySaleBills.forEach(bill => {
@@ -174,7 +149,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       return saleDate >= monday && saleDate <= sunday && bill.status;
     })
 
-    if (!this.thisWeekSaleBills || this.thisWeekSaleBills.length === 0) {
+    if (!this.thisWeekSaleBills) {
       return 0;
     }
 

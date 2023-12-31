@@ -12,7 +12,7 @@
         <fa-icon class="px-2 text-neutral-400" [icon]="faMagnifyingGlass">
         </fa-icon>
         <input class="px-1 outline-none bg-inherit border-neutral-500 w-full" appFocusOnShow [(ngModel)]="searchQuery"
-            name="searchQuery" (input)="onInputChange()" (keyup.enter)="onSearch()" type="text" placeholder="Search...">
+            name="searchQuery" (input)="onInputChange()" (keyup.enter)="onSearch()" type="text" placeholder="{{placeHolder}}">
         <fa-icon *ngIf="searchQuery" class="px-2 text-neutral-400" [icon]="faXmark" (click)="onClearText()">
         </fa-icon>
     </form>

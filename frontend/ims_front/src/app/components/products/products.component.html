@@ -1,18 +1,20 @@
 <div class="relative w-full px-2 sm:px-4 md:px-6 lg:px-8">
     <!-- HEADING: POS PAGE -->
     <div class="flex justify-between mt-4 lg:mt-8">
-        <h1 class="font-bold text-2xl lg:text-3xl">MENU</h1>
+        <h1 class="font-bold text-2xl lg:text-3xl">PRODUCTS</h1>
         <!-- ADD BUTTON -->
-        <app-button *ngIf="!updatingMenuItems" txtContent="{{showFormContainer? 'Cancel': 'Add'}}"
-            bgColor="{{showFormContainer? 'red': 'green'}}" (btnClick)="toggleFormContainer()">
-        </app-button>
+        <button *ngIf="!updatingMenuItems"
+                [ngClass]="showFormContainer? 'bg-red-600 hover:bg-red-500': 'bg-green-700 hover:bg-green-600'"
+                (click)="toggleFormContainer()">
+            {{showFormContainer? 'Cancel': 'Add'}}
+        </button>
     </div>
     <hr class="border-b-1 border-neutral-900 mt-4">
 
     <!-- Table Settings -->
     <div id="tableSettings" *ngIf="showTableSettings" class="relative flex mt-1 items-center w-full lg:mt-2">
         <app-search-bar class="w-full" [filterText]="filterText" [isFilter]="isFilter" [searchQuery]="searchQuery"
-            [showSearchBar]="showSearchBar" (removeFilter)="removeFilter()" (search)="onSearch()"
+            [placeHolder]="'Find a product by name...'" [showSearchBar]="showSearchBar" (removeFilter)="removeFilter()" (search)="onSearch()"
             (clearText)="clearText()" (btnClick)="toggleShowSearchBar()" (searchChanged)="onSearchChanged($event)">
         </app-search-bar>
         <div class="px-2 lg:px-3 py-1 text-base lg:text-lg hover:bg-neutral-300 cursor-pointer rounded-md"
@@ -22,21 +24,21 @@
         </div>
         <div *ngIf="showSortOrDelItems"
             class="flex flex-col absolute top-full right-0 w-52 bg-white shadow-xl rounded-md z-10">
-            <button
-                class="flex justify-between items-center px-4 py-2 hover:bg-neutral-100 hover:font-medium rounded-md w-full text-start"
+            <div
+                class="cursor-pointer flex justify-between items-center px-4 py-2 hover:bg-neutral-100 hover:font-medium rounded-md w-full text-start"
                 (click)="sortItemsByDate()">
                 <span>Sort by date updated</span>
                 <span>↑↓</span>
-            </button>
-            <button
-                class="flex justify-between items-center px-4 py-2 hover:bg-neutral-100 hover:font-medium rounded-md w-full text-start"
+            </div>
+            <div
+                class="cursor-pointer flex justify-between items-center px-4 py-2 hover:bg-neutral-100 hover:font-medium rounded-md w-full text-start"
                 (click)="sortItemsByName()">
                 <span>Sort by name</span>
                 <span>↑↓</span>
-            </button>
-            <button class="px-4 py-2 hover:bg-neutral-100 hover:font-medium rounded-md w-full text-start" (click)="deleteAllItems()">
+            </div>
+            <div class="cursor-pointer px-4 py-2 hover:bg-neutral-100 hover:font-medium rounded-md w-full text-start" (click)="deleteAllItems()">
                 <span class="text-[#ff0000]">Delete all products</span>
-            </button>
+            </div>
         </div>
     </div>
 
@@ -336,8 +338,8 @@
             </fa-icon>
             <p class="mb-8 mt-6 text-center">Do you want to remove this item?<br>This action cannot be
                 undone.</p>
-            <app-button (btnClick)="onConfirmDeleteProduct()" bgColor="red" txtColor="bg-white"
-                txtContent="Delete"></app-button>
+            <button class="text-white bg-red-600 hover:bg-red-500"
+                (click)="onConfirmDeleteProduct()">Delete</button>
         </div>
     </div>
 
@@ -351,8 +353,8 @@
                 Do you want to remove this product from the menu?
                 <br>This action cannot be undone.
             </p>
-            <app-button (btnClick)="onConfirmDeleteMenu()" bgColor="red" txtColor="bg-white"
-                txtContent="Delete"></app-button>
+            <button class="text-white bg-red-600 hover:bg-red-500'"
+                (click)="onConfirmDeleteMenu()">Delete</button>
         </div>
     </div>
 
@@ -360,6 +362,12 @@
     <app-modal *ngIf="showModal" [title]="'Deleting all products!'"
         [content]="'Are you sure you want to delete all products? This action cannot be undone!'"
         (closeModal)="toggleModal()" (buttonClick)="onConfirmDeleteAll()" [btnText]="'Delete all'" [btnBgColor]="'red'">
+    </app-modal>
+
+    <!-- MODAL: Redirect to Inventory -->
+    <app-modal *ngIf="showGoToStockModal" [title]="'Proceed to the Inventory Page'"
+        [content]="'Make sure to save all changes before leaving.'" (closeModal)="toggleGoToStocksModal()"
+        (buttonClick)="proceedToStocks()" [btnText]="'Proceed'">
     </app-modal>
 
     <!-- CSS Loader -->

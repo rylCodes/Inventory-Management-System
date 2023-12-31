@@ -22,6 +22,7 @@ export class SearchBarComponent {
   @Input() showSearchBar: boolean = false;
   @Input() filterText: string = "";
   @Input() searchQuery: string = '';
+  @Input() placeHolder: string = 'Search...';
 
   showLogOutActionModal: boolean = false;
 

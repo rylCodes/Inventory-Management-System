@@ -37,7 +37,7 @@
             routerLinkActive="bg-neutral-800"
             [routerLinkActiveOptions]="{exact: true}">
             <fa-icon [icon]="faList"></fa-icon>
-            <p class="ml-3">Menu</p>
+            <p class="ml-3">Products</p>
         </a>
 
         <a class="flex items-center px-4 py-3 hover:bg-neutral-800 hover:text-white hover:font-semibold transition-all duration-300"
@@ -73,11 +73,10 @@
         </a>
 
         <!-- Logout Button -->
-        <button class="flex items-center px-4 py-3 hover:bg-neutral-800 hover:text-white hover:font-semibold w-full" (click)="toggleLogOutActionModal()">
+        <div class="flex items-center px-4 py-3 hover:bg-neutral-800 hover:text-white hover:font-semibold w-full cursor-pointer" (click)="toggleLogOutActionModal()">
             <fa-icon [icon]="logOutIcon"></fa-icon>
             <p class="ml-3">Logout</p>
-            <hr>
-        </button>
+        </div>
     </div>
 </nav>
 
@@ -91,6 +90,6 @@
         <p class="mb-8 mt-6 text-center">
             Are you sure you want to log out?
         </p>
-        <app-button (btnClick)="logOut()" bgColor="red" txtColor="bg-white" txtContent="Logout"></app-button>
+        <button (click)="logOut()" class="bg-red-600 hover:bg-red-500">Logout</button>
     </div>
 </div>

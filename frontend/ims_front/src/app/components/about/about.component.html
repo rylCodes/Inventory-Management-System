@@ -1,11 +1,13 @@
 <div class="relative w-full px-2 sm:px-4 md:px-6 lg:px-8">
     <!-- HEADING -->
-    <div class="flex justify-between mt-4 lg:mt-8">
-        <h1 class="font-bold text-2xl lg:text-3xl uppercase">{{title}}</h1>
+    <div class="flex mt-4 lg:mt-8">
+        <h1 class="font-bold text-2xl lg:text-3xl uppercase">
+            <span class="font-normal capitalize">About</span> {{title}}
+        </h1>
     </div>
     <hr class="border-b-1 border-neutral-900 mt-4">
 
-    <div class="mt-4 space-y-4 p-4">
+    <div class="mt-4 space-y-4 px-4 md:mt-8">
         <p>Welcome to <strong>{{title}}</strong>, a web-based platform dedicated to simplifying inventory management and point-of-sale operations, owned and hosted by <strong>{{appOwner}}</strong>.</p>
         <p>{{title}} offers a user-friendly interface aimed at easing the complexities involved in tracking inventory and processing sales.</p>
         <p>Users can easily monitor their inventory in real-time, receive notifications for low stock levels, and access comprehensive insights through its tracking features.</p>

@@ -42,7 +42,7 @@ export class PosComponent implements OnInit, AfterContentChecked {
   showItemActionModal: boolean = false;
   showInvoice: boolean = false;
   showPermissionModal: boolean = false;
-  showGoToMenuModal: boolean = false;
+  showGoToProductModal: boolean = false;
 
   modalInputValue?: string;
 
@@ -192,13 +192,17 @@ export class PosComponent implements OnInit, AfterContentChecked {
   onSelectChange(event: Event) {
     const target = event.target as HTMLSelectElement;
     if (target.value === "addNewProduct") {
-      this.showGoToMenuModal = !this.showGoToMenuModal;
-    }
+      if (this.saleBill.customer_name || this.saleBill.remarks) {
+        this.showGoToProductModal = true;
+      } else {
+        this.proceedToProducts();
+      }
+    };
   }
 
-  toggleGoToMenuModal() {
-    this.showGoToMenuModal = !this.showGoToMenuModal;
-    if (!this.showGoToMenuModal) {
+  toggleGoToProductModal() {
+    this.showGoToProductModal = !this.showGoToProductModal;
+    if (!this.showGoToProductModal) {
       this.saleItem.menu = undefined;
     }
   }
@@ -236,8 +240,10 @@ export class PosComponent implements OnInit, AfterContentChecked {
         this.toggleBillForm();
       } else if (this.proceedPayment) {
         this.toggleProceedPayment();
+      } else if (this.showGoToProductModal) {
+        this.toggleGoToProductModal();
       }
-    }
+    };
   }
 
   viewOrder(saleBill: SaleBill) {
@@ -670,7 +676,7 @@ export class PosComponent implements OnInit, AfterContentChecked {
     }
   }
 
-  proceedToMenu() {
+  proceedToProducts() {
     this.router.navigate(['products/']);
   }
 

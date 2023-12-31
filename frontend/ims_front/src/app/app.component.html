@@ -5,7 +5,7 @@
         <div class="relative flex flex-col justify-between flex-1">
             <router-outlet class="absolute top-0"></router-outlet>
             <div *ngIf="hasRoute('/login')" class="flex flex-col mt-12">
-                <button class="text-gray-500 text-center text-xs hover:text-gray-400 p-3" (click)="scrollToTop()">Go-to-top</button>
+                <small class="text-gray-500 text-center hover:text-gray-400 p-3 cursor-pointer" (click)="scrollToTop()">Go-to-top</small>
                 <div class="flex justify-between bg-white w-full text-gray-700 p-4 text-xs">
                     <p><span class="font-bold">&copy;2023 {{title}}</span>. All rights reserved.</p>
                     <p><span class="font-bold">Version</span> {{version}}</p>

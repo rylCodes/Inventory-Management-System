@@ -28,7 +28,6 @@ import { StocksComponent } from './components/stocks/stocks.component';
 import { ProductsComponent } from './components/products/products.component';
 import { LoginComponent } from './components/login/login.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
-import { ButtonComponent } from './components/button/button.component';
 import { PosComponent } from './components/pos/pos.component';
 import { PurchasesComponent } from './components/purchases/purchases.component';
 import { SuppliersComponent } from './components/suppliers/suppliers.component';
@@ -60,7 +59,6 @@ const appRoutes: Routes = [
     StocksComponent,
     LoginComponent,
     DashboardComponent,
-    ButtonComponent,
     PosComponent,
     ProductsComponent,
     PurchasesComponent,

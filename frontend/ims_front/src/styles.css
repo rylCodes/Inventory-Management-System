@@ -85,6 +85,15 @@ table th {
     padding: 10px;
 }
 
+/* BUTTON STYLE */
+button {
+    background-color: #232323;
+    font-weight: bold;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 5px;
+}
+
 @media (max-width: 768px) {
 
     table thead th,

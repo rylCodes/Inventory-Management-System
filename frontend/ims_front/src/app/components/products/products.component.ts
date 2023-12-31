@@ -43,6 +43,8 @@ export class ProductsComponent implements OnInit {
         this.toggleMenuForm();
       } else if (this.showSearchBar) {
         this.showSearchBar = false;
+      } else if (this.showGoToStockModal) {
+        this.showGoToStockModal = false;
       }
     }
   }
@@ -84,6 +86,7 @@ export class ProductsComponent implements OnInit {
 
   showMenuActionModal: boolean = false;
   showProductActionModal: boolean = false;
+  showGoToStockModal: boolean = false;
 
   faXmark = faXmark;
   faPen = faPen;
@@ -556,8 +559,23 @@ export class ProductsComponent implements OnInit {
   onStockSelectionChange(event: Event) {
     const target = event?.target as HTMLSelectElement;
     if (target.value === 'addNewItem') {
-      this.router.navigate(['stocks/']);
+      if (this.menu.name || this.menu.category || this.menu.price > 0 || this.menu.description || this.product.qty_per_order > 1) {
+        this.showGoToStockModal = true;
+      } else {
+        this.proceedToStocks();
+      }
     }
+  }
+
+  toggleGoToStocksModal() {
+    this.showGoToStockModal = !this.showGoToStockModal;
+    if (!this.showGoToStockModal) {
+      this.product.stock_id = undefined;
+    }
+  }
+
+  proceedToStocks() {
+    this.router.navigate(['stocks/']);
   }
 
   // UPDATE PRODUCT

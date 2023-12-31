@@ -43,13 +43,13 @@
                     </div>
 
                     <!-- Logout Button -->
-                    <button
-                        class="flex w-full hover:bg-[rgba(0,0,0,0.1)] p-3 mt-3 rounded-md transition-all duration-300"
+                    <div
+                        class="flex w-full hover:bg-[rgba(0,0,0,0.1)] p-3 mt-3 rounded-md transition-all duration-300 cursor-pointer"
                         (click)="toggleLogOutActionModal()">
                         <fa-icon [ngStyle]="{color: 'rgb(82 82 82)'}" [icon]="logOutIcon"></fa-icon>
                         <p class="text-neutral-900 ml-2">Logout</p>
                         <hr>
-                    </button>
+                    </div>
 
                     <div class="flex justify-between text-xxs text-neutral-500 mt-4">
                         <p><span class="font-semibold">&copy;2023 {{title}}</span>. All rights reserved.</p>
@@ -137,7 +137,7 @@
             routerLinkActive="bg-neutral-700 text-neutral-200 font-semibold hover:bg-neutral-700"
             [routerLinkActiveOptions]="{exact: true}">
             <fa-icon class="scale-90" [icon]="faList"></fa-icon>
-            <p class="ml-3">Menu</p>
+            <p class="ml-3">Products</p>
         </a>
 
         <a class="flex items-center px-4 py-2 hover:bg-neutral-200 duration-500" routerLink="/pos"
@@ -180,7 +180,8 @@
         <p class="mb-8 mt-6 text-center">
             Are you sure you want to delete all notifications? This action cannot be undone.
         </p>
-        <app-button (btnClick)="deleteAllNotifs()" bgColor="red" txtColor="bg-white" txtContent="Delete"></app-button>
+        <button class="text-white bg-red-600 hover:bg-red-500"
+                (click)="deleteAllNotifs()">Delete</button>
     </div>
 </div>
 
@@ -194,7 +195,7 @@
         <p class="mb-8 mt-6 text-center">
             Are you sure you want to log out?
         </p>
-        <app-button (btnClick)="logOut()" bgColor="red" txtColor="bg-white" txtContent="Logout"></app-button>
+        <button (click)="logOut()" class="bg-red-700 hover:bg-red-600">Logout</button>
     </div>
 </div>
 

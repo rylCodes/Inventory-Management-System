@@ -50,7 +50,11 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
         this.showBillForm = false;
       } else if (this.showSaveBillModal) {
         this.showSaveBillModal = false;
-      }
+      } else if (this.showGoToStockModal) {
+        this.showGoToStockModal = false;
+      } else if (this.showGoToSupplierModal) {
+        this.showGoToSupplierModal = false;
+      };
     }
   }
 
@@ -90,6 +94,9 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
   showOrder: boolean = false;
   isFetching: boolean = false;
   isLoading: boolean = false;
+
+  showGoToStockModal: boolean = false;
+  showGoToSupplierModal: boolean = false;
 
   modalInputValue?: string = "";
 
@@ -173,21 +180,6 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
 
   toggleSaveBillModal() {
     this.showSaveBillModal = !this.showSaveBillModal;
-    if (this.showSaveBillModal) {
-      if (!this.bill.billno) {
-        this.toastrService.error("Failed: Please enter O.R. number");
-        this.showSaveBillModal = false;
-        return;
-      } else if (!this.bill.supplier_id) {
-        this.toastrService.error("Failed: Please enter supplier.");
-        this.showSaveBillModal = false;
-        return;
-      } else if (this.items.length < 1) {
-        this.toastrService.error("Failed: Please add at least one item to the purchase.");
-        this.showSaveBillModal = false;
-        return;
-      }
-    }
   }
 
   toggleBillActionModal() {
@@ -214,8 +206,6 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
     this.showFormContainer = !this.showFormContainer;
     this.toggleBillTable();
     this.toggleTableSettings();
-    this.resetBillForm();
-    this.resetItemForm();
   }
 
   viewOrder(bill: PurchaseBill) {
@@ -391,6 +381,20 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
   /* ADD BILLS AND ITEMS */
   // Add Bills
   addBill() {
+    if (!this.bill.billno) {
+      this.toastrService.error("Failed: Please enter O.R. number");
+      this.showSaveBillModal = false;
+      return;
+    } else if (!this.bill.supplier_id) {
+      this.toastrService.error("Failed: Please enter supplier.");
+      this.showSaveBillModal = false;
+      return;
+    } else if (this.items.length < 1) {
+      this.toastrService.error("Failed: Please add at least one item to the purchase.");
+      this.showSaveBillModal = false;
+      return;
+    };
+
     const newBill = {
       ...this.bill,
       billno: this.bill.billno.toUpperCase(),
@@ -567,10 +571,18 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
   }
 
   onSaveUpdate() {
+    if (!this.bill.billno) {
+      this.toastrService.error("Failed: Please enter O.R. number");
+      return;
+    } else if (!this.bill.supplier_id) {
+      this.toastrService.error("Failed: Please enter supplier.");
+      return;
+    };
+
     if (JSON.stringify(this.originalBill) === JSON.stringify(this.bill)) {
       this.toggleBillForm();
       return;
-    }
+    };
 
     const is_staff = sessionStorage.getItem("is_staff");
     if (is_staff === "false") {
@@ -697,15 +709,42 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
   onStockSelectionChange(event: Event) {
     const target = event?.target as HTMLSelectElement;
     if (target.value === 'addNewItem') {
-      this.router.navigate(['stocks/']);
+      if (this.bill.supplier_id || this.bill.billno || this.item.item_price > 0 || this.item.quantity_purchased > 0) {
+        this.showGoToStockModal = true;
+      } else {
+        this.proceedToStocks();
+      }
     }
   }
 
   onSupplierSelectionChange(event: Event) {
     const target = event?.target as HTMLSelectElement;
     if (target.value === 'addNewSupplier') {
-      this.router.navigate(['suppliers/']);
+      if (this.bill.billno || this.item.stock_id || this.item.item_price > 0 || this.item.quantity_purchased > 0) {
+        this.showGoToSupplierModal = true;
+      } else {
+        this.proceedToSuppliers();
+      }
     }
+  }
+
+  toggleGoToStocksModal() {
+    this.showGoToStockModal = !this.showGoToStockModal;
+    if (!this.showGoToStockModal) {
+      this.item.stock_id = undefined;
+    }
+  }
+  
+  toggleGoToSuppliersModal() {
+    this.showGoToSupplierModal = !this.showGoToSupplierModal;
+  }
+
+  proceedToStocks() {
+    this.router.navigate(['stocks/']);
+  }
+
+  proceedToSuppliers() {
+    this.router.navigate(['suppliers/']);
   }
 
   // Delete Item

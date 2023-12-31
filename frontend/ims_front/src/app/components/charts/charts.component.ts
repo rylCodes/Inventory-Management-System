@@ -53,6 +53,8 @@ export class ChartsComponent implements OnInit, OnDestroy {
 
     if (this.accumulatedSales.length > 0 || this.accumulatedPurchases.length > 0) {
       this.initializeBarChart();
+    } else {
+
     };
   }
 

@@ -139,6 +139,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOW_ALL_ORIGIN = False
 CORS_ALLOWED_ORIGINS = [
     'https://icy-water-07fda8f00.4.azurestaticapps.net',
+    'https://invenia.darylandres.com',
 ]
 
 CORS_ALLOW_METHOD = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']

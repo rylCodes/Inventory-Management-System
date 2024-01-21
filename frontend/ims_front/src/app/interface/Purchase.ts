@@ -1,7 +1,7 @@
 export interface PurchaseBill {
     id?: number,
     billno: string,
-    time: string,
+    time?: string,
     supplier_id?: number,
     grand_total: number,
     remarks: string,

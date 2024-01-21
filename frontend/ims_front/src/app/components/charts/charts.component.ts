@@ -60,7 +60,10 @@ export class ChartsComponent implements OnInit, OnDestroy {
   }
 
   loadPurchases(): void {
-    const currentMonthPurchases = this.purchases.filter(purchase => new Date(purchase.time).getMonth() === this.currentMonth);
+    const currentMonthPurchases = this.purchases.filter(purchase => {
+      // Check if purchase.time is defined before attempting to create a Date object
+      return purchase.time && new Date(purchase.time).getMonth() === this.currentMonth;
+    });
     this.accumulatedPurchases = this.calculateAccumulatedPurchases(currentMonthPurchases);
 
       if (this.accumulatedSales.length > 0 || this.accumulatedPurchases.length > 0) {

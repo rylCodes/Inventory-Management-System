@@ -42,8 +42,8 @@ export class AuthService {
         if (user && user.token) {
           // const token = JSON.stringify(user.token);
           this.setToken(user.token);
-          sessionStorage.setItem("user", user.first_name);
-          sessionStorage.setItem("is_staff", user.is_staff);
+          localStorage.setItem("user", user.first_name);
+          localStorage.setItem("is_staff", user.is_staff);
         }
         return user;
       })
@@ -51,25 +51,25 @@ export class AuthService {
   }
 
   getToken(): string | null {
-    return sessionStorage.getItem("authToken");
+    return localStorage.getItem("authToken");
   }
 
   getUserName(): string | null {
-    return sessionStorage.getItem('user');
+    return localStorage.getItem('user');
   }
 
   clearToken(): void {
-    sessionStorage.removeItem("authToken");
-    sessionStorage.removeItem("user");
-    sessionStorage.removeItem("is_staff");
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("user");
+    localStorage.removeItem("is_staff");
   }
 
   setToken(token: string): void {
-    sessionStorage.setItem("authToken", token);
+    localStorage.setItem("authToken", token);
   }
 
   isAuthenticated() {
-    return sessionStorage.getItem("authToken") !== null;
+    return localStorage.getItem("authToken") !== null;
   }
 
 // AuthService class ends here

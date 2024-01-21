@@ -118,7 +118,7 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
   bill: PurchaseBill = {
     id: undefined,
     billno: "",
-    time: undefined,
+    time: "",
     supplier_id: undefined,
     grand_total: 0,
     remarks: "",
@@ -127,7 +127,7 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
   originalBill: PurchaseBill = {
     id: undefined,
     billno: "",
-    time: undefined,
+    time: "",
     supplier_id: undefined,
     grand_total: 0,
     remarks: "",
@@ -159,7 +159,7 @@ export class PurchasesComponent implements OnInit, AfterContentChecked {
     this.bill = {
       id: undefined,
       billno: "",
-      time: undefined,
+      time: "",
       supplier_id: undefined,
       grand_total: 0,
       remarks: "",

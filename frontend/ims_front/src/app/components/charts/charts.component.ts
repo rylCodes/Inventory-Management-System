@@ -49,7 +49,8 @@ export class ChartsComponent implements OnInit, OnDestroy {
   }
 
   loadSales(): void {
-    this.accumulatedSales = this.calculateAccumulatedSales(this.sales);
+    const currentMonthSales = this.sales.filter(sale => new Date(sale.time).getMonth() === this.currentMonth);
+    this.accumulatedSales = this.calculateAccumulatedSales(currentMonthSales);
 
     if (this.accumulatedSales.length > 0 || this.accumulatedPurchases.length > 0) {
       this.initializeBarChart();
@@ -59,7 +60,8 @@ export class ChartsComponent implements OnInit, OnDestroy {
   }
 
   loadPurchases(): void {
-    this.accumulatedPurchases = this.calculateAccumulatedPurchases(this.purchases);
+    const currentMonthPurchases = this.purchases.filter(purchase => new Date(purchase.time).getMonth() === this.currentMonth);
+    this.accumulatedPurchases = this.calculateAccumulatedPurchases(currentMonthPurchases);
 
       if (this.accumulatedSales.length > 0 || this.accumulatedPurchases.length > 0) {
         this.initializeBarChart();

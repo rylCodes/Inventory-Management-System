@@ -16,7 +16,10 @@ const httpOptions = {
   providedIn: 'root'
 })
 export class NotificationsService {
-  private apiUrl = environment.baseUrl
+  private guestApiUrl = 'https://guest-invenia-api.azurewebsites.net/'
+  private defaultApiUrl = environment.baseUrl
+  private apiUrl: string = '';
+
   private notifications: Notification[] = [];
   private notificationsSubject: BehaviorSubject<Notification[]> = new BehaviorSubject<Notification[]>([]);
   private serviceStatusSubject: Subject<boolean> = new Subject<boolean>();
@@ -26,7 +29,14 @@ export class NotificationsService {
 
   stocks: Stock[] = [];
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) { 
+    const guestMode = localStorage.getItem('guestMode');
+    if (guestMode) {
+      this.apiUrl = this.guestApiUrl;
+    } else {
+      this.apiUrl = this.defaultApiUrl;
+    }
+  }
 
   handleError(err: any): void {
     console.log('Error here →', err);

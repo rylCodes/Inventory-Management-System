@@ -14,13 +14,23 @@ const httpOptions = {
   providedIn: 'root'
 })
 export class PurchasesService {
-  private apiUrl = environment.baseUrl;
+  private guestApiUrl = 'https://guest-invenia-api.azurewebsites.net/'
+  private defaultApiUrl = environment.baseUrl;
+  private apiUrl: string = '';
+
   private bills: PurchaseBill[] = [];
   private items: PurchaseItem[] = [];
   private billsSubject: BehaviorSubject<PurchaseBill[]> = new BehaviorSubject<PurchaseBill[]>([]);
   private hasFetchedData: boolean = false;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) { 
+    const guestMode = localStorage.getItem('guestMode');
+    if (guestMode) {
+      this.apiUrl = this.guestApiUrl;
+    } else {
+      this.apiUrl = this.defaultApiUrl;
+    };
+  }
   
   handlePurchaseError(error:any) {
     console.log('Error here →', error);

@@ -40,8 +40,4 @@ export class UiService {
       {positionClass: 'toast-top-center'}
     ); 
   }
-  
-  getAppVersion() {
-
-  }
 }

@@ -14,7 +14,10 @@ const httpOptions = {
   providedIn: 'root'
 })
 export class SalesService {
-  private apiUrl = environment.baseUrl;
+  private guestApiUrl = 'https://guest-invenia-api.azurewebsites.net/'
+  private defaultApiUrl = environment.baseUrl;
+  private apiUrl: string = '';
+
   private saleBills: SaleBill[] = [];
   private saleItems: SaleItem[] = [];
   private saleBillsSubject: BehaviorSubject<SaleBill[]> = new BehaviorSubject<SaleBill[]>([]);
@@ -22,7 +25,14 @@ export class SalesService {
   private hasFetchedBills: boolean = false;
   private serviceStatusSubject: Subject<boolean> = new Subject<boolean>();
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) { 
+    const guestMode = localStorage.getItem('guestMode');
+    if (guestMode) {
+      this.apiUrl = this.guestApiUrl;
+    } else {
+      this.apiUrl = this.defaultApiUrl;
+    };
+  }
   
   handleSaleError(err:any) {
     console.log('Error here →:', err);

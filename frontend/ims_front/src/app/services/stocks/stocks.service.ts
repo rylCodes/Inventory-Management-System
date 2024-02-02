@@ -17,10 +17,20 @@
     private stocks: Stock[] = [];
     private stocksSubject: BehaviorSubject<Stock[]> = new BehaviorSubject<Stock[]>([]);
     private hasFetchedData: boolean = false;
-    private apiUrl = environment.baseUrl;
-    searchQuery: string = "SD";
+    private guestApiUrl = 'https://guest-invenia-api.azurewebsites.net/'
+    private defaultApiUrl = environment.baseUrl;
+    private apiUrl: string = '';
 
-    constructor(private http: HttpClient) { }
+    searchQuery: string = "";
+
+    constructor(private http: HttpClient) { 
+      const guestMode = localStorage.getItem('guestMode');
+      if (guestMode) {
+        this.apiUrl = this.guestApiUrl;
+      } else {
+        this.apiUrl = this.defaultApiUrl;
+      };
+    }
 
     handleStockError(error:any) {
       console.log('Error here →', error);

@@ -15,9 +15,19 @@ const httpOptions = {
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = environment.baseUrl;
+  private guestApiUrl = 'https://guest-invenia-api.azurewebsites.net/'
+  private defaultApiUrl = environment.baseUrl;
 
-  constructor(private http: HttpClient, private toastrService: ToastrService) { }
+  private apiUrl: string = '';
+
+  constructor(private http: HttpClient, private toastrService: ToastrService) {
+    const guestMode = localStorage.getItem('guestMode');
+    if (guestMode) {
+      this.apiUrl = this.guestApiUrl;
+    } else {
+      this.apiUrl = this.defaultApiUrl;
+    }
+   }
 
   handleLoginError(error: any): void {
     if (error.error.error) {
@@ -55,13 +65,14 @@ export class AuthService {
   }
 
   getUserName(): string | null {
-    return localStorage.getItem('user');
+    return localStorage.getItem('user') || 'Guest';
   }
 
   clearToken(): void {
     localStorage.removeItem("authToken");
     localStorage.removeItem("user");
     localStorage.removeItem("is_staff");
+    localStorage.removeItem("guestMode");
   }
 
   setToken(token: string): void {
@@ -69,7 +80,7 @@ export class AuthService {
   }
 
   isAuthenticated() {
-    return localStorage.getItem("authToken") !== null;
+    return localStorage.getItem("authToken") !== null || localStorage.getItem('guestMode') === 'true';
   }
 
 // AuthService class ends here

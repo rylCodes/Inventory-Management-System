@@ -15,12 +15,22 @@ const httpOptions = {
 })
 export class OwnerService {
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) { 
+    const guestMode = localStorage.getItem('guestMode');
+    if (guestMode) {
+      this.apiUrl = this.guestApiUrl;
+    } else {
+      this.apiUrl = this.defaultApiUrl;
+    }
+  }
   private owners: Owner[] = [];
   private ownersSubject: BehaviorSubject<Owner[]> = new BehaviorSubject<Owner[]>([]);
   private hasFetchedData: boolean = false;
 
-  private apiUrl = environment.baseUrl;
+  private guestApiUrl = 'https://guest-invenia-api.azurewebsites.net/'
+  private defaultApiUrl = environment.baseUrl;
+  private apiUrl: string = '';
+
   searchQuery: string | null = null;
 
   handleOwnerError(error:any) {

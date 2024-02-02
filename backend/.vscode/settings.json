@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "undefined/subscriptions/ac897c7d-94ca-448b-bd86-3f20130c3a0f/resourceGroups/guest-api/providers/Microsoft.Web/sites/guest-invenia-api",
+    "appService.deploySubpath": "."
+}

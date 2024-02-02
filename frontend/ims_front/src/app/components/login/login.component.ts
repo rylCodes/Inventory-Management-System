@@ -57,4 +57,15 @@ export class LoginComponent implements OnInit {
         },
     });
   }
+
+  logInAsGuest() {
+    localStorage.setItem('guestMode', 'true');
+    this.router.navigate(['']);
+    this.toastrService
+    .info(
+      "Keep in mind that any modifications you make here may be reset or altered by others.",
+      "Guest login successful",
+      { timeOut: 7000, }
+    );
+  }
 }

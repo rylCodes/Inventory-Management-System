@@ -16,13 +16,23 @@ const httpOptions = {
 })
 export class SuppliersService {
 
-  constructor(private http: HttpClient, private toastrService: ToastrService) { }
+  constructor(private http: HttpClient, private toastrService: ToastrService) { 
+    const guestMode = localStorage.getItem('guestMode');
+    if (guestMode) {
+      this.apiUrl = this.guestApiUrl;
+    } else {
+      this.apiUrl = this.defaultApiUrl;
+    };
+  }
 
   private suppliers: Supplier[] = [];
   private suppliersSubject: BehaviorSubject<Supplier[]> = new BehaviorSubject<Supplier[]>([]);
   private hasFetchedData: boolean = false;
 
-  private apiUrl = environment.baseUrl;
+  private guestApiUrl = 'https://guest-invenia-api.azurewebsites.net/'
+  private defaultApiUrl = environment.baseUrl;
+  private apiUrl: string = '';
+
   searchQuery: string | null = null;
 
   handleSupplierError(error:any) {

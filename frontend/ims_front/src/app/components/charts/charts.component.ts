@@ -55,7 +55,7 @@ export class ChartsComponent implements OnInit, OnDestroy {
     if (this.accumulatedSales.length > 0 || this.accumulatedPurchases.length > 0) {
       this.initializeBarChart();
     } else {
-
+      this.barChart = undefined;
     };
   }
 
@@ -68,12 +68,16 @@ export class ChartsComponent implements OnInit, OnDestroy {
 
       if (this.accumulatedSales.length > 0 || this.accumulatedPurchases.length > 0) {
         this.initializeBarChart();
+      } else {
+        this.barChart = undefined;
       };
   }
 
   loadStocks() {        
     if (this.stocks.length > 0) {
       this.initializePieChart();
+    } else {
+      this.pieChart = undefined;
     };
   }
 

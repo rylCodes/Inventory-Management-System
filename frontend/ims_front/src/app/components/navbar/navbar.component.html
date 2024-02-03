@@ -72,6 +72,14 @@
             <p class="ml-3">Sales</p>
         </a>
 
+        <a class="flex items-center px-4 py-3 hover:bg-neutral-800 hover:text-white hover:font-semibold transition-all duration-300"
+            routerLink="/profile"
+            routerLinkActive="bg-neutral-800"
+            [routerLinkActiveOptions]="{exact: true}">
+            <fa-icon [icon]="faAddressCard"></fa-icon>
+            <p class="ml-3">Profile</p>
+        </a>
+
         <!-- Logout Button -->
         <div class="flex items-center px-4 py-3 hover:bg-neutral-800 hover:text-white hover:font-semibold w-full cursor-pointer" (click)="toggleLogOutActionModal()">
             <fa-icon [icon]="logOutIcon"></fa-icon>

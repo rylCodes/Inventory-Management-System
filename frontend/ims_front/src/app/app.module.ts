@@ -37,6 +37,7 @@ import { LoaderComponent } from './components/loader/loader.component';
 import { ModalComponent } from './components/modal/modal.component';
 import { SearchBarComponent } from './components/search-bar/search-bar.component';
 import { ChartsComponent } from './components/charts/charts.component';
+import { ProfileComponent } from './components/profile/profile.component';
 
 const appRoutes: Routes = [
   {path: 'login', component: LoginComponent},
@@ -48,6 +49,7 @@ const appRoutes: Routes = [
   {path: 'purchases', component: PurchasesComponent, canActivate: [authGuard]},
   {path: 'sales', component: SalesComponent, canActivate: [authGuard]},
   {path: 'about', component: AboutComponent, canActivate: [authGuard]},
+  {path: 'profile', component: ProfileComponent, canActivate: [authGuard]},
 ]
 
 @NgModule({
@@ -71,6 +73,7 @@ const appRoutes: Routes = [
     ModalComponent,
     SearchBarComponent,
     ChartsComponent,
+    ProfileComponent,
   ],
   imports: [
     MatIconModule,

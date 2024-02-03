@@ -121,7 +121,7 @@
             </tbody>
         </table>
         <!-- When no items to show. -->
-        <div class="w-full h-[5vh]" *ngIf="!noSuppliersToShow && !isFetching">
+        <div class="w-full h-[5vh]" *ngIf="noSuppliersToShow && !isFetching">
             <p class="text-center my-4">No suppliers.</p>
         </div>
         <!-- While fetching data. -->

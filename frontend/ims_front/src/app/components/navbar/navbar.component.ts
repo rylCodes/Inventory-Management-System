@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 
 import {
   faMagnifyingGlass, faTimes, faHouse, faBoxesStacked,
-  faList, faDesktop, faCreditCard, faCircleInfo,
+  faList, faDesktop, faCreditCard, faCircleInfo, faAddressCard,
   faBoxesPacking, faXmark, faRightFromBracket, faMoneyBillTrendUp,
 } from '@fortawesome/free-solid-svg-icons';
 
@@ -34,6 +34,7 @@ export class NavbarComponent {
   faCircleInfo = faCircleInfo;
   logOutIcon = faRightFromBracket;
   faXmark = faXmark;
+  faAddressCard = faAddressCard;
 
   searchQuery: string= "";
   filterText: string= "";

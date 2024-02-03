@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import {
   faRightFromBracket, faXmark, faUserCircle, faBell, faBars, faEllipsis,
-  faMagnifyingGlass, faTimes, faHouse, faBoxesStacked, faList, faCheck,
+  faMagnifyingGlass, faTimes, faHouse, faBoxesStacked, faList, faCheck, faAddressCard,
   faDesktop, faMoneyBillTrendUp, faCreditCard, faCircleInfo, faBoxesPacking, faTrashCan
 } from '@fortawesome/free-solid-svg-icons';
 import { StocksService } from 'src/app/services/stocks/stocks.service';
@@ -72,6 +72,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   faEllipsis = faEllipsis;
   faCheck = faCheck;
   faTrashCan = faTrashCan;
+  faAddressCard = faAddressCard;
 
   showLogOutActionModal: boolean = false;
   showDelAllNotifModal: boolean = false;

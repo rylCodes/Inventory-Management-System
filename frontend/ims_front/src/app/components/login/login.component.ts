@@ -60,7 +60,7 @@ export class LoginComponent implements OnInit {
 
   logInAsGuest() {
     localStorage.setItem('guestMode', 'true');
-    this.router.navigate(['']);
+    location.href = '/';
     this.toastrService
     .info(
       "Keep in mind that any modifications you make here may be reset or altered by others.",

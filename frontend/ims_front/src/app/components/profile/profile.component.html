@@ -2,66 +2,91 @@
     <!-- HEADING -->
     <div class="flex justify-between mt-4 lg:mt-8">
         <h1 class="font-bold text-2xl lg:text-3xl">BUSINESS PROFILE</h1>
+        <!-- ADD BUTTON -->
+        <button *ngIf="profiles.length < 1"
+                [ngClass]="isFormOpen? 'bg-red-600 hover:bg-red-500': 'bg-green-700 hover:bg-green-600'"
+                (click)="toggleForm()">
+            {{isFormOpen? 'Cancel': 'Create'}}
+        </button>
     </div>
     <hr class="border-b-1 border-neutral-900 mt-4">
 
-    <div class="w-full shadow-xl text-base mt-4 md:text-lg lg:mt-8">
+    <div *ngIf="profiles.length < 1 && !isFormOpen" class="w-full mt-4 lg:mt-8">
+        <p class="text-center p-4">No business details to show.</p>
+    </div>
+
+    <div *ngIf="profiles.length === 1" class="w-full shadow-xl text-base mt-4 md:text-lg lg:mt-8">
         <ul class="w-full border-2 border-neutral-800">
             <li class="flex w-full border-b-2 border-neutral-800">
-                <span class="font-bold flex items-center px-3 py-1.5 w-1/3 border-r-2 border-neutral-800">First Name</span>
-                <div class="flex items-center w-2/3 px-3 py-1.5">
-                    <span class="flex-1">Alwin</span>
-                    <span class="cursor-pointer text-sm text-green-700">
-                        <fa-icon [icon]="faPen"></fa-icon>
-                    </span>
-                </div>
+                <p class="font-bold flex items-center px-3 py-1.5 w-1/3 border-r-2 border-neutral-800">First Name</p>
+                <p class="flex-1">{{profiles[0].first_name}}</p>
             </li>
             <li class="flex w-full border-b-2 border-neutral-800">
-                <span class="font-bold flex items-center px-3 py-1.5 w-1/3 border-r-2 border-neutral-800">Last Name</span>
-                <div class="flex items-center w-2/3 px-3 py-1.5">
-                    <span class="flex-1">De Leon</span>
-                    <span class="cursor-pointer text-sm text-green-700">
-                        <fa-icon [icon]="faPen"></fa-icon>
-                    </span>
-                </div>
+                <p class="font-bold flex items-center px-3 py-1.5 w-1/3 border-r-2 border-neutral-800">Last Name</p>
+                <p class="flex-1">{{profiles[0].last_name}}</p>
             </li>
             <li class="flex w-full border-b-2 border-neutral-800">
-                <span class="font-bold flex items-center px-3 py-1.5 w-1/3 border-r-2 border-neutral-800">Business Name</span>
-                <div class="flex items-center w-2/3 px-3 py-1.5">
-                    <span class="flex-1">Aladin's Food Hub</span>
-                    <span class="cursor-pointer text-sm text-green-700">
-                        <fa-icon [icon]="faPen"></fa-icon>
-                    </span>
-                </div>
+                <p class="font-bold flex items-center px-3 py-1.5 w-1/3 border-r-2 border-neutral-800">Business Name</p>
+                <p class="flex-1">{{profiles[0].business_name}}</p>
             </li>
             <li class="flex w-full border-b-2 border-neutral-800">
-                <span class="font-bold flex items-center px-3 py-1.5 w-1/3 border-r-2 border-neutral-800">Business Address</span>
-                <div class="flex items-center w-2/3 px-3 py-1.5">
-                    <span class="flex-1">Valley Gold, Cainta, Rizal</span>
-                    <span class="cursor-pointer text-sm text-green-700">
-                        <fa-icon [icon]="faPen"></fa-icon>
-                    </span>
-                </div>
+                <p class="font-bold flex items-center px-3 py-1.5 w-1/3 border-r-2 border-neutral-800">Business Address</p>
+                <p class="flex-1">{{profiles[0].business_address}}</p>
             </li>
             <li class="flex w-full border-b-2 border-neutral-800">
-                <span class="font-bold flex items-center px-3 py-1.5 w-1/3 border-r-2 border-neutral-800">Phone</span>
-                <div class="flex items-center w-2/3 px-3 py-1.5">
-                    <span class="flex-1">09123456789</span>
-                    <span class="cursor-pointer text-sm text-green-700">
-                        <fa-icon [icon]="faPen"></fa-icon>
-                    </span>
-                </div>
+                <p class="font-bold flex items-center px-3 py-1.5 w-1/3 border-r-2 border-neutral-800">Phone</p>
+                <p class="flex-1">{{profiles[0].phone}}</p>
             </li>
             <li class="flex w-full border-neutral-800">
-                <span class="font-bold flex items-center px-3 py-1.5 w-1/3 border-r-2 border-neutral-800">Email</span>
-                <div class="flex items-center w-2/3 px-3 py-1.5">
-                    <span class="flex-1">sample@email.com</span>
-                    <span class="cursor-pointer text-sm text-green-700">
-                        <fa-icon [icon]="faPen"></fa-icon>
-                    </span>
-                </div>
+                <p class="font-bold flex items-center px-3 py-1.5 w-1/3 border-r-2 border-neutral-800">Email</p>
+                <p class="flex-1">{{profiles[0].email}}</p>
             </li>
         </ul>
+    </div>
+
+    <div *ngIf="isFormOpen" class="bg-white shadow-lg rounded-lg p-6 w-full max-w-3xl mx-auto mt-4 lg:mt-8">
+        <h3 class="text-center text-xl font-bold">Creating Business Profile</h3>
+        <form class="flex flex-col w-full text-neutral-900" (ngSubmit)="createProfile(profileForm)" #profileForm="ngForm">
+            <input #firstName="ngModel" class="uppercase placeholder:capitalize mt-6 border border-neutral-900 px-4 py-2 rounded-sm"
+                [(ngModel)]="profile.first_name"
+                type="text" name="first-name" id="first-name" required placeholder="First name*">
+            <small *ngIf="!firstName.value && firstName.dirty" class="text-red-600">This field is required.</small>
+
+            <input #lastName="ngModel" class="uppercase placeholder:capitalize mt-6 border border-neutral-900 px-4 py-2 rounded-sm"
+                [(ngModel)]="profile.last_name"
+                type="text" name="last-name" id="last-name" required placeholder="Last name*">
+            <small *ngIf="!lastName.value && lastName.dirty" class="text-red-600">This field is required.</small>
+
+            <input #businessName="ngModel" class="uppercase placeholder:capitalize mt-6 border border-neutral-900 px-4 py-2 rounded-sm"
+                [(ngModel)]="profile.business_name"
+                type="text" name="busines-name" id="business-name" required placeholder="Business name*">
+            <small *ngIf="!businessName.value && businessName.dirty" class="text-red-600">This field is required.</small>
+
+            <input #businessAddress="ngModel" class="uppercase placeholder:capitalize mt-6 border border-neutral-900 px-4 py-2 rounded-sm"
+                [(ngModel)]="profile.business_address"
+                type="text" name="business-address" id="business-address" required placeholder="Business address*">
+            <small *ngIf="!businessAddress.value && businessAddress.dirty" class="text-red-600">This field is required.</small>
+
+            <input #phone="ngModel" class="mt-6 border border-neutral-900 px-4 py-2 rounded-sm"
+                [(ngModel)]="profile.phone"
+                type="text" name="phone" id="phone" required placeholder="Phone no.*">
+            <small *ngIf="!phone.value && phone.dirty" class="text-red-600">This field is required.</small>
+
+            <input #email="ngModel" class="mt-6 border border-neutral-900 px-4 py-2 rounded-sm"
+                [(ngModel)]="profile.email"
+                type="email" name="email" id="email" required email placeholder="Email address*">
+            <small *ngIf="!email.value && email.dirty || email.touched && email.invalid" class="text-red-600">
+                Enter valid email. This field is required.
+            </small>
+
+            <div class="w-full mt-8">
+                <button [disabled]="profileForm.invalid"
+                    [ngClass]="{'opacity-50': profileForm.invalid}"
+                    class="w-full px-4 py-2 rounded-md bg-green-700 hover:bg-green-600" type="submit">
+                    Save
+                </button>
+            </div>
+        </form>
     </div>
 
     <!-- CSS Loader -->

@@ -207,7 +207,7 @@ class NotificationDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = NotificationSerializer
 
 # Owner views
-class OwnerList(generics.ListAPIView):
+class OwnerList(generics.ListCreateAPIView):
     queryset = Owner.objects.all()
     serializer_class = OwnerSerializer
 

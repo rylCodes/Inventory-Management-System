@@ -25,7 +25,7 @@ export class ProfileComponent implements OnInit, AfterViewInit {
 
   isLoading: boolean = false;
   isFormOpen: boolean = false;
-  isProfileExist = false;
+  isUpdating: boolean = false;
 
   faXmark = faXmark;
   faPen = faPen;
@@ -63,17 +63,16 @@ export class ProfileComponent implements OnInit, AfterViewInit {
   ) { }
 
   ngOnInit(): void {
-    // this.isLoading = true;
+    this.isLoading = true;
     this.ownerService.getOwners()
     .subscribe({
       next: (data) => {
         this.isLoading = false;
         this.profiles = data;
-        this.isProfileExist = true;
+        this.isFormOpen = false;
       },
       error: (error) => {
         this.isLoading = false;
-        this.isProfileExist = false;
         this.uiService.displayErrorMessage(error);
       }
     })
@@ -85,6 +84,18 @@ export class ProfileComponent implements OnInit, AfterViewInit {
 
   toggleForm() {
     this.isFormOpen = !this.isFormOpen;
+  }
+
+  toggleUpdating() {
+    this.isUpdating = !this.isUpdating;
+  }
+
+  onSubmit(profileForm: NgForm) {
+    if (this.isUpdating) {
+      this.confirmEdit();
+    } else {
+      this.createProfile(profileForm);
+    }
   }
 
   createProfile(profileForm: NgForm) {
@@ -106,6 +117,7 @@ export class ProfileComponent implements OnInit, AfterViewInit {
       next: (data) => {
         this.profiles.push(data);
         profileForm.reset();
+        this.toggleForm();
         this.toastr.success("Business profile has been successfully saved")
       },
       error: (error) => {
@@ -114,13 +126,17 @@ export class ProfileComponent implements OnInit, AfterViewInit {
     })
   }
 
-  editProfile(profile: Owner) {
-    this.profile = {...profile};
-    this.originalProfile = {...profile};
-    this.isFormOpen = true;
+  editProfile() {
+    this.toggleUpdating();
+    this.toggleForm();
+    this.profile = {...this.profiles[0]};
+    this.originalProfile = {...this.profiles[0]};
+  }
 
+  confirmEdit() {
     if (JSON.stringify(this.profile) === JSON.stringify(this.originalProfile)) {
       this.toggleForm();
+      this.toggleUpdating();
       return;
     };
 
@@ -140,6 +156,8 @@ export class ProfileComponent implements OnInit, AfterViewInit {
         const index = this.profiles.findIndex(profileData => profileData.id === data.id);
         this.profiles[index] = data;
         this.toggleForm();
+        this.toggleUpdating();
+        this.toastr.success("Business profile has been successfully updated.")
       },
       error: (error) => {
         this.isLoading = false;

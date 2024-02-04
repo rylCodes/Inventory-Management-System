@@ -348,14 +348,14 @@
                             </p>
                         </div>
                     </div>
-                    <div class="flex justify-between mt-8 text-xxs lg:text-xs">
+                    <div class="flex flex-col justify-between gap-1 mt-8 text-xxs lg:text-xs sm:flex-row">
                         <div class="flex items-center space-x-1">
                             <fa-icon [icon]="faPhone"></fa-icon>
                             <span>{{owner.phone}}</span>
                         </div>
                         <div class="flex items-center  space-x-1">
                             <fa-icon [icon]="faLocationDot"></fa-icon>
-                            <span>Valleygolf, Cainta, Rizal</span>
+                            <span>{{owner.business_address}}</span>
                         </div>
                         <div class="flex items-center space-x-1">
                             <fa-icon [icon]="faEnvelope"></fa-icon>

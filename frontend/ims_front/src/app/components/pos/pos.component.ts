@@ -393,6 +393,10 @@ export class PosComponent implements OnInit, AfterContentChecked {
     .subscribe({
       next: owners => {
         this.owner = owners[0];
+
+        if (owners.length === 0) {
+          this.toastrService.warning('Please create a business profile for the invoice details', undefined, { timeOut: 7000, });
+        };
       },
       error: err => console.log(err)
     })
@@ -817,8 +821,8 @@ export class PosComponent implements OnInit, AfterContentChecked {
       if (this.saleBill.amount_tendered < this.saleBill.grand_total) {
         this.toastrService.error("Invalid amount tendered!");
         return;
-      }
-    }
+      };
+    };
 
     const saleItems = Array.from(this.saleItems);
     const products = Array.from(this.products);
@@ -879,10 +883,16 @@ export class PosComponent implements OnInit, AfterContentChecked {
               this.stockService.editStock(stock).subscribe();
             });
 
-            // this.loadBills();
-            this.toggleInvoice();
-            this.toggleProceedPayment();
+            if (!this.owner) {
+              this.toastrService.warning('Please create a business profile for the invoice details', undefined, { timeOut: 7000, });
+              this.router.navigate(['profile']);
+              return;
+            } else {
+              this.toggleInvoice();
+            };
+
             this.addNotification();
+            this.toggleProceedPayment();
           } else {
             this.toastrService.error("No payable amount!");
             return;

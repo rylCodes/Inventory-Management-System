@@ -162,6 +162,12 @@ export class SalesComponent implements OnInit {
   }
 
   toggleInvoice(bill: SaleBill) {
+    if (!this.owner) {
+      this.toastrService.warning('Please create a business profile for the invoice details', undefined, { timeOut: 7000, });
+      this.router.navigate(['profile']);
+      return;
+    };
+
     this.bill = bill;
 
     this.eachBillItems = Array.from(this.allItems).filter(item => item.billno === this.bill.id);
@@ -253,6 +259,10 @@ export class SalesComponent implements OnInit {
       .subscribe({
         next: owners => {
           this.owner = owners[0];
+
+          if (owners.length === 0) {
+            this.toastrService.warning('Please create a business profile for the invoice details', undefined, { timeOut: 7000, });
+          };
         },
         error: (err) => console.log(err)
       });

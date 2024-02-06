@@ -45,9 +45,7 @@ export class LoginComponent implements OnInit {
       .subscribe({
         next: async () => {
           this.isLoading = false;
-          this.router.navigate(['']);
-          await this.uiService.wait(100);
-          this.toastrService.success("You've successfully logged in!", undefined, {positionClass: 'toast-top-center'})
+          location.href = '/';
               },
         error: (err) => {
           this.isLoading = false;
@@ -61,11 +59,5 @@ export class LoginComponent implements OnInit {
   logInAsGuest() {
     localStorage.setItem('guestMode', 'true');
     location.href = '/';
-    this.toastrService
-    .info(
-      "Keep in mind that any modifications you make here may be reset or altered by others.",
-      "Guest login successful",
-      { timeOut: 7000, }
-    );
   }
 }

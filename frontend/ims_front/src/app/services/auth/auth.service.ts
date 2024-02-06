@@ -54,7 +54,8 @@ export class AuthService {
           this.setToken(user.token);
           localStorage.setItem("user", user.first_name);
           localStorage.setItem("is_staff", user.is_staff);
-        }
+          this.toastrService.success("You've successfully logged in!", undefined, {positionClass: 'toast-top-center'});
+        };
         return user;
       })
     );

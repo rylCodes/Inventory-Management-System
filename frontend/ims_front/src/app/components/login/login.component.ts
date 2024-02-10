@@ -57,8 +57,8 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  logInAsGuest() {
-    this.authService.logInAsGuest();
+  async logInAsGuest() {
+    await this.authService.logInAsGuest();
     this.router.navigate(['']);
     this.toastrService
     .info(

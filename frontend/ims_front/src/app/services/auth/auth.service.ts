@@ -22,7 +22,7 @@ export class AuthService {
 
   constructor(private http: HttpClient, private toastrService: ToastrService) {
     this.handleAPIurl();
-   }
+  }
 
   handleLoginError(error: any): void {
     if (error.error.error) {
@@ -56,9 +56,11 @@ export class AuthService {
     );
   }
 
-  logInAsGuest() {
+  async logInAsGuest() {
     localStorage.setItem('guestMode', 'true');
-    this.handleAPIurl();
+    setTimeout(() => {
+      this.handleAPIurl();
+    }, 100);
   }
 
   getToken(): string | null {

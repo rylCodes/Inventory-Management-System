@@ -16,7 +16,7 @@ const httpOptions = {
 })
 export class AuthService {
   private guestApiUrl = 'https://guest-invenia-api.azurewebsites.net/'
-  private defaultApiUrl = 'https://inveniaplus-api.azurewebsites.net/';
+  private defaultApiUrl = environment.baseUrl;
 
   private apiUrlSubject = new BehaviorSubject<string>(this.defaultApiUrl);
   apiUrl$ = this.apiUrlSubject.asObservable();
@@ -38,7 +38,7 @@ export class AuthService {
   }
 
   login(form: {username: string, password: string}) {
-    return this.http.post<any>(this.apiUrlSubject + 'accounts/auth/', form, httpOptions).pipe(
+    return this.http.post<any>(this.defaultApiUrl + 'accounts/auth/', form, httpOptions).pipe(
       catchError((error) => {
         if (error) {
           this.handleLoginError(error);
@@ -50,6 +50,7 @@ export class AuthService {
           this.setToken(user.token);
           localStorage.setItem("user", user.first_name);
           localStorage.setItem("is_staff", user.is_staff);
+          console.log(this.apiUrl$);
         };
         return user;
       })
@@ -59,6 +60,7 @@ export class AuthService {
   async logInAsGuest() {
     this.apiUrlSubject.next(this.guestApiUrl);
     localStorage.setItem('guestMode', 'true');
+    console.log(this.apiUrl$);
   }
 
   getToken(): string | null {

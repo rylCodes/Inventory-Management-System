@@ -16,9 +16,6 @@ const httpOptions = {
 })
 export class OwnerService {
 
-  constructor(private http: HttpClient, private authService: AuthService) { 
-    this.authService.apiUrl$.subscribe(apiUrl => this.apiUrl = apiUrl);
-  }
   private owners: Owner[] = [];
   private ownersSubject: BehaviorSubject<Owner[]> = new BehaviorSubject<Owner[]>([]);
   private hasFetchedData: boolean = false;
@@ -26,6 +23,10 @@ export class OwnerService {
   private apiUrl: string = '';
 
   searchQuery: string | null = null;
+
+  constructor(private http: HttpClient, private authService: AuthService) { 
+    this.authService.apiUrl$.subscribe(apiUrl => this.apiUrl = apiUrl);
+  }
 
   handleOwnerError(error:any) {
     console.log('Error here →', error);

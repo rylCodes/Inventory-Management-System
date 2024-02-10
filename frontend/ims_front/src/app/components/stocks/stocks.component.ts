@@ -211,7 +211,7 @@ export class StocksComponent implements OnInit {
       this.toastrService.error("Enter item unit!");
       return;
     } else if (!this.stock.qty_alert_level === null || this.stock.qty_alert_level < 0) {
-      this.toastrService.error("Invalid quantity alert level!");
+      this.toastrService.error("Invalid low stock alert level!");
       return;
     };
 

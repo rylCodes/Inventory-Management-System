@@ -19,11 +19,7 @@ const httpOptions = {
 export class NotificationsService {
   private apiUrl: string = '';
 
-  private notifications: Notification[] = [];
-  private notificationsSubject: BehaviorSubject<Notification[]> = new BehaviorSubject<Notification[]>([]);
   private serviceStatusSubject: Subject<boolean> = new Subject<boolean>();
-  private hasFetchedData: boolean = false;
-
   notifServiceStatus$ = this.serviceStatusSubject.asObservable();
 
   stocks: Stock[] = [];

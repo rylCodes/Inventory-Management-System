@@ -15,11 +15,6 @@ const httpOptions = {
   providedIn: 'root'
 })
 export class OwnerService {
-
-  private owners: Owner[] = [];
-  private ownersSubject: BehaviorSubject<Owner[]> = new BehaviorSubject<Owner[]>([]);
-  private hasFetchedData: boolean = false;
-
   private apiUrl: string = '';
 
   searchQuery: string | null = null;
@@ -47,21 +42,12 @@ export class OwnerService {
       params = params.set('search', this.searchQuery)
     };
 
-    if (this.hasFetchedData) {
-      return this.ownersSubject.asObservable();
-    } else {
-      return this.http.get<Owner[]>(`${this.apiUrl}ims-api/owners/`, { params: params}).pipe(
-        tap((owners) => {
-          this.owners = owners;
-          this.ownersSubject.next(owners);
-          this.hasFetchedData = true;
-        }),
-        catchError((err) => {
-          this.handleOwnerError(err);
-          return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to display owners!`)
-        })
-      );
-    };
+    return this.http.get<Owner[]>(`${this.apiUrl}ims-api/owners/`, { params: params}).pipe(
+      catchError((err) => {
+        this.handleOwnerError(err);
+        return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to display owners!`)
+      })
+    );
   }
 
   editOwner(updatedOwner: Owner): Observable<Owner> {

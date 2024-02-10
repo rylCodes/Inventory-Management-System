@@ -395,7 +395,7 @@ export class PosComponent implements OnInit, AfterContentChecked {
         this.owner = owners[0];
 
         if (owners.length === 0) {
-          this.toastrService.warning('Please create a business profile to enable invoice', undefined, { timeOut: 7000, });
+          this.toastrService.warning('Set up your business profile to enable the invoice feature.', undefined, { timeOut: 7000, });
         };
       },
       error: err => console.log(err)
@@ -884,7 +884,7 @@ export class PosComponent implements OnInit, AfterContentChecked {
             });
 
             if (!this.owner) {
-              this.toastrService.warning('Please create a business profile to enable invoice', undefined, { timeOut: 7000, });
+              this.toastrService.warning('Set up your business profile to enable the invoice feature.', undefined, { timeOut: 7000, });
               this.router.navigate(['profile']);
               return;
             } else {
@@ -949,19 +949,19 @@ export class PosComponent implements OnInit, AfterContentChecked {
   
     zeroStock.forEach(stock => {
       const content = `You're out of stock for the ${stock.stock_name}!`;
-      const warningType = "Zero quantity";
+      const warningType = "Zero Quantity";
       createAndAddNotification(content, warningType);
     });
 
     negativeStock.forEach(stock => {
       const content = `The ${stock.stock_name} stock level is negative!`;
-      const warningType = "Negative quantity";
+      const warningType = "Negative Quantity";
       createAndAddNotification(content, warningType);
     });
   
     lowStocks.forEach(stock => {
       const content = `${stock.quantity} ${stock.unit}/s of ${stock.stock_name} remaining.`;
-      const warningType = "Low quantity";
+      const warningType = "Low Quantity";
       createAndAddNotification(content, warningType);
     });
   }

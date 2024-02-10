@@ -163,7 +163,7 @@ export class SalesComponent implements OnInit {
 
   toggleInvoice(bill: SaleBill) {
     if (!this.owner) {
-      this.toastrService.warning('Please create a business profile for the invoice details', undefined, { timeOut: 7000, });
+      this.toastrService.warning('Set up your business profile to enable the invoice feature.', undefined, { timeOut: 7000, });
       this.router.navigate(['profile']);
       return;
     };

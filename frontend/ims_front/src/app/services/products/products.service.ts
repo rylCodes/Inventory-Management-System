@@ -18,10 +18,6 @@ const httpOptions = {
 export class ProductsService {
   private apiUrl: string = '';
 
-  private menus: Menu[] = [];
-  private menusSubject: BehaviorSubject<Menu[]> = new BehaviorSubject<Menu[]>([]);
-  private hasFetchedBills: boolean = false;
-
   constructor(private http: HttpClient, private authService: AuthService) { 
     this.authService.apiUrl$.subscribe(apiUrl => this.apiUrl = apiUrl);
   }
@@ -47,11 +43,6 @@ export class ProductsService {
     };
 
     return this.http.get<Menu[]>(`${this.apiUrl}ims-api/menus/`, { params }).pipe(
-      // tap((menus) => {
-      //   this.menus = menus;
-      //   this.menusSubject.next(menus);
-      //   this.hasFetchedBills = true;
-      // }),
       catchError((err) => {
         this.handleError(err);
         return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to display menu!`)

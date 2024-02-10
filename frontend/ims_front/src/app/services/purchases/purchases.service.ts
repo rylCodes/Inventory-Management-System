@@ -17,11 +17,6 @@ const httpOptions = {
 export class PurchasesService {
   private apiUrl: string = '';
 
-  private bills: PurchaseBill[] = [];
-  private items: PurchaseItem[] = [];
-  private billsSubject: BehaviorSubject<PurchaseBill[]> = new BehaviorSubject<PurchaseBill[]>([]);
-  private hasFetchedData: boolean = false;
-
   constructor(private http: HttpClient, private authService: AuthService) { 
     this.authService.apiUrl$.subscribe(apiUrl => this.apiUrl = apiUrl);
   }

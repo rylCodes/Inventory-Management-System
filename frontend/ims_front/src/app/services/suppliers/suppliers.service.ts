@@ -16,11 +16,6 @@ const httpOptions = {
   providedIn: 'root'
 })
 export class SuppliersService {
-
-  private suppliers: Supplier[] = [];
-  private suppliersSubject: BehaviorSubject<Supplier[]> = new BehaviorSubject<Supplier[]>([]);
-  private hasFetchedData: boolean = false;
-
   private apiUrl: string = '';
 
   searchQuery: string | null = null;
@@ -49,11 +44,6 @@ export class SuppliersService {
     };
 
     return this.http.get<Supplier[]>(`${this.apiUrl}ims-api/suppliers/`, { params }).pipe(
-      // tap((suppliers) => {
-      //   this.suppliers = suppliers;
-      //   this.suppliersSubject.next(suppliers);
-      //   this.hasFetchedData = true;
-      // }),
       catchError((err) => {
         this.handleSupplierError(err);
         return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to display suppliers!`)

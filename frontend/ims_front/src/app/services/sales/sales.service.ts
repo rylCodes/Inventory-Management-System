@@ -17,11 +17,6 @@ const httpOptions = {
 export class SalesService {
   private apiUrl: string = '';
 
-  private saleBills: SaleBill[] = [];
-  private saleItems: SaleItem[] = [];
-  private saleBillsSubject: BehaviorSubject<SaleBill[]> = new BehaviorSubject<SaleBill[]>([]);
-  private saleItemsSubject: BehaviorSubject<SaleItem[]> = new BehaviorSubject<SaleItem[]>([]);
-  private hasFetchedBills: boolean = false;
   private serviceStatusSubject: Subject<boolean> = new Subject<boolean>();
 
   constructor(private http: HttpClient, private authService: AuthService) { 
@@ -46,14 +41,9 @@ export class SalesService {
     let params = new HttpParams;
     if (searchQuery) {
       params = params.set('search', searchQuery)
-    }
+    };
     
     return this.http.get<SaleBill[]>(`${this.apiUrl}ims-api/sales-bill/`, { params }).pipe(
-      // tap((bills) => {
-      //   this.saleBills = bills;
-      //   this.saleBillsSubject.next(bills);
-      //   this.hasFetchedBills = true;
-      // }),
       catchError((err) => {
         this.handleSaleError(err);
         return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to display transactions!`)
@@ -94,10 +84,6 @@ export class SalesService {
 
   getSaleItems(): Observable<SaleItem[]> {
     return this.http.get<SaleItem[]>(`${this.apiUrl}ims-api/sales-item/`).pipe(
-      tap((items) => {
-        this.saleItems = items;
-        this.saleItemsSubject.next(items);
-      }),
       catchError((err) => {
         this.handleSaleError(err);
         return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to display items!`)

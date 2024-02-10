@@ -43,11 +43,6 @@ export class StocksService {
     };
 
     return this.http.get<Stock[]>(`${this.apiUrl}ims-api/stocks/`, { params}).pipe(
-      // tap((stocks) => {
-      //   this.stocks = stocks,
-      //   this.stocksSubject.next(stocks);
-      //   this.hasFetchedData = true;
-      // }),
       catchError((err) => {
         this.handleStockError(err);
         return throwError(() => `${err.statusText? err.statusText : 'An error occured'}: Failed to display stocks!`);

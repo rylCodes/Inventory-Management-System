@@ -49,7 +49,6 @@ export class AuthService {
           this.setToken(user.token);
           localStorage.setItem("user", user.first_name);
           localStorage.setItem("is_staff", user.is_staff);
-          this.toastrService.success("You've successfully logged in!", undefined, {positionClass: 'toast-top-center'});
         };
         return user;
       })
@@ -57,10 +56,8 @@ export class AuthService {
   }
 
   async logInAsGuest() {
+    this.apiUrl = this.guestApiUrl;
     localStorage.setItem('guestMode', 'true');
-    setTimeout(() => {
-      this.handleAPIurl();
-    }, 100);
   }
 
   getToken(): string | null {

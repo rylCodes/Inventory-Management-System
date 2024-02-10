@@ -46,7 +46,7 @@ export class LoginComponent implements OnInit {
         next: async () => {
           this.isLoading = false;
           location.href = '/';
-              },
+          },
         error: (err) => {
           this.isLoading = false;
           console.error(err);

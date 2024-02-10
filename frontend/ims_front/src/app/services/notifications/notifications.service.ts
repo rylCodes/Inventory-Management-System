@@ -17,8 +17,6 @@ const httpOptions = {
   providedIn: 'root'
 })
 export class NotificationsService {
-  private guestApiUrl = 'https://guest-invenia-api.azurewebsites.net/'
-  private defaultApiUrl = environment.baseUrl
   private apiUrl: string = '';
 
   private notifications: Notification[] = [];
@@ -31,7 +29,6 @@ export class NotificationsService {
   stocks: Stock[] = [];
 
   constructor(private http: HttpClient, private authService: AuthService) { 
-    // const guestMode = localStorage.getItem('guestMode');
     this.authService.apiUrl$.subscribe(apiUrl => this.apiUrl = apiUrl);
   }
 

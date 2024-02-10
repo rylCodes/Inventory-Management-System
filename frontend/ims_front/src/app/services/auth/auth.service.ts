@@ -16,7 +16,7 @@ const httpOptions = {
 })
 export class AuthService {
   private guestApiUrl = 'https://guest-invenia-api.azurewebsites.net/'
-  private defaultApiUrl = environment.baseUrl;
+  private defaultApiUrl = 'https://inveniaplus-api.azurewebsites.net/';
 
   private apiUrlSubject = new BehaviorSubject<string>(this.defaultApiUrl);
   apiUrl$ = this.apiUrlSubject.asObservable();

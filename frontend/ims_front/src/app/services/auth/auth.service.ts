@@ -56,6 +56,11 @@ export class AuthService {
     );
   }
 
+  logInAsGuest() {
+    localStorage.setItem('guestMode', 'true');
+    this.handleAPIurl();
+  }
+
   getToken(): string | null {
     return localStorage.getItem("authToken");
   }

@@ -46,6 +46,7 @@ export class LoginComponent implements OnInit {
         next: async () => {
           this.isLoading = false;
           this.router.navigate(['']);
+          this.toastrService.success("You've successfully logged in");
           },
         error: (err) => {
           this.isLoading = false;
@@ -57,7 +58,13 @@ export class LoginComponent implements OnInit {
   }
 
   logInAsGuest() {
-    localStorage.setItem('guestMode', 'true');
+    this.authService.logInAsGuest();
     this.router.navigate(['']);
+    this.toastrService
+    .info(
+      "Keep in mind that any modifications you make here may be reset or altered by others.",
+      "Guest login successful",
+      { timeOut: 7000, }
+    );
   }
 }

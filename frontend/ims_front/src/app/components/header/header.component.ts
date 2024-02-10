@@ -136,15 +136,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     // this.loadStocks();
     this.loadNotifications();
-    
-    if (localStorage.getItem('guestMode') === 'true') {
-      this.toastrService
-      .info(
-        "Keep in mind that any modifications you make here may be reset or altered by others.",
-        "Guest login successful",
-        { timeOut: 7000, }
-      );
-    };
   }
 
   ngOnDestroy(): void {

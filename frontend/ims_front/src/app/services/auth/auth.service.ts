@@ -50,7 +50,6 @@ export class AuthService {
           this.setToken(user.token);
           localStorage.setItem("user", user.first_name);
           localStorage.setItem("is_staff", user.is_staff);
-          console.log(this.apiUrl$);
         };
         return user;
       })
@@ -60,7 +59,6 @@ export class AuthService {
   async logInAsGuest() {
     this.apiUrlSubject.next(this.guestApiUrl);
     localStorage.setItem('guestMode', 'true');
-    console.log(this.apiUrl$);
   }
 
   getToken(): string | null {

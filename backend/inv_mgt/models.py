@@ -28,6 +28,7 @@ class Stock(models.Model):
     date_added = models.DateTimeField(default=timezone.now)
     date_updated = models.DateTimeField(auto_now=True)
     status = models.BooleanField(choices=STATUS_CHOICES, default=True)
+    qty_alert_level = models.FloatField(default=0)
     show_notification = models.BooleanField(default=True)
 
     def __str__(self):

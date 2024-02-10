@@ -95,8 +95,8 @@
                                 class="hover:bg-[rgba(0,0,0,0.1)] p-2 whitespace-nowrap text-ellipsis overflow-hidden transition-all duration-300">
                                 <p class="whitespace-pre-wrap">
                                     <span class="font-semibold" [ngClass]="{
-                                            'text-[#ffa500]': notif.warning_type === 'Low stock level',
-                                            'text-[#ff0000]': notif.warning_type === 'Critical stock level',
+                                            'text-[#ffa500]': notif.warning_type === 'Low quantity',
+                                            'text-[#ff0000]': notif.warning_type === 'Zero quantity' || notif.warning_type === 'Negative quantity',
                                             }">
                                         {{notif.warning_type}}:
                                     </span>

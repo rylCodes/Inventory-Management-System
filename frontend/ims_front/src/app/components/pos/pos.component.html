@@ -30,7 +30,7 @@
                     <fa-icon class="cursor-pointer" [icon]="faMinus" (click)="decreaseQtyInput()"></fa-icon>
                     <input appSelectAllText
                         class="text-center uppercase border border-neutral-900 px-1 py-0.5    rounded-sm mt-1 w-2/3"
-                        type="number" name="quantity" id="quantity" [(ngModel)]="saleItem.quantity">
+                        type="number" name="quantity" id="quantity" [(ngModel)]="saleItem.quantity" min="0">
                     <fa-icon class="cursor-pointer" [icon]="faPlus" (click)="increaseQtyInput()"></fa-icon>
                 </div>
             </div>
@@ -115,7 +115,7 @@
             <!-- BILL DIV -->
             <div *ngIf="updatingOrder"
                 class="bg-[#fff] self-start h-auto mx-auto p-4 rounded-lg shadow-xl text-neutral-900 mt-4 w-full md:flex-1">
-                <form class="flex flex-col">
+                <div class="flex flex-col">
                     <h3 for="saleBill.customer_name">TRN Code:</h3>
                     <p class="uppercase border border-neutral-900 px-1 py-0.5 rounded-sm mt-1 text-center">
                         {{saleBill.billno}}
@@ -149,7 +149,7 @@
                             Checkout
                         </button>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
 
@@ -260,7 +260,7 @@
                 <label class="mt-4" for="amount_tendered">Amount Tendered:</label>
                 <input appSelectAllText class="text-end uppercase border border-neutral-900 px-2 py-1 rounded-sm mt-1"
                     type="number" name="amount_tendered" id="amount_tendered" [(ngModel)]="saleBill.amount_tendered"
-                    (input)="onAmountTenderedChange()">
+                    (input)="onAmountTenderedChange()" min="0">
 
                 <h4 class="mt-4">Change:</h4>
                 <p class="text-end uppercase bg-blue-50 border border-neutral-900 px-2 py-1 rounded-sm mt-1">

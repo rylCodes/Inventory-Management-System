@@ -912,8 +912,9 @@ export class PosComponent implements OnInit, AfterContentChecked {
   addNotification() {
     const currentDate = new Date();
     const currentDay = currentDate.getDay();
-    const critStocks = this.stocksToCheck.filter(stock => stock.quantity <= 60);
-    const lowStocks = this.stocksToCheck.filter(stock => stock.quantity <= 120 && stock.quantity > 60);
+    const zeroStock = this.stocksToCheck.filter(stock => stock.quantity === 0);
+    const negativeStock = this.stocksToCheck.filter(stock => stock.quantity < 0);
+    const lowStocks = this.stocksToCheck.filter(stock => stock.quantity <= stock.qty_alert_level && stock.quantity > 0);
   
     const createAndAddNotification = (content: string, warningType:string) => {
       const notifExists = this.notifications.some(notif => {
@@ -946,15 +947,21 @@ export class PosComponent implements OnInit, AfterContentChecked {
       }
     };
   
-    critStocks.forEach(stock => {
-      const content = `${stock.quantity} ${stock.unit}/s of ${stock.stock_name} remaining.`;
-      const warningType = "Critical stock level";
+    zeroStock.forEach(stock => {
+      const content = `You're out of stock for the ${stock.stock_name}!`;
+      const warningType = "Zero quantity";
+      createAndAddNotification(content, warningType);
+    });
+
+    negativeStock.forEach(stock => {
+      const content = `The ${stock.stock_name} stock level is negative!`;
+      const warningType = "Negative quantity";
       createAndAddNotification(content, warningType);
     });
   
     lowStocks.forEach(stock => {
       const content = `${stock.quantity} ${stock.unit}/s of ${stock.stock_name} remaining.`;
-      const warningType = "Low stock level";
+      const warningType = "Low quantity";
       createAndAddNotification(content, warningType);
     });
   }

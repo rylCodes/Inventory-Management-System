@@ -82,6 +82,7 @@ export class StocksComponent implements OnInit {
     quantity: 0,
     unit: "",
     status: true,
+    qty_alert_level: 0,
     show_notification: true,
   }
 
@@ -93,6 +94,7 @@ export class StocksComponent implements OnInit {
     quantity: 0,
     unit: "",
     status: true,
+    qty_alert_level: 0,
     show_notification: true,
   }
 
@@ -133,6 +135,7 @@ export class StocksComponent implements OnInit {
       quantity: 0,
       unit: "",
       status: true,
+      qty_alert_level: 0,
       show_notification: true,
     }
 
@@ -207,11 +210,14 @@ export class StocksComponent implements OnInit {
     } else if (!this.stock.unit) {
       this.toastrService.error("Enter item unit!");
       return;
-    }
+    } else if (!this.stock.qty_alert_level === null || this.stock.qty_alert_level < 0) {
+      this.toastrService.error("Invalid quantity alert level!");
+      return;
+    };
 
     if (this.stock.unit === "otherUnit" && this.customUnit) {
       this.stock.unit = this.customUnit;
-    }
+    };
 
     const newStock = {
       ...this.stock,
@@ -259,6 +265,9 @@ export class StocksComponent implements OnInit {
       return;
     } else if (!this.stock.unit) {
       this.toastrService.error("Enter item unit!");
+      return;
+    } else if (!this.stock.qty_alert_level === null || this.stock.qty_alert_level < 0) {
+      this.toastrService.error("Invalid quantity alert level!");
       return;
     };
 

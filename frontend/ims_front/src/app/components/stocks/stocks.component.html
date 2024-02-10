@@ -64,16 +64,21 @@
             <select class="lowercase border border-neutral-900 px-2 py-1 rounded-sm mt-1" name="stock.unit"
                 id="stock.unit" [(ngModel)]="stock.unit">
                 <option selected value="piece">piece</option>
-                <option value="bottle">bottle</option>
                 <option value="ml">ml</option>
                 <option value="gram">gram</option>
                 <option value="pack">pack</option>
+                <option value="bottle">bottle</option>
+                <option value="bottle">can</option>
                 <option class="text-neutral-500" value="otherUnit">other unit...</option>
             </select>
             <!-- Input field for custom unit when "other unit..." is selected -->
             <input class="lowercase" *ngIf="stock.unit === 'otherUnit'"
                 class="border border-neutral-900 px-2 py-1 rounded-sm mt-1" type="text" name="customUnit"
                 id="customUnit" [(ngModel)]="customUnit" placeholder="Please specify.">
+
+            <label class="mt-2 lg:mt-4" for="stock.qty_alert_level">Low Stock Alert Level:</label>
+            <input appSelectAllText class="border border-neutral-900 px-2 py-1 rounded-sm mt-1 text-center"
+                type="number" name="stock.qty_alert_level" id="stock.qty_alert_level" [(ngModel)]="stock.qty_alert_level" min="0">
 
             <div class="flex justify-around mt-4 lg:mt-6">
                 <div class="flex items-center">
@@ -99,7 +104,7 @@
             <!-- Submit Button -->
             <button class="mt-8 bg-neutral-800 text-neutral-300 font-bold p-2 rounded hover:bg-[rgb(48,48,48)] lg:mt-10"
                     type="submit" [disabled]="isLoading">
-                {{ proceedEdit? 'Update': 'Add' }}
+                {{ proceedEdit? 'Update': 'Save' }}
             </button>
         </form>
     </div>
@@ -123,9 +128,9 @@
                     <td class="py-1 p-0.5 md:px-1 md:py-2">{{stock.stock_name}}</td>
                     <td class="py-1 p-0.5 md:px-1 md:py-2">{{stock.description}}</td>
                     <td class="py-1 p-0.5 md:px-1 md:py-2" [ngClass]="{
-                            'text-[#ff0000]' : stock.quantity <= 60,
-                            'text-[#ffa500]': stock.quantity <= 120 && stock.quantity > 60,
-                            'font-semibold': stock.quantity <= 120,
+                            'text-[#ff0000]' : stock.quantity <= 0,
+                            'text-[#ffa500]': stock.quantity <= stock.qty_alert_level && stock.quantity >= 1,
+                            'font-semibold': stock.quantity <= stock.qty_alert_level,
                             }">
                         {{stock.quantity | number: '1.0-3'}}
                     </td>

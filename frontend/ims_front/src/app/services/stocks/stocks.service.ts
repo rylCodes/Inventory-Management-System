@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, catchError, throwError, of, BehaviorSubject, tap } from 'rxjs';
 import { Stock } from 'src/app/interface/Stock';
 import { environment } from 'src/environments/environment';
+import { AuthService } from '../auth/auth.service';
 
 const httpOptions = {
   headers: new HttpHeaders({
@@ -14,22 +15,12 @@ const httpOptions = {
   providedIn: 'root'
 })
 export class StocksService {
-  private stocks: Stock[] = [];
-  private stocksSubject: BehaviorSubject<Stock[]> = new BehaviorSubject<Stock[]>([]);
-  private hasFetchedData: boolean = false;
-  private guestApiUrl = 'https://guest-invenia-api.azurewebsites.net/'
-  private defaultApiUrl = environment.baseUrl;
   private apiUrl: string = '';
 
   searchQuery: string = "";
 
-  constructor(private http: HttpClient) { 
-    const guestMode = localStorage.getItem('guestMode');
-    if (guestMode) {
-      this.apiUrl = this.guestApiUrl;
-    } else {
-      this.apiUrl = this.defaultApiUrl;
-    };
+  constructor(private http: HttpClient, private authService: AuthService) { 
+    this.apiUrl = this.authService.getAPI();
   }
 
   handleStockError(error:any) {

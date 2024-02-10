@@ -4,6 +4,7 @@ import { BehaviorSubject, Observable, catchError, throwError, tap } from 'rxjs';
 import { Product } from 'src/app/interface/Product';
 import { Menu } from 'src/app/interface/Product';
 import { environment } from 'src/environments/environment';
+import { AuthService } from '../auth/auth.service';
 
 const httpOptions = {
   headers: new HttpHeaders({
@@ -23,13 +24,9 @@ export class ProductsService {
   private menusSubject: BehaviorSubject<Menu[]> = new BehaviorSubject<Menu[]>([]);
   private hasFetchedBills: boolean = false;
 
-  constructor(private http: HttpClient) { 
-    const guestMode = localStorage.getItem('guestMode');
-    if (guestMode) {
-      this.apiUrl = this.guestApiUrl;
-    } else {
-      this.apiUrl = this.defaultApiUrl;
-    };
+  constructor(private http: HttpClient, private autService: AuthService) { 
+    // const guestMode = localStorage.getItem('guestMode');
+    this.apiUrl = this.autService.getAPI();
   }
   
   handleError(err:any) {

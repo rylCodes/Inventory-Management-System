@@ -21,12 +21,7 @@ export class AuthService {
   private apiUrl: string = '';
 
   constructor(private http: HttpClient, private toastrService: ToastrService) {
-    const guestMode = localStorage.getItem('guestMode');
-    if (guestMode) {
-      this.apiUrl = this.guestApiUrl;
-    } else {
-      this.apiUrl = this.defaultApiUrl;
-    }
+    this.handleAPIurl();
    }
 
   handleLoginError(error: any): void {
@@ -74,6 +69,7 @@ export class AuthService {
     localStorage.removeItem("user");
     localStorage.removeItem("is_staff");
     localStorage.removeItem("guestMode");
+    this.handleAPIurl();
   }
 
   setToken(token: string): void {
@@ -82,6 +78,19 @@ export class AuthService {
 
   isAuthenticated() {
     return localStorage.getItem("authToken") !== null || localStorage.getItem('guestMode') === 'true';
+  }
+
+  handleAPIurl(): void {
+    const guestMode = localStorage.getItem('guestMode');
+    if (guestMode) {
+      this.apiUrl = this.guestApiUrl;
+    } else {
+      this.apiUrl = this.defaultApiUrl;
+    };
+  }
+
+  getAPI() {
+    return this.apiUrl;
   }
 
 // AuthService class ends here

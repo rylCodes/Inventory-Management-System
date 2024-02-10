@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, catchError, throwError, BehaviorSubject, of, tap, Subject } from 'rxjs';
 import { SaleBill, SaleItem } from 'src/app/interface/Sale';
 import { environment } from 'src/environments/environment';
+import { AuthService } from '../auth/auth.service';
 
 const httpOptions = {
   headers: new HttpHeaders({
@@ -25,13 +26,8 @@ export class SalesService {
   private hasFetchedBills: boolean = false;
   private serviceStatusSubject: Subject<boolean> = new Subject<boolean>();
 
-  constructor(private http: HttpClient) { 
-    const guestMode = localStorage.getItem('guestMode');
-    if (guestMode) {
-      this.apiUrl = this.guestApiUrl;
-    } else {
-      this.apiUrl = this.defaultApiUrl;
-    };
+  constructor(private http: HttpClient, private autService: AuthService) { 
+    this.apiUrl = this.autService.getAPI();
   }
   
   handleSaleError(err:any) {

@@ -48,7 +48,7 @@ export class NavbarComponent {
 
   logOut() {
     this.authService.clearToken();
-    location.href = '/#/login';
+    this.router.navigate(["login"]);
   }
 
 }

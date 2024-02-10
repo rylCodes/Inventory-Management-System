@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { BehaviorSubject, Observable, catchError, throwError, tap } from 'rxjs';
 import { Owner } from 'src/app/interface/Owner';
 import { environment } from 'src/environments/environment';
+import { AuthService } from '../auth/auth.service';
 
 const httpOptions = {
   headers: new HttpHeaders({
@@ -15,13 +16,9 @@ const httpOptions = {
 })
 export class OwnerService {
 
-  constructor(private http: HttpClient) { 
+  constructor(private http: HttpClient, private authService: AuthService) { 
     const guestMode = localStorage.getItem('guestMode');
-    if (guestMode) {
-      this.apiUrl = this.guestApiUrl;
-    } else {
-      this.apiUrl = this.defaultApiUrl;
-    }
+    this.apiUrl = this.authService.getAPI();
   }
   private owners: Owner[] = [];
   private ownersSubject: BehaviorSubject<Owner[]> = new BehaviorSubject<Owner[]>([]);

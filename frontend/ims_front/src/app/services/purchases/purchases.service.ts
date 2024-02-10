@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, catchError, throwError, of, BehaviorSubject, tap } from 'rxjs';
 import { PurchaseBill, PurchaseItem } from 'src/app/interface/Purchase';
 import { environment } from 'src/environments/environment';
+import { AuthService } from '../auth/auth.service';
 
 const httpOptions = {
   headers: new HttpHeaders({
@@ -23,13 +24,9 @@ export class PurchasesService {
   private billsSubject: BehaviorSubject<PurchaseBill[]> = new BehaviorSubject<PurchaseBill[]>([]);
   private hasFetchedData: boolean = false;
 
-  constructor(private http: HttpClient) { 
-    const guestMode = localStorage.getItem('guestMode');
-    if (guestMode) {
-      this.apiUrl = this.guestApiUrl;
-    } else {
-      this.apiUrl = this.defaultApiUrl;
-    };
+  constructor(private http: HttpClient, private autService: AuthService) { 
+    // const guestMode = localStorage.getItem('guestMode');
+    this.apiUrl = this.autService.getAPI();
   }
   
   handlePurchaseError(error:any) {

@@ -5,6 +5,7 @@ import { Notification } from 'src/app/interface/Notification';
 import { Stock } from 'src/app/interface/Stock';
 import { environment } from 'src/environments/environment';
 import { observableToBeFn } from 'rxjs/internal/testing/TestScheduler';
+import { AuthService } from '../auth/auth.service';
 
 const httpOptions = {
   headers: new HttpHeaders({
@@ -29,13 +30,9 @@ export class NotificationsService {
 
   stocks: Stock[] = [];
 
-  constructor(private http: HttpClient) { 
-    const guestMode = localStorage.getItem('guestMode');
-    if (guestMode) {
-      this.apiUrl = this.guestApiUrl;
-    } else {
-      this.apiUrl = this.defaultApiUrl;
-    }
+  constructor(private http: HttpClient, private authService: AuthService) { 
+    // const guestMode = localStorage.getItem('guestMode');
+    this.apiUrl = this.authService.getAPI();
   }
 
   handleError(err: any): void {

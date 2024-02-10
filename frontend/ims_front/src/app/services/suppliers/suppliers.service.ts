@@ -4,6 +4,7 @@ import { Observable, catchError, throwError, tap, BehaviorSubject } from 'rxjs';
 import { Supplier } from 'src/app/interface/Supplier';
 import { ToastrService } from 'ngx-toastr';
 import { environment } from 'src/environments/environment';
+import { AuthService } from '../auth/auth.service';
 
 const httpOptions = {
   headers: new HttpHeaders({
@@ -16,13 +17,10 @@ const httpOptions = {
 })
 export class SuppliersService {
 
-  constructor(private http: HttpClient, private toastrService: ToastrService) { 
+  constructor(private http: HttpClient, private toastrService: ToastrService, private authService: AuthService) { 
     const guestMode = localStorage.getItem('guestMode');
-    if (guestMode) {
-      this.apiUrl = this.guestApiUrl;
-    } else {
-      this.apiUrl = this.defaultApiUrl;
-    };
+    this.apiUrl = this.authService.getAPI();
+
   }
 
   private suppliers: Supplier[] = [];

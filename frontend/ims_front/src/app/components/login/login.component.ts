@@ -45,7 +45,7 @@ export class LoginComponent implements OnInit {
       .subscribe({
         next: async () => {
           this.isLoading = false;
-          location.href = '/';
+          this.router.navigate(['']);
           },
         error: (err) => {
           this.isLoading = false;
@@ -58,6 +58,6 @@ export class LoginComponent implements OnInit {
 
   logInAsGuest() {
     localStorage.setItem('guestMode', 'true');
-    location.href = '/';
+    this.router.navigate(['']);
   }
 }

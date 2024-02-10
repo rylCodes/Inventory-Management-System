@@ -198,7 +198,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   logOut() {
     this.authService.clearToken();
-    location.href = '/#/login';
+    this.router.navigate(['login']);
   }
 
   toggleLogOutActionModal() {

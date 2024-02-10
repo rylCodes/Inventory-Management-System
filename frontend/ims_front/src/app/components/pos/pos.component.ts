@@ -395,7 +395,7 @@ export class PosComponent implements OnInit, AfterContentChecked {
         this.owner = owners[0];
 
         if (owners.length === 0) {
-          this.toastrService.warning('Please create a business profile for the invoice details', undefined, { timeOut: 7000, });
+          this.toastrService.warning('Please create a business profile to enable invoice', undefined, { timeOut: 7000, });
         };
       },
       error: err => console.log(err)
@@ -884,7 +884,7 @@ export class PosComponent implements OnInit, AfterContentChecked {
             });
 
             if (!this.owner) {
-              this.toastrService.warning('Please create a business profile for the invoice details', undefined, { timeOut: 7000, });
+              this.toastrService.warning('Please create a business profile to enable invoice', undefined, { timeOut: 7000, });
               this.router.navigate(['profile']);
               return;
             } else {

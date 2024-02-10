@@ -15,8 +15,6 @@ const httpOptions = {
   providedIn: 'root'
 })
 export class PurchasesService {
-  private guestApiUrl = 'https://guest-invenia-api.azurewebsites.net/'
-  private defaultApiUrl = environment.baseUrl;
   private apiUrl: string = '';
 
   private bills: PurchaseBill[] = [];
@@ -24,9 +22,8 @@ export class PurchasesService {
   private billsSubject: BehaviorSubject<PurchaseBill[]> = new BehaviorSubject<PurchaseBill[]>([]);
   private hasFetchedData: boolean = false;
 
-  constructor(private http: HttpClient, private autService: AuthService) { 
-    // const guestMode = localStorage.getItem('guestMode');
-    this.apiUrl = this.autService.getAPI();
+  constructor(private http: HttpClient, private authService: AuthService) { 
+    this.authService.apiUrl$.subscribe(apiUrl => this.apiUrl = apiUrl);
   }
   
   handlePurchaseError(error:any) {

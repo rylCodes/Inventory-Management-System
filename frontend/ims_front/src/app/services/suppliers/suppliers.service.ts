@@ -17,21 +17,17 @@ const httpOptions = {
 })
 export class SuppliersService {
 
-  constructor(private http: HttpClient, private toastrService: ToastrService, private authService: AuthService) { 
-    const guestMode = localStorage.getItem('guestMode');
-    this.apiUrl = this.authService.getAPI();
-
-  }
-
   private suppliers: Supplier[] = [];
   private suppliersSubject: BehaviorSubject<Supplier[]> = new BehaviorSubject<Supplier[]>([]);
   private hasFetchedData: boolean = false;
 
-  private guestApiUrl = 'https://guest-invenia-api.azurewebsites.net/'
-  private defaultApiUrl = environment.baseUrl;
   private apiUrl: string = '';
 
   searchQuery: string | null = null;
+
+  constructor(private http: HttpClient, private toastrService: ToastrService, private authService: AuthService) { 
+    this.authService.apiUrl$.subscribe(apiUrl => this.apiUrl = apiUrl);
+  }
 
   handleSupplierError(error:any) {
     console.log('Error here →', error);

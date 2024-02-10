@@ -16,17 +16,14 @@ const httpOptions = {
   providedIn: 'root'
 })
 export class ProductsService {
-  private guestApiUrl = 'https://guest-invenia-api.azurewebsites.net/'
-  private defaultApiUrl = environment.baseUrl;
   private apiUrl: string = '';
 
   private menus: Menu[] = [];
   private menusSubject: BehaviorSubject<Menu[]> = new BehaviorSubject<Menu[]>([]);
   private hasFetchedBills: boolean = false;
 
-  constructor(private http: HttpClient, private autService: AuthService) { 
-    // const guestMode = localStorage.getItem('guestMode');
-    this.apiUrl = this.autService.getAPI();
+  constructor(private http: HttpClient, private authService: AuthService) { 
+    this.authService.apiUrl$.subscribe(apiUrl => this.apiUrl = apiUrl);
   }
   
   handleError(err:any) {

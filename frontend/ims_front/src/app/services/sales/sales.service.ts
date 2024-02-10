@@ -15,8 +15,6 @@ const httpOptions = {
   providedIn: 'root'
 })
 export class SalesService {
-  private guestApiUrl = 'https://guest-invenia-api.azurewebsites.net/'
-  private defaultApiUrl = environment.baseUrl;
   private apiUrl: string = '';
 
   private saleBills: SaleBill[] = [];
@@ -26,8 +24,8 @@ export class SalesService {
   private hasFetchedBills: boolean = false;
   private serviceStatusSubject: Subject<boolean> = new Subject<boolean>();
 
-  constructor(private http: HttpClient, private autService: AuthService) { 
-    this.apiUrl = this.autService.getAPI();
+  constructor(private http: HttpClient, private authService: AuthService) { 
+    this.authService.apiUrl$.subscribe(apiUrl => this.apiUrl = apiUrl);
   }
   
   handleSaleError(err:any) {

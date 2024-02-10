@@ -32,7 +32,7 @@ export class NotificationsService {
 
   constructor(private http: HttpClient, private authService: AuthService) { 
     // const guestMode = localStorage.getItem('guestMode');
-    this.apiUrl = this.authService.getAPI();
+    this.authService.apiUrl$.subscribe(apiUrl => this.apiUrl = apiUrl);
   }
 
   handleError(err: any): void {

@@ -17,15 +17,12 @@ const httpOptions = {
 export class OwnerService {
 
   constructor(private http: HttpClient, private authService: AuthService) { 
-    const guestMode = localStorage.getItem('guestMode');
-    this.apiUrl = this.authService.getAPI();
+    this.authService.apiUrl$.subscribe(apiUrl => this.apiUrl = apiUrl);
   }
   private owners: Owner[] = [];
   private ownersSubject: BehaviorSubject<Owner[]> = new BehaviorSubject<Owner[]>([]);
   private hasFetchedData: boolean = false;
 
-  private guestApiUrl = 'https://guest-invenia-api.azurewebsites.net/'
-  private defaultApiUrl = environment.baseUrl;
   private apiUrl: string = '';
 
   searchQuery: string | null = null;

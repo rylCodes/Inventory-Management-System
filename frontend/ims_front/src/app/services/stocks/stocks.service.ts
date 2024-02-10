@@ -20,7 +20,7 @@ export class StocksService {
   searchQuery: string = "";
 
   constructor(private http: HttpClient, private authService: AuthService) { 
-    this.apiUrl = this.authService.getAPI();
+    this.authService.apiUrl$.subscribe(apiUrl => this.apiUrl = apiUrl);
   }
 
   handleStockError(error:any) {

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { catchError, map } from 'rxjs/operators';
-import { throwError } from 'rxjs';
+import { BehaviorSubject, throwError } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { environment } from 'src/environments/environment';
 
@@ -18,7 +18,8 @@ export class AuthService {
   private guestApiUrl = 'https://guest-invenia-api.azurewebsites.net/'
   private defaultApiUrl = environment.baseUrl;
 
-  private apiUrl: string = '';
+  private apiUrlSubject = new BehaviorSubject<string>(this.defaultApiUrl);
+  apiUrl$ = this.apiUrlSubject.asObservable();
 
   constructor(private http: HttpClient, private toastrService: ToastrService) {
     this.handleAPIurl();
@@ -37,7 +38,7 @@ export class AuthService {
   }
 
   login(form: {username: string, password: string}) {
-    return this.http.post<any>(this.apiUrl + 'accounts/auth/', form, httpOptions).pipe(
+    return this.http.post<any>(this.apiUrlSubject + 'accounts/auth/', form, httpOptions).pipe(
       catchError((error) => {
         if (error) {
           this.handleLoginError(error);
@@ -56,7 +57,7 @@ export class AuthService {
   }
 
   async logInAsGuest() {
-    this.apiUrl = this.guestApiUrl;
+    this.apiUrlSubject.next(this.guestApiUrl);
     localStorage.setItem('guestMode', 'true');
   }
 
@@ -87,14 +88,10 @@ export class AuthService {
   handleAPIurl(): void {
     const guestMode = localStorage.getItem('guestMode');
     if (guestMode) {
-      this.apiUrl = this.guestApiUrl;
+      this.apiUrlSubject.next(this.guestApiUrl);
     } else {
-      this.apiUrl = this.defaultApiUrl;
+      this.apiUrlSubject.next(this.defaultApiUrl);
     };
-  }
-
-  getAPI() {
-    return this.apiUrl;
   }
 
 // AuthService class ends here

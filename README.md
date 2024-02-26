@@ -11,7 +11,7 @@ Invenia+ is an inventory management system built using Angular, Tailwind CSS, Dj
 
 ## Deployment
 - **Frontend:** Hosted on Azure Static.
-- **Backend:** Deployed on Azure App Service. Please note that the actual backend source code for authorized users is deployed in a separate Git repository. The backend code available in this repository is for Guest Mode only. During deployment, you may see errors due to the deployment of both frontend and backend code together, but the actual deployed application is fully functional.
+- **Backend:** Deployed on Azure App Service. Please note that the actual backend source code, which utilizes Azure PostgreSQL for authorized users, is deployed in a separate private Git repository. The backend code available for Guest Mode can be found in the [guest-invenia-backend](https://github.com/rylCodes/guest-invenia-backend/) repository.
 
 ## Future Plans
 - **WebSocket Integration:** Notifications will transition to WebSocket for real-time updates.

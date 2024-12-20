@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { RouterModule, Routes } from '@angular/router';
-import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http'
+import { RouterModule, Routes, UrlSerializer } from '@angular/router';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -13,9 +13,11 @@ import { ChartModule } from 'angular-highcharts';
 import { DatePipe } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 
+import { REMOVE_STYLES_ON_COMPONENT_DESTROY } from '@angular/platform-browser';
 import { authGuard } from './guard/auth.guard';
 import { AuthService } from './services/auth/auth.service';
 import { AuthInterceptor } from './interceptor/auth.interceptor';
+import { DefaultUrlSerializer, UrlTree } from '@angular/router';
 
 import { SelectAllTextDirective } from './directives/select-all-text/select-all-text.directive';
 import { FocusOnShowDirective } from './directives/focus-on-show/focus-on-show.directive';
@@ -40,17 +42,37 @@ import { ChartsComponent } from './components/charts/charts.component';
 import { ProfileComponent } from './components/profile/profile.component';
 
 const appRoutes: Routes = [
-  {path: 'login', component: LoginComponent},
-  {path: '', component: DashboardComponent, canActivate: [authGuard]},
-  {path: 'stocks', component: StocksComponent, canActivate: [authGuard]},
-  {path: 'products', component: ProductsComponent, canActivate: [authGuard]},
-  {path: 'pos', component: PosComponent, canActivate: [authGuard]},
-  {path: 'suppliers', component: SuppliersComponent, canActivate: [authGuard]},
-  {path: 'purchases', component: PurchasesComponent, canActivate: [authGuard]},
-  {path: 'sales', component: SalesComponent, canActivate: [authGuard]},
-  {path: 'about', component: AboutComponent, canActivate: [authGuard]},
-  {path: 'profile', component: ProfileComponent, canActivate: [authGuard]},
-]
+  { path: 'login', component: LoginComponent },
+  { path: '', component: DashboardComponent, canActivate: [authGuard] },
+  { path: 'stocks', component: StocksComponent, canActivate: [authGuard] },
+  { path: 'products', component: ProductsComponent, canActivate: [authGuard] },
+  { path: 'pos', component: PosComponent, canActivate: [authGuard] },
+  {
+    path: 'suppliers',
+    component: SuppliersComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'purchases',
+    component: PurchasesComponent,
+    canActivate: [authGuard],
+  },
+  { path: 'sales', component: SalesComponent, canActivate: [authGuard] },
+  { path: 'about', component: AboutComponent, canActivate: [authGuard] },
+  { path: 'profile', component: ProfileComponent, canActivate: [authGuard] },
+];
+
+class CustomUrlSerializer extends DefaultUrlSerializer {
+  override parse(url: string): UrlTree {
+    try {
+      return super.parse(url);
+    } catch (error) {
+      console.error('URL parsing error:', error, url);
+      // Handle the error, e.g., redirect to the home page
+      return this.parse('/');
+    }
+  }
+}
 
 @NgModule({
   declarations: [
@@ -79,7 +101,12 @@ const appRoutes: Routes = [
     MatIconModule,
     BrowserModule,
     AppRoutingModule,
-    RouterModule.forRoot(appRoutes, { useHash: true }),
+    RouterModule.forRoot(appRoutes, {
+      useHash: true,
+      paramsInheritanceStrategy: 'always',
+      canceledNavigationResolution: 'replace',
+      urlUpdateStrategy: 'deferred',
+    }),
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
@@ -91,7 +118,6 @@ const appRoutes: Routes = [
     ToastrModule.forRoot({
       positionClass: 'toast-top-center',
       closeButton: true,
-      // progressBar: true,
       preventDuplicates: true,
       resetTimeoutOnDuplicate: true,
       timeOut: 3000,
@@ -100,12 +126,20 @@ const appRoutes: Routes = [
   providers: [
     DatePipe,
     AuthService,
-      {
-        provide: HTTP_INTERCEPTORS,
-        useClass: AuthInterceptor,
-        multi: true,
-      }
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true,
+    },
+    {
+      provide: REMOVE_STYLES_ON_COMPONENT_DESTROY,
+      useValue: false,
+    },
+    {
+      provide: UrlSerializer,
+      useClass: CustomUrlSerializer,
+    },
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

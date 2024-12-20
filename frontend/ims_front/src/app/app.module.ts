@@ -1,7 +1,11 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouterModule, Routes, UrlSerializer } from '@angular/router';
-import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
+import {
+  HTTP_INTERCEPTORS,
+  provideHttpClient,
+  withInterceptorsFromDi,
+} from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -97,6 +101,7 @@ class CustomUrlSerializer extends DefaultUrlSerializer {
     ChartsComponent,
     ProfileComponent,
   ],
+  bootstrap: [AppComponent],
   imports: [
     MatIconModule,
     BrowserModule,
@@ -107,7 +112,6 @@ class CustomUrlSerializer extends DefaultUrlSerializer {
       canceledNavigationResolution: 'replace',
       urlUpdateStrategy: 'deferred',
     }),
-    HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
     FontAwesomeModule,
@@ -139,7 +143,7 @@ class CustomUrlSerializer extends DefaultUrlSerializer {
       provide: UrlSerializer,
       useClass: CustomUrlSerializer,
     },
+    provideHttpClient(withInterceptorsFromDi()),
   ],
-  bootstrap: [AppComponent],
 })
 export class AppModule {}

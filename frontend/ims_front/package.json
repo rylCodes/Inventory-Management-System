@@ -32,7 +32,8 @@
     "ngx-pagination": "^6.0.3",
     "ngx-print": "^1.5.0",
     "ngx-toastr": "^18.0.0",
-    "rxjs": "~7.8.0"
+    "rxjs": "~7.8.0",
+    "zone.js": "^0.15.0"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^16.2.10",
